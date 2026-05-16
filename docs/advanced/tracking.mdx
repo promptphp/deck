@@ -1,31 +1,9 @@
-# Tracking & Performance
+---
+title: "Tracking & performance"
+description: "Execution logging, database schema, Eloquent models, and analytics for prompt performance monitoring."
+sidebarTitle: "Tracking"
+---
 
-- [Introduction](#introduction)
-- [Setup](#setup)
-    - [Enable Tracking](#enable-tracking)
-    - [Publish Migrations](#publish-migrations)
-    - [Database Connection](#database-connection)
-- [Database Schema](#database-schema)
-    - [prompt_versions Table](#prompt-versions-table)
-    - [prompt_executions Table](#prompt-executions-table)
-- [Recording Executions](#recording-executions)
-    - [Manual Tracking](#manual-tracking)
-    - [Automatic Tracking via Middleware](#automatic-tracking)
-    - [Tracked Fields](#tracked-fields)
-- [Eloquent Models](#eloquent-models)
-    - [PromptVersion](#prompt-version-model)
-    - [PromptExecution](#prompt-execution-model)
-- [Factories](#factories)
-    - [PromptVersionFactory](#prompt-version-factory)
-    - [PromptExecutionFactory](#prompt-execution-factory)
-- [Querying Execution Data](#querying-execution-data)
-    - [Basic Queries](#basic-queries)
-    - [Performance Analysis](#performance-analysis)
-    - [A/B Testing](#ab-testing)
-    - [Cost Analysis](#cost-analysis)
-- [Version Management via Database](#version-management-via-database)
-
-<a name="introduction"></a>
 ## Introduction
 
 Prompt Deck includes an optional database tracking system that logs prompt versions and execution data. This enables:
@@ -38,11 +16,9 @@ Prompt Deck includes an optional database tracking system that logs prompt versi
 
 Tracking is entirely optional. Prompt Deck works fully without it.
 
-<a name="setup"></a>
 ## Setup
 
-<a name="enable-tracking"></a>
-### Enable Tracking
+### Enable tracking
 
 Set the tracking configuration in `config/prompt-deck.php`:
 
@@ -61,8 +37,7 @@ PROMPTDECK_TRACKING_ENABLED=true
 
 By default, tracking is **disabled** when `APP_DEBUG=true` and **enabled** in production.
 
-<a name="publish-migrations"></a>
-### Publish Migrations
+### Publish migrations
 
 Publish and run the migrations to create the required tables:
 
@@ -71,8 +46,7 @@ php artisan vendor:publish --tag=prompt-deck-migrations
 php artisan migrate
 ```
 
-<a name="database-connection"></a>
-### Database Connection
+### Database connection
 
 By default, tracking uses your application's default database connection. To store tracking data on a separate database:
 
@@ -82,61 +56,60 @@ PROMPTDECK_DB_CONNECTION=analytics
 
 The connection name must match a connection defined in `config/database.php`.
 
-<a name="database-schema"></a>
-## Database Schema
+## Database schema
 
-<a name="prompt-versions-table"></a>
-### prompt_versions Table
+### prompt_versions table
 
 Stores prompt version records and tracks which version is active.
 
-| Column | Type | Nullable | Description |
-|---|---|---|---|
-| `id` | `bigint` | No | Auto-incrementing primary key. |
-| `name` | `string` | No | The prompt name (e.g. `order-summary`). |
-| `version` | `unsigned int` | No | The version number (e.g. `1`, `2`, `3`). |
-| `system_prompt` | `text` | Yes | The system prompt content. |
-| `user_prompt` | `text` | No | The user prompt content. |
-| `metadata` | `json` | Yes | Version metadata as JSON. |
-| `is_active` | `boolean` | No | Whether this version is the active version. Default: `false`. |
-| `created_at` | `timestamp` | Yes | Creation timestamp. |
-| `updated_at` | `timestamp` | Yes | Last update timestamp. |
+| Column          | Type           | Nullable | Description                                                   |
+| --------------- | -------------- | -------- | ------------------------------------------------------------- |
+| `id`            | `bigint`       | No       | Auto-incrementing primary key.                                |
+| `name`          | `string`       | No       | The prompt name (e.g. `order-summary`).                       |
+| `version`       | `unsigned int` | No       | The version number (e.g. `1`, `2`, `3`).                      |
+| `system_prompt` | `text`         | Yes      | The system prompt content.                                    |
+| `user_prompt`   | `text`         | No       | The user prompt content.                                      |
+| `metadata`      | `json`         | Yes      | Version metadata as JSON.                                     |
+| `is_active`     | `boolean`      | No       | Whether this version is the active version. Default: `false`. |
+| `created_at`    | `timestamp`    | Yes      | Creation timestamp.                                           |
+| `updated_at`    | `timestamp`    | Yes      | Last update timestamp.                                        |
 
 **Indexes:**
+
 - Unique index on `(name, version)` — ensures no duplicate versions per prompt.
 - Index on `(name, is_active)` — fast lookups for the active version.
 
-<a name="prompt-executions-table"></a>
-### prompt_executions Table
+### prompt_executions table
 
 Logs individual prompt executions with performance data.
 
-| Column | Type | Nullable | Description |
-|---|---|---|---|
-| `id` | `bigint` | No | Auto-incrementing primary key. |
-| `prompt_name` | `string` | No | The prompt name. |
-| `prompt_version` | `unsigned int` | No | The prompt version used. |
-| `input` | `json` | Yes | The input sent to the AI provider. |
-| `output` | `text` | Yes | The response received from the AI provider. |
-| `tokens` | `unsigned int` | Yes | Total token usage (input + output). |
-| `latency_ms` | `unsigned int` | Yes | Round-trip time in milliseconds. |
-| `cost` | `decimal(8,6)` | Yes | Estimated cost in your currency. |
-| `model` | `string` | Yes | The AI model used (e.g. `gpt-4o`). |
-| `provider` | `string` | Yes | The AI provider (e.g. `openai`, `anthropic`). |
-| `feedback` | `json` | Yes | User feedback (ratings, comments, etc.). |
-| `created_at` | `timestamp` | Yes | Execution timestamp. |
+| Column           | Type           | Nullable | Description                                   |
+| ---------------- | -------------- | -------- | --------------------------------------------- |
+| `id`             | `bigint`       | No       | Auto-incrementing primary key.                |
+| `prompt_name`    | `string`       | No       | The prompt name.                              |
+| `prompt_version` | `unsigned int` | No       | The prompt version used.                      |
+| `input`          | `json`         | Yes      | The input sent to the AI provider.            |
+| `output`         | `text`         | Yes      | The response received from the AI provider.   |
+| `tokens`         | `unsigned int` | Yes      | Total token usage (input + output).           |
+| `latency_ms`     | `unsigned int` | Yes      | Round-trip time in milliseconds.              |
+| `cost`           | `decimal(8,6)` | Yes      | Estimated cost in your currency.              |
+| `model`          | `string`       | Yes      | The AI model used (e.g. `gpt-4o`).            |
+| `provider`       | `string`       | Yes      | The AI provider (e.g. `openai`, `anthropic`). |
+| `feedback`       | `json`         | Yes      | User feedback (ratings, comments, etc.).      |
+| `created_at`     | `timestamp`    | Yes      | Execution timestamp.                          |
 
 **Indexes:**
+
 - Index on `(prompt_name, prompt_version, created_at)` — fast filtering by prompt and time range.
 
-> **Note**
-> The `prompt_executions` table does not have an `updated_at` column. Records are insert-only.
+<Note>
+    The `prompt_executions` table does not have an `updated_at` column. Records
+    are insert-only.
+</Note>
 
-<a name="recording-executions"></a>
-## Recording Executions
+## Recording executions
 
-<a name="manual-tracking"></a>
-### Manual Tracking
+### Manual tracking
 
 Use the `PromptDeck::track()` method to record an execution manually:
 
@@ -170,31 +143,27 @@ PromptDeck::track('order-summary', 2, [
 
 If tracking is disabled in configuration, the `track()` method is a safe no-op — you can call it without checking configuration first.
 
-<a name="automatic-tracking"></a>
-### Automatic Tracking via Middleware
+### Automatic tracking via middleware
 
-When using the [Laravel AI SDK integration](ai-sdk.md), the `TrackPromptMiddleware` handles tracking automatically. See [AI SDK — Performance Tracking Middleware](ai-sdk.md#performance-tracking-middleware) for setup details.
+When using the [Laravel AI SDK integration](/integrations/ai-sdk), the `TrackPromptMiddleware` handles tracking automatically. See [AI SDK — Performance Tracking Middleware](/integrations/ai-sdk#performance-tracking-middleware) for setup details.
 
-<a name="tracked-fields"></a>
-### Tracked Fields
+### Tracked fields
 
-| Field | Type | Description |
-|---|---|---|
-| `input` | `array\|null` | The input data sent to the AI provider. Stored as JSON. |
-| `output` | `string\|null` | The text response from the AI provider. |
-| `tokens` | `int\|null` | Total token count (input + output tokens). |
-| `latency` | `float\|null` | Round-trip time in milliseconds. Stored as `latency_ms`. |
-| `cost` | `float\|null` | Estimated cost. Stored with up to 6 decimal places. |
-| `model` | `string\|null` | AI model identifier (e.g. `gpt-4o`, `claude-3-sonnet`). |
-| `provider` | `string\|null` | AI provider name (e.g. `openai`, `anthropic`). |
-| `feedback` | `array\|null` | Arbitrary feedback data. Stored as JSON. |
+| Field      | Type           | Description                                              |
+| ---------- | -------------- | -------------------------------------------------------- |
+| `input`    | `array\|null`  | The input data sent to the AI provider. Stored as JSON.  |
+| `output`   | `string\|null` | The text response from the AI provider.                  |
+| `tokens`   | `int\|null`    | Total token count (input + output tokens).               |
+| `latency`  | `float\|null`  | Round-trip time in milliseconds. Stored as `latency_ms`. |
+| `cost`     | `float\|null`  | Estimated cost. Stored with up to 6 decimal places.      |
+| `model`    | `string\|null` | AI model identifier (e.g. `gpt-4o`, `claude-3-sonnet`).  |
+| `provider` | `string\|null` | AI provider name (e.g. `openai`, `anthropic`).           |
+| `feedback` | `array\|null`  | Arbitrary feedback data. Stored as JSON.                 |
 
-<a name="eloquent-models"></a>
-## Eloquent Models
+## Eloquent models
 
 Prompt Deck provides two Eloquent models for interacting with tracking data.
 
-<a name="prompt-version-model"></a>
 ### PromptVersion
 
 `Veeqtoh\PromptDeck\Models\PromptVersion`
@@ -219,13 +188,12 @@ $versions = PromptVersion::where('name', 'order-summary')
 
 **Casts:**
 
-| Attribute | Cast |
-|---|---|
-| `version` | `integer` |
+| Attribute   | Cast      |
+| ----------- | --------- |
+| `version`   | `integer` |
 | `is_active` | `boolean` |
-| `metadata` | `array` |
+| `metadata`  | `array`   |
 
-<a name="prompt-execution-model"></a>
 ### PromptExecution
 
 `Veeqtoh\PromptDeck\Models\PromptExecution`
@@ -251,24 +219,24 @@ $v2Executions = PromptExecution::where('prompt_name', 'order-summary')
 
 **Casts:**
 
-| Attribute | Cast |
-|---|---|
-| `prompt_version` | `integer` |
-| `tokens` | `integer` |
-| `latency_ms` | `integer` |
-| `cost` | `decimal:6` |
-| `input` | `array` |
-| `feedback` | `array` |
+| Attribute        | Cast        |
+| ---------------- | ----------- |
+| `prompt_version` | `integer`   |
+| `tokens`         | `integer`   |
+| `latency_ms`     | `integer`   |
+| `cost`           | `decimal:6` |
+| `input`          | `array`     |
+| `feedback`       | `array`     |
 
-> **Note**
-> `PromptExecution` sets `UPDATED_AT = null` since execution records are insert-only and never updated.
+<Note>
+    `PromptExecution` sets `UPDATED_AT = null` since execution records are
+    insert-only and never updated.
+</Note>
 
-<a name="factories"></a>
 ## Factories
 
 Both models include factories for testing.
 
-<a name="prompt-version-factory"></a>
 ### PromptVersionFactory
 
 ```php
@@ -290,13 +258,12 @@ $version = PromptVersion::factory()
 
 **Available states:**
 
-| Method | Description |
-|---|---|
-| `active()` | Mark as the active version (`is_active = true`). |
-| `version(int $v)` | Set a specific version number. |
-| `named(string $name)` | Set a specific prompt name. |
+| Method                | Description                                      |
+| --------------------- | ------------------------------------------------ |
+| `active()`            | Mark as the active version (`is_active = true`). |
+| `version(int $v)`     | Set a specific version number.                   |
+| `named(string $name)` | Set a specific prompt name.                      |
 
-<a name="prompt-execution-factory"></a>
 ### PromptExecutionFactory
 
 ```php
@@ -321,17 +288,15 @@ $execution = PromptExecution::factory()
 
 **Available states:**
 
-| Method | Description |
-|---|---|
-| `withFeedback(array $feedback = [])` | Include user feedback. Generates random feedback if no argument given. |
-| `minimal()` | Set all optional fields to `null`. |
-| `forPrompt(string $name, int $version)` | Set a specific prompt name and version. |
+| Method                                  | Description                                                            |
+| --------------------------------------- | ---------------------------------------------------------------------- |
+| `withFeedback(array $feedback = [])`    | Include user feedback. Generates random feedback if no argument given. |
+| `minimal()`                             | Set all optional fields to `null`.                                     |
+| `forPrompt(string $name, int $version)` | Set a specific prompt name and version.                                |
 
-<a name="querying-execution-data"></a>
-## Querying Execution Data
+## Querying execution data
 
-<a name="basic-queries"></a>
-### Basic Queries
+### Basic queries
 
 ```php
 use Veeqtoh\PromptDeck\Models\PromptExecution;
@@ -350,8 +315,7 @@ $recent = PromptExecution::where('prompt_name', 'order-summary')
     ->get();
 ```
 
-<a name="performance-analysis"></a>
-### Performance Analysis
+### Performance analysis
 
 ```php
 // Average latency for a prompt version
@@ -372,8 +336,7 @@ $p95 = PromptExecution::where('prompt_name', 'order-summary')
     ->value('latency_ms');
 ```
 
-<a name="ab-testing"></a>
-### A/B Testing
+### A/B testing
 
 Compare metrics across prompt versions:
 
@@ -394,8 +357,7 @@ $ratings = PromptExecution::where('prompt_name', 'order-summary')
     ->get();
 ```
 
-<a name="cost-analysis"></a>
-### Cost Analysis
+### Cost analysis
 
 ```php
 // Total cost for a prompt
@@ -417,8 +379,7 @@ $dailyCost = PromptExecution::where('prompt_name', 'order-summary')
     ->get();
 ```
 
-<a name="version-management-via-database"></a>
-## Version Management via Database
+## Version management via database
 
 When tracking is enabled, version activation is managed through the `prompt_versions` table instead of `metadata.json` files. This provides a centralised, queryable record of version history.
 

@@ -1,34 +1,15 @@
-# Testing
+---
+title: "Testing"
+description: "Testing strategies and examples for prompts, commands, tracking, and AI SDK integration."
+---
 
-- [Introduction](#introduction)
-- [Setting Up Tests](#setting-up-tests)
-    - [Test Base Class](#test-base-class)
-    - [Disabling Cache and Tracking](#disabling-cache-and-tracking)
-- [Testing Prompts](#testing-prompts)
-    - [Creating Test Prompt Files](#creating-test-prompt-files)
-    - [Testing Prompt Loading](#testing-prompt-loading)
-    - [Testing Variable Interpolation](#testing-variable-interpolation)
-    - [Testing Roles](#testing-roles)
-    - [Testing Messages Output](#testing-messages-output)
-- [Testing with the Facade](#testing-with-the-facade)
-- [Testing Version Management](#testing-version-management)
-- [Testing Execution Tracking](#testing-execution-tracking)
-    - [Using Factories](#using-factories)
-- [Testing Artisan Commands](#testing-artisan-commands)
-- [Testing AI SDK Integration](#testing-ai-sdk-integration)
-    - [Testing HasPromptTemplate](#testing-hasprompttemplate)
-    - [Clearing Cached Templates](#clearing-cached-templates)
-
-<a name="introduction"></a>
 ## Introduction
 
 Prompt Deck is designed to be easily testable. This guide covers strategies for testing prompts, commands, tracking, and AI SDK integration in your Laravel application.
 
-<a name="setting-up-tests"></a>
-## Setting Up Tests
+## Setting up tests
 
-<a name="test-base-class"></a>
-### Test Base Class
+### Test base class
 
 If you're using Orchestra Testbench (recommended for package testing), register the service provider in your test case:
 
@@ -58,8 +39,7 @@ abstract class TestCase extends BaseTestCase
 }
 ```
 
-<a name="disabling-cache-and-tracking"></a>
-### Disabling Cache and Tracking
+### Disabling cache and tracking
 
 For most tests, disable caching and tracking to avoid side effects:
 
@@ -77,11 +57,9 @@ protected function getFixturePath(string $path = ''): string
 }
 ```
 
-<a name="testing-prompts"></a>
-## Testing Prompts
+## Testing prompts
 
-<a name="creating-test-prompt-files"></a>
-### Creating Test Prompt Files
+### Creating test prompt files
 
 Create fixture prompt files in your test directory:
 
@@ -98,17 +76,18 @@ tests/
 ```
 
 `tests/fixtures/prompts/order-summary/v1/system.md`:
+
 ```markdown
 You are a {{ $tone }} AI assistant specialized in order summaries.
 ```
 
 `tests/fixtures/prompts/order-summary/v1/user.md`:
+
 ```markdown
 Summarise this order: {{ $input }}
 ```
 
-<a name="testing-prompt-loading"></a>
-### Testing Prompt Loading
+### Testing prompt loading
 
 ```php
 use Veeqtoh\PromptDeck\Facades\PromptDeck;
@@ -129,8 +108,7 @@ it('throws when version does not exist', function () {
 })->throws(\Veeqtoh\PromptDeck\Exceptions\InvalidVersionException::class);
 ```
 
-<a name="testing-variable-interpolation"></a>
-### Testing Variable Interpolation
+### Testing variable interpolation
 
 ```php
 it('interpolates variables in prompt content', function () {
@@ -151,8 +129,7 @@ it('leaves unmatched placeholders intact', function () {
 });
 ```
 
-<a name="testing-roles"></a>
-### Testing Roles
+### Testing roles
 
 ```php
 it('lists available roles', function () {
@@ -183,8 +160,7 @@ it('gets raw content without interpolation', function () {
 });
 ```
 
-<a name="testing-messages-output"></a>
-### Testing Messages Output
+### Testing messages output
 
 ```php
 it('builds messages array for AI APIs', function () {
@@ -207,8 +183,7 @@ it('filters messages to specific roles', function () {
 });
 ```
 
-<a name="testing-with-the-facade"></a>
-## Testing with the Facade
+## Testing with the facade
 
 You can mock the facade in tests where you don't want filesystem access:
 
@@ -232,8 +207,7 @@ it('uses a mocked prompt', function () {
 });
 ```
 
-<a name="testing-version-management"></a>
-## Testing Version Management
+## Testing version management
 
 ```php
 it('lists all versions for a prompt', function () {
@@ -251,8 +225,7 @@ it('activates a specific version', function () {
 });
 ```
 
-<a name="testing-execution-tracking"></a>
-## Testing Execution Tracking
+## Testing execution tracking
 
 When testing tracking, enable it and run the migrations in your test setup:
 
@@ -293,8 +266,7 @@ it('does not track when disabled', function () {
 });
 ```
 
-<a name="using-factories"></a>
-### Using Factories
+### Using factories
 
 Use the included factories to seed test data:
 
@@ -326,8 +298,7 @@ it('finds the active version', function () {
 });
 ```
 
-<a name="testing-artisan-commands"></a>
-## Testing Artisan Commands
+## Testing Artisan commands
 
 ```php
 use Illuminate\Support\Facades\File;
@@ -369,9 +340,6 @@ it('tests a prompt via prompt:test', function () {
 it('shows diff between versions', function () {
     $this->artisan('make:prompt', ['name' => 'diff-test']);
 
-    // Create v2 by answering the interactive prompt
-    // Or set up fixtures with two versions
-
     $this->artisan('prompt:diff', [
         'name'  => 'diff-test',
         '--v1'  => 1,
@@ -380,10 +348,8 @@ it('shows diff between versions', function () {
 });
 ```
 
-<a name="testing-ai-sdk-integration"></a>
-## Testing AI SDK Integration
+## Testing AI SDK integration
 
-<a name="testing-hasprompttemplate"></a>
 ### Testing HasPromptTemplate
 
 Create a test agent class that uses the trait:
@@ -417,8 +383,7 @@ it('returns empty array for default variables', function () {
 });
 ```
 
-<a name="clearing-cached-templates"></a>
-### Clearing Cached Templates
+### Clearing cached templates
 
 When testing with different prompt versions:
 
@@ -438,5 +403,7 @@ it('clears cached template between tests', function () {
 });
 ```
 
-> **Tip**
-> Always call `forgetPromptTemplate()` in tests where you modify prompt files or change the active version between assertions.
+<Tip>
+    Always call `forgetPromptTemplate()` in tests where you modify prompt files
+    or change the active version between assertions.
+</Tip>
