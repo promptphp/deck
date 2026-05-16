@@ -9,40 +9,35 @@
   },
   "favicon": "/logo/logo.svg",
   "navigation": {
-    "tabs": [
+    "groups": [
       {
-        "tab": "Documentation",
-        "groups": [
-          {
-            "group": "Getting started",
-            "pages": [
-              "getting-started/introduction",
-              "getting-started/installation",
-              "getting-started/configuration"
-            ]
-          },
-          {
-            "group": "Core concepts",
-            "pages": [
-              "core/prompts",
-              "core/make-prompt",
-              "core/commands"
-            ]
-          },
-          {
-            "group": "Integrations",
-            "pages": [
-              "integrations/ai-sdk"
-            ]
-          },
-          {
-            "group": "Advanced",
-            "pages": [
-              "advanced/tracking",
-              "advanced/testing",
-              "advanced/api-reference"
-            ]
-          }
+        "group": "Getting started",
+        "pages": [
+          "getting-started/introduction",
+          "getting-started/installation",
+          "getting-started/configuration"
+        ]
+      },
+      {
+        "group": "Core concepts",
+        "pages": [
+          "core/prompts",
+          "core/make-prompt",
+          "core/commands"
+        ]
+      },
+      {
+        "group": "Integrations",
+        "pages": [
+          "integrations/ai-sdk"
+        ]
+      },
+      {
+        "group": "Advanced",
+        "pages": [
+          "advanced/tracking",
+          "advanced/testing",
+          "advanced/api-reference"
         ]
       }
     ],
@@ -50,7 +45,7 @@
       "anchors": [
         {
           "anchor": "GitHub",
-          "href": "https://github.com/veeqtoh/prompt-deck",
+          "href": "https://github.com/promptphp/prompt-deck",
           "icon": "github"
         },
         {
@@ -62,8 +57,8 @@
     }
   },
   "logo": {
-    "light": "/logo/logo.svg",
-    "dark": "/logo/logo.svg"
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
   },
   "navbar": {
     "links": [

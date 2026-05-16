@@ -1,12 +1,15 @@
-<p align="center"><img src="/docs/public/logo.svg" alt="Prompt Deck Logo"></p>
+<p align="center"><img src="/docs/logo/banner.svg" alt="Prompt Deck Logo"></p>
 
 <p align="center">
 <a href="https://packagist.org/packages/veeqtoh/prompt-deck"><img src="https://img.shields.io/packagist/v/veeqtoh/prompt-deck?style=flat-square" alt="Latest Version on Packagist"></a>
 <a href="https://packagist.org/packages/veeqtoh/prompt-deck"><img src="https://img.shields.io/packagist/php-v/veeqtoh/prompt-deck?style=flat-square" alt="PHP from Packagist"></a>
 <a href="https://github.com/veeqtoh/prompt-deck/blob/master/LICENSE"><img src="https://img.shields.io/github/license/veeqtoh/prompt-deck?style=flat-square" alt="GitHub license"></a>
+<a href="https://packagist.org/packages/veeqtoh/prompt-deck">
+  <img src="https://img.shields.io/packagist/dt/veeqtoh/prompt-deck?style=flat-square" alt="Total Downloads on Packagist">
+</a>
 <a href="https://laravel-news.com/prompt-deck-manage-ai-prompts-as-versioned-files-in-laravel/">
-    <img src="https://img.shields.io/badge/Featured in Laravel News-%FF0000.svg?&style=flat-square&logo=laravel&logoColor=white"  alt="https://laravel-news.com/prompt-deck-manage-ai-prompts-as-versioned-files-in-laravel"/>
-  </a>
+  <img src="https://img.shields.io/badge/Featured%20in%20Laravel%20News-F9322C?style=flat-square&logo=laravel&logoColor=white" alt="Featured in Laravel News">
+</a>
 </p>
 
 ## Introduction
