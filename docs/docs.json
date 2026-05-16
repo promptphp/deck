@@ -1,0 +1,97 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Prompt Deck by PromptPHP",
+  "colors": {
+    "primary": "#6366F1",
+    "light": "#818CF8",
+    "dark": "#4F46E5"
+  },
+  "favicon": "/logo/logo.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting started",
+            "pages": [
+              "getting-started/introduction",
+              "getting-started/installation",
+              "getting-started/configuration"
+            ]
+          },
+          {
+            "group": "Core concepts",
+            "pages": [
+              "core/prompts",
+              "core/make-prompt",
+              "core/commands"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "integrations/ai-sdk"
+            ]
+          },
+          {
+            "group": "Advanced",
+            "pages": [
+              "advanced/tracking",
+              "advanced/testing",
+              "advanced/api-reference"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "GitHub",
+          "href": "https://github.com/veeqtoh/prompt-deck",
+          "icon": "github"
+        },
+        {
+          "anchor": "Packagist",
+          "href": "https://packagist.org/packages/veeqtoh/prompt-deck",
+          "icon": "box"
+        }
+      ]
+    }
+  },
+  "logo": {
+    "light": "/logo/logo.svg",
+    "dark": "/logo/logo.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "GitHub",
+        "href": "https://github.com/promptphp/prompt-deck"
+      },
+      {
+        "label": "Sponsor",
+        "href": "https://github.com/sponsors/veeqtoh"
+      }
+    ]
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/promptphp/prompt-deck"
+    }
+  }
+}

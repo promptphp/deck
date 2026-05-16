@@ -1,26 +1,20 @@
-# Artisan Commands
+---
+title: "Artisan commands"
+description: "All available Artisan commands for managing prompts from the command line."
+---
 
-- [Introduction](#introduction)
-- [make:prompt](#make-prompt)
-- [prompt:list](#prompt-list)
-- [prompt:activate](#prompt-activate)
-- [prompt:diff](#prompt-diff)
-- [prompt:test](#prompt-test)
-
-<a name="introduction"></a>
 ## Introduction
 
 Prompt Deck registers five Artisan commands for managing your prompts from the command line. All commands are available when running in the console.
 
-| Command | Description |
-|---|---|
-| `make:prompt` | Create a new prompt structure with versioned role files. |
-| `prompt:list` | List all available prompts and their versions. |
-| `prompt:activate` | Activate a specific version of a prompt. |
-| `prompt:diff` | Show differences between two prompt versions. |
-| `prompt:test` | Test a prompt with sample input and see the rendered result. |
+| Command           | Description                                                  |
+| ----------------- | ------------------------------------------------------------ |
+| `make:prompt`     | Create a new prompt structure with versioned role files.     |
+| `prompt:list`     | List all available prompts and their versions.               |
+| `prompt:activate` | Activate a specific version of a prompt.                     |
+| `prompt:diff`     | Show differences between two prompt versions.                |
+| `prompt:test`     | Test a prompt with sample input and see the rendered result. |
 
-<a name="make-prompt"></a>
 ## make:prompt
 
 Create a new prompt structure for your AI agent.
@@ -31,20 +25,20 @@ make:prompt {name?} {--from=} {--desc=} {--u|user} {--role=*} {--i|interactive} 
 
 ### Arguments
 
-| Argument | Required | Description |
-|----------|----------|-------------|
-| `name` | No | The name of the prompt. Omit for interactive mode. Automatically normalised to kebab-case. |
+| Argument | Required | Description                                                                                |
+| -------- | -------- | ------------------------------------------------------------------------------------------ |
+| `name`   | No       | The name of the prompt. Omit for interactive mode. Automatically normalised to kebab-case. |
 
 ### Options
 
-| Option | Shorthand | Description |
-|---|---|---|
-| `--from=` | | Path to a custom stub file to use as the user prompt template. |
-| `--desc=` | | A short description stored in `metadata.json`. |
-| `--user` | `-u` | Also create a `user` prompt file alongside the default `system` prompt. |
-| `--role=*` | | Additional roles to scaffold. Repeatable (e.g. `--role=assistant --role=developer`). |
-| `--interactive` | `-i` | Interactively choose which additional roles to create. |
-| `--force` | `-f` | Overwrite an existing prompt's latest version without confirmation. |
+| Option          | Shorthand | Description                                                                          |
+| --------------- | --------- | ------------------------------------------------------------------------------------ |
+| `--from=`       |           | Path to a custom stub file to use as the user prompt template.                       |
+| `--desc=`       |           | A short description stored in `metadata.json`.                                       |
+| `--user`        | `-u`      | Also create a `user` prompt file alongside the default `system` prompt.              |
+| `--role=*`      |           | Additional roles to scaffold. Repeatable (e.g. `--role=assistant --role=developer`). |
+| `--interactive` | `-i`      | Interactively choose which additional roles to create.                               |
+| `--force`       | `-f`      | Overwrite an existing prompt's latest version without confirmation.                  |
 
 ### Examples
 
@@ -77,7 +71,7 @@ php artisan make:prompt order-summary --user --from=stubs/my-template.md
 Version 1 of the [order-summary] prompt has been created successfully with the following roles: system, user.
 ```
 
-### Behaviour with Existing Prompts
+### Behaviour with existing prompts
 
 When run against a prompt that already exists, the command presents a choice:
 
@@ -91,9 +85,8 @@ What would you like to do?
 
 With `--force`, the latest version is overwritten without prompting.
 
-See [Creating Prompts](make-prompt.md) for comprehensive documentation.
+See [Creating Prompts](/core/make-prompt) for comprehensive documentation.
 
-<a name="prompt-list"></a>
 ## prompt:list
 
 List all available prompts and their versions.
@@ -104,8 +97,8 @@ prompt:list {--all : Show all versions for each prompt}
 
 ### Options
 
-| Option | Description |
-|---|---|
+| Option  | Description                                                 |
+| ------- | ----------------------------------------------------------- |
 | `--all` | Show all versions for each prompt, not just the active one. |
 
 ### Examples
@@ -151,7 +144,6 @@ Output:
 - If no prompts are found, an informational message is shown.
 - Descriptions come from each version's `metadata.json`.
 
-<a name="prompt-activate"></a>
 ## prompt:activate
 
 Activate a specific version of a prompt.
@@ -162,10 +154,10 @@ prompt:activate {name : The prompt name} {version : The version number to activa
 
 ### Arguments
 
-| Argument | Required | Description |
-|----------|----------|-------------|
-| `name` | Yes | The prompt name (e.g. `order-summary`). |
-| `version` | Yes | The version number to activate (e.g. `2`). |
+| Argument  | Required | Description                                |
+| --------- | -------- | ------------------------------------------ |
+| `name`    | Yes      | The prompt name (e.g. `order-summary`).    |
+| `version` | Yes      | The version number to activate (e.g. `2`). |
 
 ### Examples
 
@@ -179,12 +171,12 @@ Output:
 Version 2 of prompt [order-summary] activated.
 ```
 
-### How It Works
+### How it works
 
 - **With database tracking enabled**: Updates the `prompt_versions` table — sets `is_active = false` on all versions for that prompt, then `is_active = true` on the specified version.
 - **Without tracking**: Writes the `active_version` key to the prompt's root `metadata.json` file.
 
-### Error Handling
+### Error handling
 
 If the prompt or version does not exist, an error message is displayed:
 
@@ -192,7 +184,6 @@ If the prompt or version does not exist, an error message is displayed:
 Version 5 for prompt [order-summary] does not exist.
 ```
 
-<a name="prompt-diff"></a>
 ## prompt:diff
 
 Show differences between two prompt versions using unified diff output.
@@ -203,17 +194,17 @@ prompt:diff {name : The prompt name} {--v1= : First version number} {--v2= : Sec
 
 ### Arguments
 
-| Argument | Required | Description |
-|----------|----------|-------------|
-| `name` | Yes | The prompt name (e.g. `order-summary`). |
+| Argument | Required | Description                             |
+| -------- | -------- | --------------------------------------- |
+| `name`   | Yes      | The prompt name (e.g. `order-summary`). |
 
 ### Options
 
-| Option | Required | Description |
-|---|---|---|
-| `--v1=` | Yes | The first version number to compare. |
-| `--v2=` | Yes | The second version number to compare. |
-| `--type=` | No | Which role files to compare: `system`, `user`, or `all` (default). |
+| Option    | Required | Description                                                        |
+| --------- | -------- | ------------------------------------------------------------------ |
+| `--v1=`   | Yes      | The first version number to compare.                               |
+| `--v2=`   | Yes      | The second version number to compare.                              |
+| `--type=` | No       | Which role files to compare: `system`, `user`, or `all` (default). |
 
 ### Examples
 
@@ -259,7 +250,6 @@ php artisan prompt:diff order-summary --v1=1 --v2=2 --type=user
 - If a role file doesn't exist in either version, it is silently skipped.
 - Uses `sebastian/diff` for unified diff output.
 
-<a name="prompt-test"></a>
 ## prompt:test
 
 Test a prompt with sample input and see the rendered result.
@@ -270,16 +260,16 @@ prompt:test {name : The prompt name} {--ver= : Specific version (defaults to act
 
 ### Arguments
 
-| Argument | Required | Description |
-|----------|----------|-------------|
-| `name` | Yes | The prompt name to test (e.g. `order-summary`). |
+| Argument | Required | Description                                     |
+| -------- | -------- | ----------------------------------------------- |
+| `name`   | Yes      | The prompt name to test (e.g. `order-summary`). |
 
 ### Options
 
-| Option | Description |
-|---|---|
-| `--ver=` | Specific version to test. Defaults to the active version. |
-| `--input=` | Custom input text. Defaults to `"Sample user input"`. |
+| Option         | Description                                                   |
+| -------------- | ------------------------------------------------------------- |
+| `--ver=`       | Specific version to test. Defaults to the active version.     |
+| `--input=`     | Custom input text. Defaults to `"Sample user input"`.         |
 | `--variables=` | JSON string of variables for interpolation. Defaults to `{}`. |
 
 ### Examples

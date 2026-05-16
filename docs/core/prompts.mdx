@@ -1,37 +1,8 @@
-# Prompts
+---
+title: "Working with prompts"
+description: "Load, render, version, cache, and track AI prompts in your Laravel application."
+---
 
-- [Introduction](#introduction)
-- [Retrieving Prompts](#retrieving-prompts)
-    - [The PromptDeck Facade](#the-prompt-facade)
-    - [Dependency Injection](#dependency-injection)
-    - [Active Version](#active-version)
-    - [Specific Version](#specific-version)
-- [Rendering Roles](#rendering-roles)
-    - [Dynamic Role Methods](#dynamic-role-methods)
-    - [The role Method](#the-role-method)
-    - [Raw Content](#raw-content)
-- [Inspecting Prompts](#inspecting-prompts)
-    - [Available Roles](#available-roles)
-    - [Checking for a Role](#checking-for-a-role)
-    - [Metadata](#metadata)
-    - [Name and Version](#name-and-version)
-- [Building Messages for AI APIs](#building-messages-for-ai-apis)
-    - [All Roles](#all-roles)
-    - [Filtering Roles](#filtering-roles)
-- [Variable Interpolation](#variable-interpolation)
-    - [Syntax](#syntax)
-    - [Supported Value Types](#supported-value-types)
-    - [Missing Variables](#missing-variables)
-- [Versioning](#versioning)
-    - [Directory Structure](#directory-structure)
-    - [Listing Versions](#listing-versions)
-    - [Activating a Version](#activating-a-version)
-    - [Version Resolution Order](#version-resolution)
-- [Caching](#caching)
-- [Execution Tracking](#execution-tracking)
-- [Serialisation](#serialisation)
-
-<a name="introduction"></a>
 ## Introduction
 
 Prompt Deck provides a clean, expressive API for loading, rendering, and managing versioned AI prompts in your Laravel application. Prompts are stored as plain files on disk and organised by name, version, and role. They are accessed through the `PromptDeck` facade, which feels like any other first-party Laravel service.
@@ -50,11 +21,9 @@ $prompt->user(['input' => $request->message]);
 // "Summarise the following order: ..."
 ```
 
-<a name="retrieving-prompts"></a>
-## Retrieving Prompts
+## Retrieving prompts
 
-<a name="the-prompt-facade"></a>
-### The PromptDeck Facade
+### The PromptDeck facade
 
 The `PromptDeck` facade is the primary entry point for loading prompts. It delegates to the `PromptManager` singleton registered by the service provider:
 
@@ -68,10 +37,9 @@ $prompt = PromptDeck::get('order-summary');
 $prompt = PromptDeck::get('order-summary', 2);
 ```
 
-The `get` method returns a `PromptTemplate` instance. If no version is specified, the [active version](#version-resolution) is resolved automatically.
+The `get` method returns a `PromptTemplate` instance. If no version is specified, the [active version](#version-resolution-order) is resolved automatically.
 
-<a name="dependency-injection"></a>
-### Dependency Injection
+### Dependency injection
 
 You can also inject the `PromptManager` directly via Laravel's service container:
 
@@ -92,8 +60,7 @@ class OrderController extends Controller
 
 The `PromptManager` is registered as a singleton, so the same instance is reused throughout the request lifecycle.
 
-<a name="active-version"></a>
-### Active Version
+### Active version
 
 Use the `active` method to explicitly load the active version:
 
@@ -105,8 +72,7 @@ $prompt->version(); // e.g. 3
 
 This is equivalent to calling `get()` without a version number.
 
-<a name="specific-version"></a>
-### Specific Version
+### Specific version
 
 Pass a version number as the second argument to `get` to load a specific version, regardless of which version is currently active:
 
@@ -118,13 +84,11 @@ $prompt->version(); // 1
 
 If the version does not exist, an `InvalidVersionException` is thrown.
 
-<a name="rendering-roles"></a>
-## Rendering Roles
+## Rendering roles
 
 Once you have a `PromptTemplate` instance, you can render any role's content with variable interpolation.
 
-<a name="dynamic-role-methods"></a>
-### Dynamic Role Methods
+### Dynamic role methods
 
 The most expressive way to render a role is to call it as a method directly on the prompt instance. This uses PHP's `__call` magic method and works for **any** role — not just `system` and `user`:
 
@@ -149,8 +113,7 @@ When called without arguments, the content is returned with placeholders left in
 $prompt->system(); // "You are a {{ $tone }} AI assistant..."
 ```
 
-<a name="the-role-method"></a>
-### The `role` Method
+### The `role` method
 
 If the role name is dynamic or stored in a variable, use the explicit `role` method:
 
@@ -162,8 +125,7 @@ $content = $prompt->role($roleName, ['context' => $history]);
 
 This is functionally identical to the magic method approach. If the role does not exist, an empty string is returned.
 
-<a name="raw-content"></a>
-### Raw Content
+### Raw content
 
 To retrieve a role's content **without** variable interpolation, use the `raw` method:
 
@@ -174,11 +136,9 @@ $template = $prompt->raw('system');
 
 This is useful when you need to inspect the template, store it, or perform your own interpolation logic.
 
-<a name="inspecting-prompts"></a>
-## Inspecting Prompts
+## Inspecting prompts
 
-<a name="available-roles"></a>
-### Available Roles
+### Available roles
 
 The `roles` method returns an array of all role names defined in the prompt:
 
@@ -189,8 +149,7 @@ $prompt->roles();
 
 Roles are discovered automatically from the files in the version directory. Any file matching the configured extension (e.g. `.md`) becomes a role — the filename (without extension) is the role name.
 
-<a name="checking-for-a-role"></a>
-### Checking for a Role
+### Checking for a role
 
 Use the `has` method to check whether a specific role exists before attempting to render it:
 
@@ -200,7 +159,6 @@ if ($prompt->has('assistant')) {
 }
 ```
 
-<a name="metadata"></a>
 ### Metadata
 
 Each prompt version can carry metadata (stored in `metadata.json` at the version level). Access it via the `metadata` method:
@@ -212,19 +170,16 @@ $prompt->metadata();
 
 Metadata is an associative array. If no `metadata.json` exists in the version directory, an empty array is returned.
 
-<a name="name-and-version"></a>
-### Name and Version
+### Name and version
 
 ```php
 $prompt->name();    // 'order-summary'
 $prompt->version(); // 2
 ```
 
-<a name="building-messages-for-ai-apis"></a>
-## Building Messages for AI APIs
+## Building messages for AI APIs
 
-<a name="all-roles"></a>
-### All Roles
+### All roles
 
 The `toMessages` method builds a messages array compatible with OpenAI, Anthropic, and other chat-completion APIs. It renders every role with the given variables and returns them in definition order:
 
@@ -257,8 +212,7 @@ $response = Anthropic::messages()->create([
 ]);
 ```
 
-<a name="filtering-roles"></a>
-### Filtering Roles
+### Filtering roles
 
 Pass a second argument to limit which roles are included and in what order:
 
@@ -271,18 +225,16 @@ $messages = $prompt->toMessages(
 
 Roles specified in the filter that don't exist in the prompt are silently skipped.
 
-<a name="variable-interpolation"></a>
-## Variable Interpolation
+## Variable interpolation
 
-<a name="syntax"></a>
 ### Syntax
 
 Prompt Deck supports two placeholder syntaxes within prompt files:
 
-| Syntax | Example |
-|---|---|
+| Syntax               | Example       |
+| -------------------- | ------------- |
 | Spaced (recommended) | `{{ $tone }}` |
-| Compact | `{{tone}}` |
+| Compact              | `{{tone}}`    |
 
 Both are replaced when you render a role with variables:
 
@@ -293,11 +245,12 @@ $prompt->system(['tone' => 'friendly', 'task' => 'summarise']);
 // "You are a friendly AI assistant. Task: summarise"
 ```
 
-> **Tip**
-> Use the spaced syntax (`{{ $variable }}`) for consistency with Laravel Blade conventions.
+<Tip>
+    Use the spaced syntax (`{{ $variable }}`) for consistency with Laravel Blade
+    conventions.
+</Tip>
 
-<a name="supported-value-types"></a>
-### Supported Value Types
+### Supported value types
 
 Values are cast to strings via PHP's `(string)` cast, so you can pass any scalar or stringable value:
 
@@ -310,8 +263,7 @@ $prompt->system([
 ]);
 ```
 
-<a name="missing-variables"></a>
-### Missing Variables
+### Missing variables
 
 Placeholders that are not matched by the provided variables are **left intact**. This lets you render in stages or identify unfilled variables:
 
@@ -320,11 +272,9 @@ $prompt->system(['tone' => 'friendly']);
 // "You are a friendly AI assistant. Your role is {{ $role }}."
 ```
 
-<a name="versioning"></a>
 ## Versioning
 
-<a name="directory-structure"></a>
-### Directory Structure
+### Directory structure
 
 Prompts are versioned using directory-based versioning. Each version lives in its own sub-directory (`v1/`, `v2/`, etc.) inside the prompt folder:
 
@@ -342,11 +292,11 @@ resources/prompts/
 ```
 
 Each version directory can contain:
+
 - Any number of role files (e.g. `system.md`, `user.md`, `assistant.md`)
 - An optional `metadata.json` for version-level metadata
 
-<a name="listing-versions"></a>
-### Listing Versions
+### Listing versions
 
 Retrieve all versions for a prompt programmatically:
 
@@ -367,10 +317,9 @@ Or use the Artisan command:
 php artisan prompt:list --all
 ```
 
-See [Artisan Commands — prompt:list](commands.md#prompt-list) for details.
+See [Artisan Commands — prompt:list](/core/commands#promptlist) for details.
 
-<a name="activating-a-version"></a>
-### Activating a Version
+### Activating a version
 
 Set a specific version as the active version:
 
@@ -388,10 +337,9 @@ Or use the Artisan command:
 php artisan prompt:activate order-summary 2
 ```
 
-See [Artisan Commands — prompt:activate](commands.md#prompt-activate) for details.
+See [Artisan Commands — prompt:activate](/core/commands#promptactivate) for details.
 
-<a name="version-resolution"></a>
-### Version Resolution Order
+### Version resolution order
 
 When you call `PromptDeck::get('name')` without a version, the active version is resolved in this priority order:
 
@@ -401,7 +349,6 @@ When you call `PromptDeck::get('name')` without a version, the active version is
 
 If no versions exist at all, an `InvalidVersionException` is thrown.
 
-<a name="caching"></a>
 ## Caching
 
 When caching is enabled, loaded prompts are stored in your configured cache store to avoid repeated filesystem reads:
@@ -420,10 +367,9 @@ The cache key follows the pattern `{prefix}{name}.v{version}`. Prompts are cache
 
 Caching is automatically **disabled** when `APP_DEBUG=true` to ensure file changes are picked up immediately during development.
 
-See [Configuration — Cache](configuration.md#cache) for the full reference.
+See [Configuration — Cache](/getting-started/configuration#cache) for the full reference.
 
-<a name="execution-tracking"></a>
-## Execution Tracking
+## Execution tracking
 
 When database tracking is enabled, you can log prompt executions for performance monitoring, A/B testing, and audit trails:
 
@@ -440,14 +386,16 @@ PromptDeck::track('order-summary', 2, [
 ]);
 ```
 
-All fields in the data array are optional. Records are inserted into the `prompt_executions` table: If tracking is disabled, the `track` method is a safe no-op.
+All fields in the data array are optional. Records are inserted into the `prompt_executions` table. If tracking is disabled, the `track` method is a safe no-op.
 
-See [Tracking & Performance](tracking.md) for comprehensive documentation on the tracking system, database schema, and Eloquent models.
+See [Tracking & Performance](/advanced/tracking) for comprehensive documentation on the tracking system, database schema, and Eloquent models.
 
-> **Tip**
-> When using the [Laravel AI SDK integration](ai-sdk.md), the `TrackPromptMiddleware` handles execution tracking automatically — no manual `track()` calls needed.
+<Tip>
+    When using the [Laravel AI SDK integration](/integrations/ai-sdk), the
+    `TrackPromptMiddleware` handles execution tracking automatically — no manual
+    `track()` calls needed.
+</Tip>
 
-<a name="serialisation"></a>
 ## Serialisation
 
 The `PromptTemplate` class implements Laravel's `Arrayable` contract. Call `toArray()` to get a serialisable representation:

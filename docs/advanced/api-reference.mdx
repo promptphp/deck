@@ -1,24 +1,7 @@
-# API Reference
-
-- [PromptManager](#prompt-manager)
-- [PromptTemplate](#prompt-template)
-- [PromptDeck Facade](#promptdeck-facade)
-- [HasPromptTemplate Trait](#hasprompttemplate-trait)
-- [TrackPromptMiddleware](#trackpromptmiddleware)
-- [AfterMakeAgent Listener](#aftermakeagent-listener)
-- [Models](#models)
-  - [PromptVersion](#prompt-version)
-  - [PromptExecution](#prompt-execution)
-- [Exceptions](#exceptions)
-  - [PromptDeckException](#promptdeckexception)
-  - [PromptNotFoundException](#promptnotfoundexception)
-  - [InvalidVersionException](#invalidversionexception)
-  - [ConfigurationException](#configurationexception)
-  - [PromptRenderingException](#promptrenderingexception)
-
 ---
-
-<a name="prompt-manager"></a>
+title: "API reference"
+description: "Complete class and method reference for Prompt Deck."
+---
 
 ## PromptManager
 
@@ -48,7 +31,7 @@ public function __construct(
 
 #### `get(string $name, ?int $version = null): PromptTemplate`
 
-Load a prompt by name and optional version. If version is `null`, the [active version](prompts.md#version-resolution) is resolved automatically. Returns a `PromptTemplate` instance.
+Load a prompt by name and optional version. If version is `null`, the [active version](/core/prompts#version-resolution-order) is resolved automatically. Returns a `PromptTemplate` instance.
 
 Caches the loaded prompt if caching is enabled.
 
@@ -110,8 +93,6 @@ $manager->track('order-summary', 2, [
 ```
 
 ---
-
-<a name="prompt-template"></a>
 
 ## PromptTemplate
 
@@ -231,15 +212,13 @@ $prompt->custom_role();                    // renders 'custom_role' role
 
 ---
 
-<a name="promptdeck-facade"></a>
-
-## PromptDeck Facade
+## PromptDeck facade
 
 `Veeqtoh\PromptDeck\Facades\PromptDeck`
 
 Static proxy to the `PromptManager` singleton.
 
-### Available Methods
+### Available methods
 
 | Method                                                       | Returns          | Description                                 |
 | ------------------------------------------------------------ | ---------------- | ------------------------------------------- |
@@ -251,9 +230,7 @@ Static proxy to the `PromptManager` singleton.
 
 ---
 
-<a name="hasprompttemplate-trait"></a>
-
-## HasPromptTemplate Trait
+## HasPromptTemplate trait
 
 `Veeqtoh\PromptDeck\Concerns\HasPromptTemplate`
 
@@ -264,10 +241,6 @@ Trait for integrating Prompt Deck templates with Laravel AI SDK agents.
 #### `promptName(): string`
 
 Get the prompt name. Defaults to the kebab-cased class name (e.g. `SalesCoach` → `sales-coach`). Override to use a custom name.
-
-#### `promptVersion(): ?int`
-
-Get the prompt version to load. Returns `null` by default (active version). Override to pin to a specific version.
 
 #### `promptVersion(): ?int`
 
@@ -299,8 +272,6 @@ Clear the cached `PromptTemplate`, forcing a fresh load on next access. Returns 
 
 ---
 
-<a name="trackpromptmiddleware"></a>
-
 ## TrackPromptMiddleware
 
 `Veeqtoh\PromptDeck\Ai\TrackPromptMiddleware`
@@ -317,9 +288,7 @@ Only tracks agents that use the `HasPromptTemplate` trait (i.e. agents with a `p
 
 ---
 
-<a name="aftermakeagent-listener"></a>
-
-## AfterMakeAgent Listener
+## AfterMakeAgent listener
 
 `Veeqtoh\PromptDeck\Listeners\AfterMakeAgent`
 
@@ -333,11 +302,7 @@ Handle the `CommandFinished` event. Only acts on successful `make:agent` command
 
 ---
 
-<a name="models"></a>
-
 ## Models
-
-<a name="prompt-version"></a>
 
 ### PromptVersion
 
@@ -351,8 +316,6 @@ Handle the `CommandFinished` event. Only acts on successful `make:agent` command
 | `user_prompt`   | `string`       | —         | User prompt content.                |
 | `metadata`      | `array\|null`  | `array`   | Version metadata.                   |
 | `is_active`     | `bool`         | `boolean` | Whether this is the active version. |
-
-<a name="prompt-execution"></a>
 
 ### PromptExecution
 
@@ -373,21 +336,15 @@ Handle the `CommandFinished` event. Only acts on successful `make:agent` command
 
 ---
 
-<a name="exceptions"></a>
-
 ## Exceptions
 
 All Prompt Deck exceptions extend the base `PromptDeckException` class.
-
-<a name="promptdeckexception"></a>
 
 ### PromptDeckException
 
 `Veeqtoh\PromptDeck\Exceptions\PromptDeckException`
 
 Abstract base exception for all Prompt Deck errors. Extends PHP's `Exception` class.
-
-<a name="promptnotfoundexception"></a>
 
 ### PromptNotFoundException
 
@@ -398,8 +355,6 @@ Thrown when a prompt directory does not exist.
 | Factory Method              | Description                                                    |
 | --------------------------- | -------------------------------------------------------------- |
 | `named(string $name): self` | Creates exception with message: `"Prompt [{name}] not found."` |
-
-<a name="invalidversionexception"></a>
 
 ### InvalidVersionException
 
@@ -412,8 +367,6 @@ Thrown when a requested version does not exist or no versions are found.
 | `forPrompt(string $name, int $version): self` | Creates exception with message: `"Version {version} for prompt [{name}] does not exist."` |
 | `noVersions(string $name): self`              | Creates exception with message: `"No versions found for prompt [{name}]."`                |
 
-<a name="configurationexception"></a>
-
 ### ConfigurationException
 
 `Veeqtoh\PromptDeck\Exceptions\ConfigurationException`
@@ -423,8 +376,6 @@ Thrown when Prompt Deck configuration is invalid.
 | Factory Method                    | Description                                                                                      |
 | --------------------------------- | ------------------------------------------------------------------------------------------------ |
 | `invalidPath(string $path): self` | Creates exception with message: `"Prompts path [{path}] is not a directory or is not writable."` |
-
-<a name="promptrenderingexception"></a>
 
 ### PromptRenderingException
 
