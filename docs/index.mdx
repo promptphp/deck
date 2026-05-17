@@ -1,118 +1,103 @@
 ---
 title: "Welcome"
-description: Organize, version, and test your AI agent instructions with Prompt Deck, a powerful Laravel package for seamless AI integration.
+description: Organise, version, and test your AI agent instructions with Prompt Deck, a powerful Laravel package for seamless AI integration.
 mode: "custom"
 ---
 
 {/* Top Accent Glow Effect */}
 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-gradient-to-b from-primary/10 via-transparent to-transparent blur-3xl pointer-events-none -z-10" />
 
-<div className="relative w-full flex flex-col items-center justify-center text-center pt-28 pb-20 px-6">
-  {/* Hero Section */}
-  <div className="max-w-3xl">
-    {/* <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20 backdrop-blur-md mb-6 animate-pulse">
-      ✨ Now available for Laravel 11+
-    </div> */}
-    
-    <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-white dark:via-slate-200 dark:to-white mb-6">
-      Prompt Deck
-    </h1>
-    
-    <p className="text-xl text-slate-600 dark:text-slate-400 mb-10 leading-relaxed max-w-2xl mx-auto">
-      Organise your AI Agent instructions as structured, version-controlled files in your Laravel application.
-    </p>
-    
-    <div className="flex flex-wrap justify-center gap-4">
-      <a href="/getting-started" className="relative group overflow-hidden bg-primary text-white px-8 py-3.5 rounded-full font-semibold text-lg shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-300 hover:-translate-y-0.5">
-        <span className="relative z-10">Get Started</span>
-        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      </a>
-      <a href="https://github.com" target="_blank" className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 text-slate-900 dark:text-white px-8 py-3.5 rounded-full font-semibold text-lg border border-slate-200/50 dark:border-slate-700/50 transition-all duration-300 hover:-translate-y-0.5 backdrop-blur-sm">
-        GitHub
-      </a>
+    <div className="relative w-full flex flex-col items-center justify-center text-center pt-28 pb-20 px-6">
+        {/* Hero Section */}
+        <div className="max-w-3xl">
+            {/* <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20 backdrop-blur-md mb-6 animate-pulse">
+                ✨ Now available for Laravel 11+
+            </div> */}
+
+        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-white dark:via-slate-200 dark:to-white mb-6">
+            Prompt Deck
+        </h1>
+
+        <p className="text-xl text-slate-600 dark:text-slate-400 mb-10 leading-relaxed max-w-2xl mx-auto">
+            Organise your AI Agent instructions as structured, version-controlled files in your Laravel application.
+        </p>
+
+        <div className="flex flex-wrap justify-center gap-4">
+            <a href="/getting-started/introduction" className="relative group overflow-hidden bg-primary text-white px-8 py-3.5 rounded-full font-semibold text-lg shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-300 hover:-translate-y-0.5">
+                <span className="relative z-10">Get Started</span>
+                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </a>
+            <a href="https://github.com/sponsors/veeqtoh" target="_blank" className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 text-slate-900 dark:text-white px-8 py-3.5 rounded-full font-semibold text-lg border border-slate-200/50 dark:border-slate-700/50 transition-all duration-300 hover:-translate-y-0.5 backdrop-blur-sm">
+                Sponsor
+            </a>
+            <a href="https://github.com/promptphp/prompt-deck" target="_blank" className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 text-slate-900 dark:text-white px-8 py-3.5 rounded-full font-semibold text-lg border border-slate-200/50 dark:border-slate-700/50 transition-all duration-300 hover:-translate-y-0.5 backdrop-blur-sm">
+                GitHub
+            </a>
+        </div>
     </div>
-  </div>
 </div>
 
 {/* Main Layout Wrapper */}
 <div className="max-w-6xl mx-auto px-6 pb-32">
-  
-  {/* Interactive Feature Grid */}
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+    {/* Interactive Feature Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        {/* Card 1 */}
+        <div className="group relative p-8 rounded-3xl border border-slate-200/60 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-none hover:border-primary/40 dark:hover:border-primary/40">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4 group-hover:scale-110 transition-transform duration-300">📁</div>
+            <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors duration-300">Versioned Prompts</h3>
+            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                Store prompts as files on disk with directory-based versioning.
+            </p>
+        </div>
+        {/* Card 2 */}
+        <div className="group relative p-8 rounded-3xl border border-slate-200/60 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-none hover:border-primary/40 dark:hover:border-primary/40">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4 group-hover:scale-110 transition-transform duration-300">🔄</div>
+            <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors duration-300">Interpolation</h3>
+            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                Use `{{ $variable }}` syntax in prompt templates for dynamic content rendering.
+            </p>
+        </div>
+        {/* Card 3 */}
+        <div className="group relative p-8 rounded-3xl border border-slate-200/60 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-none hover:border-primary/40 dark:hover:border-primary/40">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4 group-hover:scale-110 transition-transform duration-300">📊</div>
+            <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors duration-300">Performance Tracking</h3>
+            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                Log executions with token usage, latency, cost, and feedback for A/B testing and monitoring.
+            </p>
+        </div>
+    </div>
+
+    {/* Interactive Code Preview Block */}
+    <div className="border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 rounded-3xl p-6 md:p-10 backdrop-blur-sm relative overflow-hidden group">
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all duration-700" />
     
-    {/* Card 1 */}
-    <div className="group relative p-8 rounded-3xl border border-slate-200/60 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-none hover:border-primary/40 dark:hover:border-primary/40">
-      <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4 group-hover:scale-110 transition-transform duration-300">📁</div>
-      <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors duration-300">Versioned Prompts</h3>
-      <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Organise instructions as versioned markdown structures directly inside your source control repository.</p>
+            <div className="max-w-2xl mb-8">
+                <h2 className="text-2xl md:text-3xl font-bold mb-3 text-slate-900 dark:text-white">A workflow natural to you.</h2>
+                <p className="text-slate-600 dark:text-slate-400">Run one artisan command, version your prompts.</p>
+            </div>
+
+            <CodeGroup>
+                ```bash Artisan Command
+                # Generate a versioned system prompt template
+                php artisan make:prompt order-summary
+                ```
+
+                ```markdown Prompt File (v1/system.md)
+                You are a {{ $tone }} customer service agent.
+                Summarise the following order details: {{ $order }}.
+                ```
+
+                ```php Implementation (Controller)
+                use Veeqtoh\PromptDeck\Facades\PromptDeck;
+
+                // Loads active markdown context and returns compiled payload arrays
+                $messages = PromptDeck::get('order-summary')
+                    ->toMessages([
+                        'tone'  => 'friendly',
+                        'order' => $orderDetails
+                    ]);
+                ```
+            </CodeGroup>
+
     </div>
-    
-    {/* Card 2 */}
-    <div className="group relative p-8 rounded-3xl border border-slate-200/60 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-none hover:border-primary/40 dark:hover:border-primary/40">
-      <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4 group-hover:scale-110 transition-transform duration-300">🔄</div>
-      <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors duration-300">Interpolation</h3>
-      <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Inject application state instantly into your system prompts using clean, readable syntax at execution runtime.</p>
-    </div>
-    
-    {/* Card 3 */}
-    <div className="group relative p-8 rounded-3xl border border-slate-200/60 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-none hover:border-primary/40 dark:hover:border-primary/40">
-      <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4 group-hover:scale-110 transition-transform duration-300">📊</div>
-      <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors duration-300">A/B Testing</h3>
-      <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Route LLM flows between different prompt iterations to track metrics and evaluate response consistency.</p>
-    </div>
-
-    {/* Card 4 */}
-    <div className="group relative p-8 rounded-3xl border border-slate-200/60 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-none hover:border-primary/40 dark:hover:border-primary/40">
-      <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4 group-hover:scale-110 transition-transform duration-300">💻</div>
-      <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors duration-300">Artisan Scaffold</h3>
-      <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Generate directories, active config variants, and markdown code structures quickly with command-line tooling.</p>
-    </div>
-
-    {/* Card 5 */}
-    <div className="group relative p-8 rounded-3xl border border-slate-200/60 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-none hover:border-primary/40 dark:hover:border-primary/40">
-      <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4 group-hover:scale-110 transition-transform duration-300">📈</div>
-      <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors duration-300">Performance logs</h3>
-      <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Log historical execution speed and prompt token payloads inside internal metrics pipelines seamlessly.</p>
-    </div>
-
-    {/* Card 6 */}
-    <div className="group relative p-8 rounded-3xl border border-slate-200/60 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-none hover:border-primary/40 dark:hover:border-primary/40">
-      <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg mb-4 group-hover:scale-110 transition-transform duration-300">🔌</div>
-      <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors duration-300">AI SDK Native</h3>
-      <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Uses trait mappings designed to natively inject files into Laravel AI SDK setups automatically.</p>
-    </div>
-  </div>
-
-  {/* Interactive Code Preview Block */}
-  <div className="border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 rounded-3xl p-6 md:p-10 backdrop-blur-sm relative overflow-hidden group">
-    <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all duration-700" />
-    
-    <div className="max-w-2xl mb-8">
-      <h2 className="text-2xl md:text-3xl font-bold mb-3 text-slate-900 dark:text-white">Beautifully simple implementation</h2>
-      <p className="text-slate-600 dark:text-slate-400">Manage file configurations via artisan and load compilation states natively into your codebases.</p>
-    </div>
-
-    <CodeGroup>
-      ```bash Artisan Command
-      # Generate a versioned system prompt template
-      php artisan make:prompt order-summary
-      ```
-
-      ```markdown Prompt File (v1/system.md)
-      You are a {{ $tone }} customer service agent. 
-      Summarise the following order details: {{ $order }}.
-      ```
-
-      ```php Implementation (Controller)
-      use Veeqtoh\PromptDeck\Facades\PromptDeck;
-
-      // Loads active markdown context and returns compiled payload arrays
-      $messages = PromptDeck::get('order-summary')
-          ->toMessages([
-              'tone'  => 'friendly', 
-              'order' => $orderDetails
-          ]);
-      ```
-    </CodeGroup>
-  </div>
 </div>
