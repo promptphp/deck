@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see \PromptPHP\Deck\PromptManager
  */
-class PromptDeck extends Facade
+class Deck extends Facade
 {
     protected static function getFacadeAccessor(): string
     {

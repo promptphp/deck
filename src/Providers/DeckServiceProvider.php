@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Providers;
+namespace PromptPHP\Deck\Providers;
 
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
-use Veeqtoh\PromptDeck\Console\Commands\ActivatePromptCommand;
-use Veeqtoh\PromptDeck\Console\Commands\ListPromptsCommand;
-use Veeqtoh\PromptDeck\Console\Commands\MakePromptCommand;
-use Veeqtoh\PromptDeck\Console\Commands\PromptDiffCommand;
-use Veeqtoh\PromptDeck\Console\Commands\TestPromptCommand;
-use Veeqtoh\PromptDeck\PromptManager;
+use PromptPHP\Deck\Console\Commands\ActivatePromptCommand;
+use PromptPHP\Deck\Console\Commands\ListPromptsCommand;
+use PromptPHP\Deck\Console\Commands\MakePromptCommand;
+use PromptPHP\Deck\Console\Commands\PromptDiffCommand;
+use PromptPHP\Deck\Console\Commands\TestPromptCommand;
+use PromptPHP\Deck\PromptManager;
 
-class PromptDeckServiceProvider extends ServiceProvider
+class DeckServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
@@ -98,13 +98,13 @@ class PromptDeckServiceProvider extends ServiceProvider
     protected function registerAiSdkIntegration(): void
     {
         if (class_exists(\Laravel\Ai\AiServiceProvider::class)) {
-            $this->app->singleton(\Veeqtoh\PromptDeck\Ai\TrackPromptMiddleware::class);
+            $this->app->singleton(\PromptPHP\Deck\Ai\TrackPromptMiddleware::class);
 
             // Auto-scaffold a prompt when `make:agent` finishes successfully.
             if (config('prompt-deck.scaffold_on_make_agent', true)) {
                 Event::listen(
                     CommandFinished::class,
-                    \Veeqtoh\PromptDeck\Listeners\AfterMakeAgent::class
+                    \PromptPHP\Deck\Listeners\AfterMakeAgent::class
                 );
             }
         }

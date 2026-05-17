@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace PromptPHP\Deck\Tests;
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use PromptPHP\Deck\Providers\PromptDeckServiceProvider;
+use PromptPHP\Deck\Providers\DeckServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -34,7 +34,7 @@ abstract class TestCase extends BaseTestCase
     protected function getPackageProviders($app): array
     {
         return [
-            PromptDeckServiceProvider::class,
+            DeckServiceProvider::class,
         ];
     }
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use PromptPHP\Deck\Facades\PromptDeck;
+use PromptPHP\Deck\Facades\Deck;
 use PromptPHP\Deck\PromptManager;
 use PromptPHP\Deck\PromptTemplate;
 

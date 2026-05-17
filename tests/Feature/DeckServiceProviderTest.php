@@ -44,7 +44,7 @@ test('Artisan commands are registered', function () {
 test('publishable config is registered', function () {
     // Verify the provider has registered publishable resources.
     $publishes = \Illuminate\Support\ServiceProvider::pathsToPublish(
-        \PromptPHP\Deck\Providers\PromptDeckServiceProvider::class,
+        \PromptPHP\Deck\Providers\DeckServiceProvider::class,
         'prompt-deck-config'
     );
 
@@ -54,7 +54,7 @@ test('publishable config is registered', function () {
 test('stubs are not included in default provider publishing', function () {
     // When publishing via --provider, stubs should not be included.
     $allPublishes = \Illuminate\Support\ServiceProvider::pathsToPublish(
-        \PromptPHP\Deck\Providers\PromptDeckServiceProvider::class
+        \PromptPHP\Deck\Providers\DeckServiceProvider::class
     );
 
     $stubPaths = array_filter($allPublishes, fn ($path) => str_contains($path, '.stub'));

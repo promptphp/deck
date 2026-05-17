@@ -27,7 +27,7 @@ composer require veeqtoh/prompt-deck
 Publish the config and migrations
 
 ```bash
-php artisan vendor:publish --provider="PromptPHP\Deck\Providers\PromptDeckServiceProvider"
+php artisan vendor:publish --provider="PromptPHP\Deck\Providers\DeckServiceProvider"
 
 # Run migrations.
 php artisan migrate
@@ -62,7 +62,7 @@ Summarise the following order for the customer: {{ $order }}.
 Load and render prompts with the `PromptDeck` facade
 
 ```php
-use PromptPHP\Deck\Facades\PromptDeck;
+use PromptPHP\Deck\Facades\Deck;
 
 // Load the active version of a prompt
 $prompt = PromptDeck::get('order-summary');

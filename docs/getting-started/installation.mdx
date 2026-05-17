@@ -73,7 +73,7 @@ This creates two tables:
 If you prefer, you may publish both the configuration and migration files by running a single command:
 
 ```bash
-php artisan vendor:publish --provider="PromptPHP\Deck\Providers\PromptDeckServiceProvider"
+php artisan vendor:publish --provider="PromptPHP\Deck\Providers\DeckServiceProvider"
 ```
 
 ## Environment variables
@@ -124,7 +124,7 @@ If you have disabled auto-discovery, add the provider and facade to your `bootst
 // bootstrap/providers.php (Laravel 11+)
 return [
     // ...
-    PromptPHP\Deck\Providers\PromptDeckServiceProvider::class,
+    PromptPHP\Deck\Providers\DeckServiceProvider::class,
 ];
 ```
 
@@ -133,12 +133,12 @@ Or for `config/app.php`:
 ```php
 'providers' => [
     // ...
-    PromptPHP\Deck\Providers\PromptDeckServiceProvider::class,
+    PromptPHP\Deck\Providers\DeckServiceProvider::class,
 ],
 
 'aliases' => [
     // ...
-    'PromptDeck' => PromptPHP\Deck\Facades\PromptDeck::class,
+    'PromptDeck' => PromptPHP\Deck\Facades\Deck::class,
 ],
 ```
 

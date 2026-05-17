@@ -19,21 +19,21 @@ If you're using Orchestra Testbench (recommended for package testing), register 
 namespace Tests;
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use PromptPHP\Deck\Providers\PromptDeckServiceProvider;
+use PromptPHP\Deck\Providers\DeckServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
     protected function getPackageProviders($app): array
     {
         return [
-            PromptDeckServiceProvider::class,
+            DeckServiceProvider::class,
         ];
     }
 
     protected function getPackageAliases($app): array
     {
         return [
-            'PromptDeck' => \PromptPHP\Deck\Facades\PromptDeck::class,
+            'PromptDeck' => \PromptPHP\Deck\Facades\Deck::class,
         ];
     }
 }
@@ -90,7 +90,7 @@ Summarise this order: {{ $input }}
 ### Testing prompt loading
 
 ```php
-use PromptPHP\Deck\Facades\PromptDeck;
+use PromptPHP\Deck\Facades\Deck;
 
 it('loads a prompt by name', function () {
     $prompt = PromptDeck::get('order-summary', 1);
@@ -188,7 +188,7 @@ it('filters messages to specific roles', function () {
 You can mock the facade in tests where you don't want filesystem access:
 
 ```php
-use PromptPHP\Deck\Facades\PromptDeck;
+use PromptPHP\Deck\Facades\Deck;
 use PromptPHP\Deck\PromptTemplate;
 
 it('uses a mocked prompt', function () {

@@ -10,7 +10,7 @@ Prompt Deck provides a clean, expressive API for loading, rendering, and managin
 A prompt can contain multiple **roles** (system, user, assistant, developer, tool, or any custom role you define). Each role's content supports `{{ $variable }}` interpolation, and the entire prompt can be converted into a messages array ready to send to OpenAI, Anthropic, or any chat-completion API.
 
 ```php
-use PromptPHP\Deck\Facades\PromptDeck;
+use PromptPHP\Deck\Facades\Deck;
 
 $prompt = PromptDeck::get('order-summary');
 
@@ -28,7 +28,7 @@ $prompt->user(['input' => $request->message]);
 The `PromptDeck` facade is the primary entry point for loading prompts. It delegates to the `PromptManager` singleton registered by the service provider:
 
 ```php
-use PromptPHP\Deck\Facades\PromptDeck;
+use PromptPHP\Deck\Facades\Deck;
 
 // Load the active version
 $prompt = PromptDeck::get('order-summary');
