@@ -30,7 +30,7 @@ test('handle() ignores commands that are not make:agent', function () {
     // Should not call make:prompt — no error, just a no-op.
     $listener->handle($event);
 
-    expect($output->fetch())->not->toContain('PromptDeck');
+    expect($output->fetch())->not->toContain('Deck');
 });
 
 test('handle() ignores make:agent when exit code is non-zero', function () {
@@ -42,7 +42,7 @@ test('handle() ignores make:agent when exit code is non-zero', function () {
 
     $listener->handle($event);
 
-    expect($output->fetch())->not->toContain('PromptDeck');
+    expect($output->fetch())->not->toContain('Deck');
 });
 
 // =====================================================================
@@ -76,9 +76,9 @@ test('handle() extracts agent name from input and calls make:prompt', function (
     // Verify the prompt directory was created.
     expect(is_dir("{$basePath}/sales-coach"))->toBeTrue();
 
-    // Verify output contains PromptDeck confirmation.
+    // Verify output contains Deck confirmation.
     $text = $output->fetch();
-    expect($text)->toContain('PromptDeck');
+    expect($text)->toContain('Deck');
     expect($text)->toContain('sales-coach');
     expect($text)->toContain('SalesCoach');
 
@@ -125,7 +125,7 @@ test('handle() skips when scaffold_on_make_agent config is false', function () {
 
     $listener->handle($event);
 
-    expect($output->fetch())->not->toContain('PromptDeck');
+    expect($output->fetch())->not->toContain('Deck');
 });
 
 test('handle() skips when input returns null for name argument', function () {
@@ -139,7 +139,7 @@ test('handle() skips when input returns null for name argument', function () {
 
     $listener->handle($event);
 
-    expect($output->fetch())->not->toContain('PromptDeck');
+    expect($output->fetch())->not->toContain('Deck');
 });
 
 test('handle() skips when agent name argument is empty', function () {
@@ -153,7 +153,7 @@ test('handle() skips when agent name argument is empty', function () {
 
     $listener->handle($event);
 
-    expect($output->fetch())->not->toContain('PromptDeck');
+    expect($output->fetch())->not->toContain('Deck');
 });
 
 test('handle() skips when getArgument throws', function () {
@@ -167,7 +167,7 @@ test('handle() skips when getArgument throws', function () {
 
     $listener->handle($event);
 
-    expect($output->fetch())->not->toContain('PromptDeck');
+    expect($output->fetch())->not->toContain('Deck');
 });
 
 test('handle() does not fail when prompt directory already exists', function () {
@@ -187,8 +187,8 @@ test('handle() does not fail when prompt directory already exists', function () 
     // Should not throw — silently skips when prompt already exists.
     $listener->handle($event);
 
-    // Should NOT contain PromptDeck message since the prompt was skipped.
-    expect($output->fetch())->not->toContain('PromptDeck');
+    // Should NOT contain Deck message since the prompt was skipped.
+    expect($output->fetch())->not->toContain('Deck');
 
     // Cleanup.
     (new \Illuminate\Filesystem\Filesystem)->deleteDirectory("{$basePath}/existing-agent");

@@ -6,7 +6,7 @@ namespace PromptPHP\Deck\Exceptions;
 
 use Exception;
 
-abstract class PromptDeckException extends Exception
+abstract class DeckException extends Exception
 {
     //
 }

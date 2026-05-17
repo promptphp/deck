@@ -69,7 +69,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | When the Laravel AI SDK is installed and this option is enabled,
-    | PromptDeck will automatically create a matching prompt directory
+    | Deck will automatically create a matching prompt directory
     | whenever you run `php artisan make:agent`. Set to false to disable.
     |
     */

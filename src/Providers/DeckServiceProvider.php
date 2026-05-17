@@ -35,7 +35,7 @@ class DeckServiceProvider extends ServiceProvider
     }
 
     /**
-     * Setup the configuration for PromptDeck.
+     * Setup the configuration for Deck.
      */
     protected function configure(): void
     {
@@ -77,7 +77,7 @@ class DeckServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register Artisan commands for PromptDeck.
+     * Register Artisan commands for Deck.
      */
     protected function registerArtisanCommands(): void
     {

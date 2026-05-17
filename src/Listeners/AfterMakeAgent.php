@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 /**
  * Listens for the Laravel AI SDK's `make:agent` command and
- * automatically scaffolds a corresponding PromptDeck prompt.
+ * automatically scaffolds a corresponding Deck prompt.
  *
  * When a developer runs:
  *   php artisan make:agent SalesCoach
@@ -62,12 +62,12 @@ class AfterMakeAgent
 
             if ($exitCode === 0) {
                 $event->output->writeln(
-                    "<info>PromptDeck:</info> Created prompt <comment>{$promptName}</comment> for agent <comment>{$agentName}</comment>."
+                    "<info>Deck:</info> Created prompt <comment>{$promptName}</comment> for agent <comment>{$agentName}</comment>."
                 );
             }
         } catch (\Throwable) {
             // Swallow errors — the agent was already created successfully.
-            // We don't want PromptDeck to break the make:agent workflow.
+            // We don't want Deck to break the make:agent workflow.
         }
     }
 

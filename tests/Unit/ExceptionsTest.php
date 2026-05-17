@@ -4,40 +4,40 @@ declare(strict_types=1);
 
 use PromptPHP\Deck\Exceptions\ConfigurationException;
 use PromptPHP\Deck\Exceptions\InvalidVersionException;
-use PromptPHP\Deck\Exceptions\PromptDeckException;
+use PromptPHP\Deck\Exceptions\DeckException;
 use PromptPHP\Deck\Exceptions\PromptNotFoundException;
 use PromptPHP\Deck\Exceptions\PromptRenderingException;
 
 // --- Hierarchy ---
 
-test('PromptDeckException extends base Exception', function () {
-    expect(PromptDeckException::class)
+test('DeckException extends base Exception', function () {
+    expect(DeckException::class)
         ->toExtend(\Exception::class);
 });
 
-test('ConfigurationException extends PromptDeckException', function () {
+test('ConfigurationException extends DeckException', function () {
     $e = ConfigurationException::invalidPath('/some/path');
 
-    expect($e)->toBeInstanceOf(PromptDeckException::class)
+    expect($e)->toBeInstanceOf(DeckException::class)
         ->and($e)->toBeInstanceOf(\Exception::class);
 });
 
-test('InvalidVersionException extends PromptDeckException', function () {
+test('InvalidVersionException extends DeckException', function () {
     $e = InvalidVersionException::forPrompt('test', 1);
 
-    expect($e)->toBeInstanceOf(PromptDeckException::class);
+    expect($e)->toBeInstanceOf(DeckException::class);
 });
 
-test('PromptNotFoundException extends PromptDeckException', function () {
+test('PromptNotFoundException extends DeckException', function () {
     $e = PromptNotFoundException::named('test');
 
-    expect($e)->toBeInstanceOf(PromptDeckException::class);
+    expect($e)->toBeInstanceOf(DeckException::class);
 });
 
-test('PromptRenderingException extends PromptDeckException', function () {
+test('PromptRenderingException extends DeckException', function () {
     $e = PromptRenderingException::dueToMissingVariable('name', 'greeting');
 
-    expect($e)->toBeInstanceOf(PromptDeckException::class);
+    expect($e)->toBeInstanceOf(DeckException::class);
 });
 
 // --- Message format ---

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PromptPHP\Deck\Exceptions;
 
-class InvalidVersionException extends PromptDeckException
+class InvalidVersionException extends DeckException
 {
     /**
      * * Create an exception for a non-existent version.
