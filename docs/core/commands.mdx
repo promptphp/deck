@@ -154,20 +154,25 @@ prompt:activate {name : The prompt name} {version : The version number to activa
 
 ### Arguments
 
-| Argument  | Required | Description                                |
-| --------- | -------- | ------------------------------------------ |
-| `name`    | Yes      | The prompt name (e.g. `order-summary`).    |
-| `version` | Yes      | The version number to activate (e.g. `2`). |
+| Argument  | Required | Description                                    |
+| --------- | -------- | -----------------------------------------------|
+| `name`    | Yes      | The prompt name (e.g. `order-summary`).        |
+| `version` | Yes      | The version number to activate (e.g. `2, v2`). |
 
 ### Examples
 
 ```bash
 php artisan prompt:activate order-summary 2
+
+# or
+
+php artisan prompt:activate order-summary v2
 ```
 
 Output:
 
-```
+
+```bash
 Version 2 of prompt [order-summary] activated.
 ```
 

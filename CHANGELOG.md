@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Removed
+
+## [0.4.1] - 2026-05-17
+
+### Fixed
+
+- Refactored `ActivatePromptCommand` and `PromptManager` to support prompt version activation in formats `1` or `v1`.
+
+## [0.4.0] - 2026-05-17
+
+### Added
+
+### Changed
+
 - Renamed the package from `veeqtoh/prompt-deck` to `promptphp/deck`.
 - Renamed the PHP namespace from `Veeqtoh\PromptDeck` to `PromptPHP\Deck`.
 - Renamed the public package identity from Prompt Deck to Deck by PromptPHP.

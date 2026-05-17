@@ -274,6 +274,8 @@ test('activate() creates metadata.json if it does not exist', function () {
     expect($meta['active_version'])->toBe(1);
 });
 
+use InvalidArgumentException;
+
 test('activate() preserves existing metadata keys when updating active_version', function () {
     $this->createPromptFixture('preserve-meta', 1, 'sys', 'usr', null, [
         'name'           => 'preserve-meta',
@@ -281,22 +283,34 @@ test('activate() preserves existing metadata keys when updating active_version',
         'active_version' => 1,
     ]);
 
+    // Version 2 must actually exist before it can be activated.
+    mkdir("{$this->tempDir}/preserve-meta/v2", 0777, true);
+
     freshManager()->activate('preserve-meta', 2);
 
     $meta = json_decode(file_get_contents("{$this->tempDir}/preserve-meta/metadata.json"), true);
+
     expect($meta['active_version'])->toBe(2)
         ->and($meta['name'])->toBe('preserve-meta')
         ->and($meta['description'])->toBe('My prompt');
 });
 
-test('activate() always returns true in filesystem mode', function () {
+test('activate() returns true in filesystem mode when version exists', function () {
     $this->createPromptFixture('fs-activate', 1, 'sys', 'usr');
 
-    // Even for a non-existent version number, filesystem mode always returns true
-    $result = freshManager()->activate('fs-activate', 999);
+    $result = freshManager()->activate('fs-activate', 1);
 
     expect($result)->toBeTrue();
 });
+
+test('activate() throws in filesystem mode when version does not exist', function () {
+    $this->createPromptFixture('fs-activate-missing', 1, 'sys', 'usr');
+
+    freshManager()->activate('fs-activate-missing', 999);
+})->throws(
+    InvalidArgumentException::class,
+    'Version [999] does not exist for prompt [fs-activate-missing].'
+);
 
 // =====================================================================
 // activate() — database mode (tracking enabled)
@@ -328,16 +342,17 @@ test('activate() with tracking enabled updates database', function () {
         ->and((bool) $v2->is_active)->toBeTrue();
 });
 
-test('activate() with tracking enabled returns false when version not in DB', function () {
+test('activate() with tracking enabled throws when prompt does not exist', function () {
     $this->setUpTrackingTables();
 
     $this->app['config']->set('deck.tracking.enabled', true);
     $this->app['config']->set('deck.tracking.connection', 'testing');
 
-    $result = freshManager()->activate('nonexistent', 99);
-
-    expect($result)->toBeFalse();
-});
+    freshManager()->activate('nonexistent', 99);
+})->throws(
+    InvalidArgumentException::class,
+    'Prompt [nonexistent] does not exist.'
+);
 
 // =====================================================================
 // getActiveVersion() — database mode
