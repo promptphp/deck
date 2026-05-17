@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Database\Factories;
+namespace PromptPHP\Deck\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Veeqtoh\PromptDeck\Models\PromptVersion;
+use PromptPHP\Deck\Models\PromptVersion;
 
 class PromptVersionFactory extends Factory
 {

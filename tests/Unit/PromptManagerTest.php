@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\DB;
-use Veeqtoh\PromptDeck\Exceptions\InvalidVersionException;
-use Veeqtoh\PromptDeck\Exceptions\PromptNotFoundException;
-use Veeqtoh\PromptDeck\PromptManager;
-use Veeqtoh\PromptDeck\PromptTemplate;
+use PromptPHP\Deck\Exceptions\InvalidVersionException;
+use PromptPHP\Deck\Exceptions\PromptNotFoundException;
+use PromptPHP\Deck\PromptManager;
+use PromptPHP\Deck\PromptTemplate;
 
 // =====================================================================
 // Helper to get a fresh PromptManager bound to the test's temp directory

@@ -6,7 +6,7 @@ use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Veeqtoh\PromptDeck\Listeners\AfterMakeAgent;
+use PromptPHP\Deck\Listeners\AfterMakeAgent;
 
 // =====================================================================
 // Listener instantiation

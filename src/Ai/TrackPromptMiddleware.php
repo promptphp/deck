@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Ai;
+namespace PromptPHP\Deck\Ai;
 
 use Closure;
-use Veeqtoh\PromptDeck\PromptManager;
+use PromptPHP\Deck\PromptManager;
 
 /**
  * Laravel AI SDK agent middleware that automatically tracks

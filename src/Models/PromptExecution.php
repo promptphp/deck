@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Models;
+namespace PromptPHP\Deck\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Veeqtoh\PromptDeck\Database\Factories\PromptExecutionFactory;
+use PromptPHP\Deck\Database\Factories\PromptExecutionFactory;
 
 class PromptExecution extends Model
 {

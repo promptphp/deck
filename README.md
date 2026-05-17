@@ -27,7 +27,7 @@ composer require veeqtoh/prompt-deck
 Publish the config and migrations
 
 ```bash
-php artisan vendor:publish --provider="Veeqtoh\PromptDeck\Providers\PromptDeckServiceProvider"
+php artisan vendor:publish --provider="PromptPHP\Deck\Providers\PromptDeckServiceProvider"
 
 # Run migrations.
 php artisan migrate
@@ -62,7 +62,7 @@ Summarise the following order for the customer: {{ $order }}.
 Load and render prompts with the `PromptDeck` facade
 
 ```php
-use Veeqtoh\PromptDeck\Facades\PromptDeck;
+use PromptPHP\Deck\Facades\PromptDeck;
 
 // Load the active version of a prompt
 $prompt = PromptDeck::get('order-summary');
@@ -102,7 +102,7 @@ $prompt = PromptDeck::get('order-summary', 'v2');
 If you use the [Laravel AI SDK](https://laravel.com/docs/ai-sdk), add the `HasPromptTemplate` trait to your agents. This way, you do not need to define the `instructions()` method as it is provided automatically.
 
 ```php
-use Veeqtoh\PromptDeck\Concerns\HasPromptTemplate;
+use PromptPHP\Deck\Concerns\HasPromptTemplate;
 
 class OrderAgent extends Agent
 {

@@ -114,7 +114,7 @@ Logs individual prompt executions with performance data.
 Use the `PromptDeck::track()` method to record an execution manually:
 
 ```php
-use Veeqtoh\PromptDeck\Facades\PromptDeck;
+use PromptPHP\Deck\Facades\PromptDeck;
 
 PromptDeck::track('order-summary', 2, [
     'input'    => ['message' => 'Summarise order #1234'],
@@ -166,12 +166,12 @@ Prompt Deck provides two Eloquent models for interacting with tracking data.
 
 ### PromptVersion
 
-`Veeqtoh\PromptDeck\Models\PromptVersion`
+`PromptPHP\Deck\Models\PromptVersion`
 
 Represents a prompt version record in the `prompt_versions` table.
 
 ```php
-use Veeqtoh\PromptDeck\Models\PromptVersion;
+use PromptPHP\Deck\Models\PromptVersion;
 
 // Find the active version
 $active = PromptVersion::where('name', 'order-summary')
@@ -196,12 +196,12 @@ $versions = PromptVersion::where('name', 'order-summary')
 
 ### PromptExecution
 
-`Veeqtoh\PromptDeck\Models\PromptExecution`
+`PromptPHP\Deck\Models\PromptExecution`
 
 Represents an execution record in the `prompt_executions` table.
 
 ```php
-use Veeqtoh\PromptDeck\Models\PromptExecution;
+use PromptPHP\Deck\Models\PromptExecution;
 
 // Get recent executions
 $recent = PromptExecution::where('prompt_name', 'order-summary')
@@ -240,7 +240,7 @@ Both models include factories for testing.
 ### PromptVersionFactory
 
 ```php
-use Veeqtoh\PromptDeck\Models\PromptVersion;
+use PromptPHP\Deck\Models\PromptVersion;
 
 // Create a basic version
 $version = PromptVersion::factory()->create();
@@ -267,7 +267,7 @@ $version = PromptVersion::factory()
 ### PromptExecutionFactory
 
 ```php
-use Veeqtoh\PromptDeck\Models\PromptExecution;
+use PromptPHP\Deck\Models\PromptExecution;
 
 // Create a basic execution
 $execution = PromptExecution::factory()->create();
@@ -299,7 +299,7 @@ $execution = PromptExecution::factory()
 ### Basic queries
 
 ```php
-use Veeqtoh\PromptDeck\Models\PromptExecution;
+use PromptPHP\Deck\Models\PromptExecution;
 
 // Total executions for a prompt
 $count = PromptExecution::where('prompt_name', 'order-summary')->count();

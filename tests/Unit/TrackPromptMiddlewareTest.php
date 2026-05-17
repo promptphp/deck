@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Veeqtoh\PromptDeck\Ai\TrackPromptMiddleware;
-use Veeqtoh\PromptDeck\PromptManager;
-use Veeqtoh\PromptDeck\PromptTemplate;
+use PromptPHP\Deck\Ai\TrackPromptMiddleware;
+use PromptPHP\Deck\PromptManager;
+use PromptPHP\Deck\PromptTemplate;
 
 // =====================================================================
 // Middleware instantiation

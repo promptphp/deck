@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Tests;
+namespace PromptPHP\Deck\Tests;
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use Veeqtoh\PromptDeck\Providers\PromptDeckServiceProvider;
+use PromptPHP\Deck\Providers\PromptDeckServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {

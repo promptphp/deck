@@ -19,7 +19,7 @@ If you're using Orchestra Testbench (recommended for package testing), register 
 namespace Tests;
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use Veeqtoh\PromptDeck\Providers\PromptDeckServiceProvider;
+use PromptPHP\Deck\Providers\PromptDeckServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -33,7 +33,7 @@ abstract class TestCase extends BaseTestCase
     protected function getPackageAliases($app): array
     {
         return [
-            'PromptDeck' => \Veeqtoh\PromptDeck\Facades\PromptDeck::class,
+            'PromptDeck' => \PromptPHP\Deck\Facades\PromptDeck::class,
         ];
     }
 }
@@ -90,7 +90,7 @@ Summarise this order: {{ $input }}
 ### Testing prompt loading
 
 ```php
-use Veeqtoh\PromptDeck\Facades\PromptDeck;
+use PromptPHP\Deck\Facades\PromptDeck;
 
 it('loads a prompt by name', function () {
     $prompt = PromptDeck::get('order-summary', 1);
@@ -101,11 +101,11 @@ it('loads a prompt by name', function () {
 
 it('throws when prompt does not exist', function () {
     PromptDeck::get('non-existent');
-})->throws(\Veeqtoh\PromptDeck\Exceptions\PromptNotFoundException::class);
+})->throws(\PromptPHP\Deck\Exceptions\PromptNotFoundException::class);
 
 it('throws when version does not exist', function () {
     PromptDeck::get('order-summary', 999);
-})->throws(\Veeqtoh\PromptDeck\Exceptions\InvalidVersionException::class);
+})->throws(\PromptPHP\Deck\Exceptions\InvalidVersionException::class);
 ```
 
 ### Testing variable interpolation
@@ -188,8 +188,8 @@ it('filters messages to specific roles', function () {
 You can mock the facade in tests where you don't want filesystem access:
 
 ```php
-use Veeqtoh\PromptDeck\Facades\PromptDeck;
-use Veeqtoh\PromptDeck\PromptTemplate;
+use PromptPHP\Deck\Facades\PromptDeck;
+use PromptPHP\Deck\PromptTemplate;
 
 it('uses a mocked prompt', function () {
     PromptDeck::shouldReceive('get')
@@ -243,7 +243,7 @@ protected function defineDatabaseMigrations(): void
 ```
 
 ```php
-use Veeqtoh\PromptDeck\Models\PromptExecution;
+use PromptPHP\Deck\Models\PromptExecution;
 
 it('tracks prompt executions', function () {
     PromptDeck::track('order-summary', 1, [
@@ -271,8 +271,8 @@ it('does not track when disabled', function () {
 Use the included factories to seed test data:
 
 ```php
-use Veeqtoh\PromptDeck\Models\PromptVersion;
-use Veeqtoh\PromptDeck\Models\PromptExecution;
+use PromptPHP\Deck\Models\PromptVersion;
+use PromptPHP\Deck\Models\PromptExecution;
 
 it('queries execution data', function () {
     PromptExecution::factory()
@@ -355,7 +355,7 @@ it('shows diff between versions', function () {
 Create a test agent class that uses the trait:
 
 ```php
-use Veeqtoh\PromptDeck\Concerns\HasPromptTemplate;
+use PromptPHP\Deck\Concerns\HasPromptTemplate;
 
 class TestAgent
 {

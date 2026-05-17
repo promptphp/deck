@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Exceptions;
+namespace PromptPHP\Deck\Exceptions;
 
 class InvalidVersionException extends PromptDeckException
 {

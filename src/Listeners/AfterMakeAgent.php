@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Listeners;
+namespace PromptPHP\Deck\Listeners;
 
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Support\Str;

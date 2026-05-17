@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Veeqtoh\PromptDeck\Exceptions\PromptNotFoundException;
+use PromptPHP\Deck\Exceptions\PromptNotFoundException;
 
 // ──────────────────────────────────────────────────────────────
 // Validation: missing version options

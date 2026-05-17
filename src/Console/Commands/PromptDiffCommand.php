@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Console\Commands;
+namespace PromptPHP\Deck\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
-use Veeqtoh\PromptDeck\Exceptions\PromptNotFoundException;
+use PromptPHP\Deck\Exceptions\PromptNotFoundException;
 
 class PromptDiffCommand extends Command
 {

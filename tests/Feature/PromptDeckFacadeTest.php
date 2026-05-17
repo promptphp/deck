@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Veeqtoh\PromptDeck\Facades\PromptDeck;
-use Veeqtoh\PromptDeck\PromptManager;
-use Veeqtoh\PromptDeck\PromptTemplate;
+use PromptPHP\Deck\Facades\PromptDeck;
+use PromptPHP\Deck\PromptManager;
+use PromptPHP\Deck\PromptTemplate;
 
 test('facade accessor returns prompt-deck', function () {
     // Resolve via facade accessor.

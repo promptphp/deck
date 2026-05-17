@@ -235,7 +235,7 @@ test('make:prompt creates base directory if it does not exist', function () {
     $this->app['config']->set('prompt-deck.path', $newPath);
 
     // Re-register the singleton with the new path.
-    $this->app->forgetInstance(\Veeqtoh\PromptDeck\PromptManager::class);
+    $this->app->forgetInstance(\PromptPHP\Deck\PromptManager::class);
 
     $this->artisan('make:prompt', ['name' => 'nested-prompt'])
         ->assertSuccessful();

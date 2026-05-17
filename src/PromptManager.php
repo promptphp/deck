@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck;
+namespace PromptPHP\Deck;
 
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
-use Veeqtoh\PromptDeck\Exceptions\InvalidVersionException;
-use Veeqtoh\PromptDeck\Exceptions\PromptNotFoundException;
+use PromptPHP\Deck\Exceptions\InvalidVersionException;
+use PromptPHP\Deck\Exceptions\PromptNotFoundException;
 
 class PromptManager
 {

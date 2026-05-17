@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Concerns;
+namespace PromptPHP\Deck\Concerns;
 
 use Stringable;
-use Veeqtoh\PromptDeck\PromptManager;
-use Veeqtoh\PromptDeck\PromptTemplate;
+use PromptPHP\Deck\PromptManager;
+use PromptPHP\Deck\PromptTemplate;
 
 /**
  * Trait for integrating PromptDeck templates with Laravel AI SDK agents.

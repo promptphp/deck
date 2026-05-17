@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Veeqtoh\PromptDeck\Models\PromptExecution;
-use Veeqtoh\PromptDeck\Models\PromptVersion;
+use PromptPHP\Deck\Models\PromptExecution;
+use PromptPHP\Deck\Models\PromptVersion;
 
 /*
 |--------------------------------------------------------------------------

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Veeqtoh\PromptDeck\Exceptions\ConfigurationException;
-use Veeqtoh\PromptDeck\Exceptions\InvalidVersionException;
-use Veeqtoh\PromptDeck\Exceptions\PromptDeckException;
-use Veeqtoh\PromptDeck\Exceptions\PromptNotFoundException;
-use Veeqtoh\PromptDeck\Exceptions\PromptRenderingException;
+use PromptPHP\Deck\Exceptions\ConfigurationException;
+use PromptPHP\Deck\Exceptions\InvalidVersionException;
+use PromptPHP\Deck\Exceptions\PromptDeckException;
+use PromptPHP\Deck\Exceptions\PromptNotFoundException;
+use PromptPHP\Deck\Exceptions\PromptRenderingException;
 
 // --- Hierarchy ---
 

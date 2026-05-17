@@ -88,7 +88,7 @@ namespace App\Ai\Agents;
 
 use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Promptable;
-use Veeqtoh\PromptDeck\Concerns\HasPromptTemplate;
+use PromptPHP\Deck\Concerns\HasPromptTemplate;
 
 class SalesCoach implements Agent
 {
@@ -213,8 +213,8 @@ use Laravel\Ai\Contracts\HasMiddleware;
 use Laravel\Ai\Contracts\HasStructuredOutput;
 use Laravel\Ai\Contracts\HasTools;
 use Laravel\Ai\Promptable;
-use Veeqtoh\PromptDeck\Ai\TrackPromptMiddleware;
-use Veeqtoh\PromptDeck\Concerns\HasPromptTemplate;
+use PromptPHP\Deck\Ai\TrackPromptMiddleware;
+use PromptPHP\Deck\Concerns\HasPromptTemplate;
 
 class SalesCoach implements Agent, Conversational, HasTools, HasStructuredOutput, HasMiddleware
 {
@@ -373,7 +373,7 @@ The `TrackPromptMiddleware` automatically records prompt executions via Prompt D
   <Step title="Add middleware to your agent">
     ```php
     use Laravel\Ai\Contracts\HasMiddleware;
-    use Veeqtoh\PromptDeck\Ai\TrackPromptMiddleware;
+    use PromptPHP\Deck\Ai\TrackPromptMiddleware;
 
     class SalesCoach implements Agent, HasMiddleware
     {
