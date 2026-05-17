@@ -119,34 +119,44 @@ class PromptManager
 
     /**
      * Activate a specific version.
+     *
+     * For simplicity, we'll store in a JSON file or use the database if tracking is enabled.
+     * We'll assume we have a "prompt_versions" table with an "is_active" column.
      */
     public function activate(string $name, int $version): bool
     {
-        // Store active version in database or config file?
-        // For simplicity, we'll store in a JSON file or use the database if tracking is enabled.
-        // We'll assume we have a "prompt_versions" table with an "is_active" column.
-        if ($this->trackingConfig['enabled'] ?? false) {
-            // Update database.
-            DB::connection($this->trackingConfig['connection'] ?? config('database.default'))
-                ->table('prompt_versions')
-                ->where('name', $name)
-                ->update(['is_active' => false]);
+        $this->ensureVersionExists($name, $version);
 
-            return DB::table('prompt_versions')
-                ->where('name', $name)
-                ->where('version', $version)
-                ->update(['is_active' => true]) > 0;
+        if ($this->trackingConfig['enabled'] ?? false) {
+            $connection = DB::connection(
+                $this->trackingConfig['connection'] ?? config('database.default')
+            );
+
+            // Update database.
+            $connection->transaction(function () use ($connection, $name, $version): void {
+                $connection
+                    ->table('prompt_versions')
+                    ->where('name', $name)
+                    ->update(['is_active' => false]);
+
+                $connection
+                    ->table('prompt_versions')
+                    ->where('name', $name)
+                    ->where('version', $version)
+                    ->update(['is_active' => true]);
+            });
         }
 
         // Fallback: store in a JSON file in the prompt directory.
         $metadataFile = "{$this->basePath}/{$name}/metadata.json";
+
         $metadata     = $this->files->exists($metadataFile)
-            ? json_decode($this->files->get($metadataFile), true)
+            ? json_decode($this->files->get($metadataFile), true) ?? []
             : [];
 
         $metadata['active_version'] = $version;
 
-        $this->files->put($metadataFile, json_encode($metadata, JSON_PRETTY_PRINT));
+        $this->files->put($metadataFile, json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
         return true;
     }
@@ -266,5 +276,29 @@ class PromptManager
         }
 
         return [];
+    }
+
+    /**
+     * Ensure the specified prompt version exists before activation.
+     *
+     * @throws \InvalidArgumentException if the version is invalid or does not exist.
+     */
+    protected function ensureVersionExists(string $name, int $version): void
+    {
+        if ($version < 1) {
+            throw new \InvalidArgumentException('The prompt version must be a positive integer.');
+        }
+
+        $promptPath = "{$this->basePath}/{$name}";
+
+        if (! $this->files->isDirectory($promptPath)) {
+            throw new \InvalidArgumentException("Prompt [{$name}] does not exist.");
+        }
+
+        $versionPath = "{$promptPath}/v{$version}";
+
+        if (! $this->files->isDirectory($versionPath)) {
+            throw new \InvalidArgumentException("Version [{$version}] does not exist for prompt [{$name}]. Create it first before activating.");
+        }
     }
 }
