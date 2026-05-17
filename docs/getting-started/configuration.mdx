@@ -1,21 +1,21 @@
 ---
 title: "Configuration"
-description: "All available configuration options for Prompt Deck."
+description: "All available configuration options for Deck by PromptPHP."
 ---
 
 ## Introduction
 
-Prompt Deck ships with sensible defaults that work out of the box. Like most Laravel packages, all configuration lives in `config/prompt-deck.php` and every option can be overridden via environment variables for deployment flexibility.
+Deck by PromptPHP ships with sensible defaults that work out of the box. Like most Laravel packages, all configuration lives in `config/deck.php` and every option can be overridden via environment variables for deployment flexibility.
 
 ## Publishing the configuration
 
 Publish the configuration file using the Artisan command:
 
 ```bash
-php artisan vendor:publish --tag=prompt-deck-config
+php artisan vendor:publish --tag=deck-config
 ```
 
-This copies the package's default configuration to `config/prompt-deck.php` in your application. Once published, you can modify it freely.
+This copies the package's default configuration to `config/deck.php` in your application. Once published, you can modify it freely.
 
 ## Prompts path
 
@@ -84,7 +84,7 @@ The `cache` section controls prompt caching behaviour. Caching avoids repeated f
     'enabled' => env('DECK_CACHE_ENABLED', env('APP_DEBUG', false) ? false : true),
     'store'   => env('DECK_CACHE_STORE', 'file'),
     'ttl'     => env('DECK_CACHE_TTL', 3600),
-    'prefix'  => env('CACHE_PREFIX', env('DECK_CACHE_PREFIX', 'prompt-deck:')),
+    'prefix'  => env('CACHE_PREFIX', env('DECK_CACHE_PREFIX', 'deck:')),
 ],
 ```
 
@@ -129,15 +129,15 @@ Cache time-to-live in **seconds**. After this duration, the prompt is re-read fr
 ### Cache key prefix
 
 ```php
-'prefix' => env('CACHE_PREFIX', env('DECK_CACHE_PREFIX', 'prompt-deck:')),
+'prefix' => env('CACHE_PREFIX', env('DECK_CACHE_PREFIX', 'deck:')),
 ```
 
-The prefix prepended to all cache keys. The final cache key follows the pattern: `{prefix}{prompt-name}.v{version}`.
+The prefix prepended to all cache keys. The final cache key follows the pattern: `{prefix}{name}.v{version}`.
 
 For example, with the default prefix:
 
 ```
-prompt-deck:order-summary.v2
+deck:order-summary.v2
 ```
 
 ## Database tracking
@@ -160,7 +160,7 @@ The `tracking` section controls whether prompt versions and executions are logge
 Like caching, tracking is **disabled** in debug mode and **enabled** in production by default. When enabled:
 
 - **Version activation** is stored in the `prompt_versions` database table (instead of `metadata.json`).
-- **Execution tracking** via `PromptDeck::track()` inserts records into the `prompt_executions` table.
+- **Execution tracking** via `Deck::track()` inserts records into the `prompt_executions` table.
 
 <Warning>
     You must publish and run the migrations before enabling tracking. See
@@ -186,7 +186,7 @@ DECK_DB_CONNECTION=analytics
 'scaffold_on_make_agent' => env('DECK_SCAFFOLD_ON_MAKE_AGENT', true),
 ```
 
-When the [Laravel AI SDK](https://laravel.com/docs/ai-sdk) is installed and this option is `true`, Prompt Deck automatically creates a matching prompt directory whenever you run `php artisan make:agent`. See the [AI SDK Integration](/integrations/ai-sdk) documentation for details.
+When the [Laravel AI SDK](https://laravel.com/docs/ai-sdk) is installed and this option is `true`, Deck automatically creates a matching prompt directory whenever you run `php artisan make:agent`. See the [AI SDK Integration](/integrations/ai-sdk) documentation for details.
 
 Set to `false` to disable automatic scaffolding:
 
@@ -204,7 +204,7 @@ DECK_SCAFFOLD_ON_MAKE_AGENT=false
 | `cache.enabled`          | `bool`         | `true` (prod) / `false` (debug) | Enable prompt caching.                        |
 | `cache.store`            | `string`       | `file`                          | Cache store name.                             |
 | `cache.ttl`              | `int`          | `3600`                          | Cache TTL in seconds.                         |
-| `cache.prefix`           | `string`       | `prompt-deck:`                  | Cache key prefix.                             |
+| `cache.prefix`           | `string`       | `deck:`                         | Cache key prefix.                             |
 | `tracking.enabled`       | `bool`         | `true` (prod) / `false` (debug) | Enable database tracking.                     |
 | `tracking.connection`    | `string\|null` | `null`                          | Database connection name.                     |
 | `scaffold_on_make_agent` | `bool`         | `true`                          | Auto-scaffold prompts on `make:agent`.        |
@@ -213,10 +213,10 @@ DECK_SCAFFOLD_ON_MAKE_AGENT=false
 
 | Variable                            | Default        | Description                       |
 | ----------------------------------- | -------------- | --------------------------------- |
-| `DECK_CACHE_ENABLED`          | Dynamic        | Enable/disable caching.           |
-| `DECK_CACHE_STORE`            | `file`         | Cache store to use.               |
-| `DECK_CACHE_TTL`              | `3600`         | Cache TTL in seconds.             |
-| `DECK_CACHE_PREFIX`           | `prompt-deck:` | Cache key prefix.                 |
-| `DECK_TRACKING_ENABLED`       | Dynamic        | Enable/disable database tracking. |
-| `DECK_DB_CONNECTION`          | `null`         | Database connection for tracking. |
-| `DECK_SCAFFOLD_ON_MAKE_AGENT` | `true`         | Auto-scaffold on `make:agent`.    |
+| `DECK_CACHE_ENABLED`                | Dynamic        | Enable/disable caching.           |
+| `DECK_CACHE_STORE`                  | `file`         | Cache store to use.               |
+| `DECK_CACHE_TTL`                    | `3600`         | Cache TTL in seconds.             |
+| `DECK_CACHE_PREFIX`                 | `deck:`        | Cache key prefix.                 |
+| `DECK_TRACKING_ENABLED`             | Dynamic        | Enable/disable database tracking. |
+| `DECK_DB_CONNECTION`                | `null`         | Database connection for tracking. |
+| `DECK_SCAFFOLD_ON_MAKE_AGENT`       | `true`         | Auto-scaffold on `make:agent`.    |

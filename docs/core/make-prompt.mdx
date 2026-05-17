@@ -1,11 +1,11 @@
 ---
 title: "Creating prompts"
-description: "Generate versioned, role-based prompt structures with the make:prompt Artisan command."
+description: "Generate versioned, role-based prompt structures with the `make:prompt` Artisan command."
 ---
 
 ## Introduction
 
-Prompt Deck provides an Artisan generator command that scaffolds versioned, role-based prompt structures for your AI agents. The command follows Laravel conventions and supports interactive workflows, automatic versioning, customisable stubs, and rich metadata — everything you need to manage prompts as first-class project assets.
+Deck by PromptPHP provides an Artisan generator command that scaffolds versioned, role-based prompt structures for your AI agents. The command follows Laravel conventions and supports interactive workflows, automatic versioning, customisable stubs, and rich metadata.
 
 ## Generating prompts
 
@@ -92,7 +92,7 @@ resources/prompts/
     └── metadata.json
 ```
 
-The file extension is controlled by the `prompt-deck.extension` configuration value (default: `md`). For example, setting it to `txt` produces `system.txt`, `user.txt`, etc.
+The file extension is controlled by the `deck.extension` configuration value (default: `md`). For example, setting it to `txt` produces `system.txt`, `user.txt`, etc.
 
 ### Metadata
 
@@ -197,7 +197,7 @@ All scaffolded roles (including `system` and optionally `user`) are recorded in 
 
 ## Versioning
 
-Prompt Deck uses directory-based versioning. Each version lives in its own sub-directory (`v1/`, `v2/`, etc.) inside the prompt folder.
+Deck uses directory-based versioning. Each version lives in its own sub-directory (`v1/`, `v2/`, etc.) inside the prompt folder.
 
 ### Auto-increment
 
@@ -253,7 +253,7 @@ To customise the stubs for your project, create a `stubs/prompt-deck/` directory
 ```
 your-app/
 └── stubs/
-    └── prompt-deck/
+    └── deck/
         ├── system-prompt.stub
         ├── user-prompt.stub
         └── role-prompt.stub
@@ -288,12 +288,12 @@ This normalisation applies to both the prompt name and any extra role names prov
 
 ## Configuration
 
-The command respects the following values from `config/prompt-deck.php`:
+The command respects the following values from `config/deck.php`:
 
 | Key                     | Default                    | Description                                         |
 | ----------------------- | -------------------------- | --------------------------------------------------- |
-| `prompt-deck.path`      | `resource_path('prompts')` | Base directory where prompt structures are created. |
-| `prompt-deck.extension` | `md`                       | File extension for generated prompt files.          |
+| `deck.path`             | `resource_path('prompts')` | Base directory where prompt structures are created. |
+| `deck.extension`        | `md`                       | File extension for generated prompt files.          |
 
 See the full [Configuration](/getting-started/configuration) reference for all options.
 

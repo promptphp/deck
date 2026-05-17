@@ -1,13 +1,13 @@
 ---
 title: "Introduction"
-description: "Prompt Deck helps you organise your AI Agents instructions as structured, version-controlled files, making it easy to iterate, compare, and activate prompt versions across your Laravel / PHP application."
+description: "Deck by PromptPHP helps you organise your AI Agents instructions as structured, version-controlled files, making it easy to iterate, compare, and activate prompt versions across your Laravel / PHP application."
 ---
 
 It provides variable interpolation, performance tracking, A/B testing, and optional seamless integration with the [Laravel AI SDK](https://laravel.com/docs/ai-sdk).
 
 ## Quick start
 
-Get up and running with Prompt Deck in minutes.
+Get up and running with Deck in minutes.
 
 <Card
     title="Installation guide"
@@ -15,7 +15,7 @@ Get up and running with Prompt Deck in minutes.
     href="/getting-started/installation"
     horizontal
 >
-    Install, configure, and verify Prompt Deck in your Laravel project.
+    Install, configure, and verify Deck in your Laravel project.
 </Card>
 
 ## Quick usage
@@ -47,19 +47,19 @@ Summarise the following order for the customer: {{ $order }}.
 
 ### Using a prompt
 
-Load and render prompts with the `PromptDeck` facade:
+Load and render prompts with the `Deck` facade:
 
 ```php
 use PromptPHP\Deck\Facades\Deck;
 
-// Load the active version of a prompt
-$prompt = PromptDeck::get('order-summary');
+// Load the active version of a prompt.
+$prompt = Deck::get('order-summary');
 
-// Render a role with variables
+// Render a role with variables.
 $prompt->system(['tone' => 'friendly', 'order' => $orderDetails]);
 // "You are a friendly customer service agent. Summarise the following order..."
 
-// Build a messages array ready for any chat-completion API
+// Build a messages array ready for any chat-completion API.
 $messages = $prompt->toMessages(['tone' => 'friendly', 'order' => $orderDetails]);
 // [['role' => 'system', 'content' => '...']]
 ```
@@ -82,7 +82,7 @@ php artisan prompt:activate order-summary v2
 Or load a specific version programmatically:
 
 ```php
-$prompt = PromptDeck::get('order-summary', 'v2');
+$prompt = Deck::get('order-summary', 'v2');
 ```
 
 ### Laravel AI SDK integration
@@ -96,7 +96,7 @@ class OrderAgent extends Agent
 {
     use HasPromptTemplate;
 
-    // instructions() and promptMessages() are provided automatically
+    // instructions() and promptMessages() are provided automatically.
 }
 ```
 

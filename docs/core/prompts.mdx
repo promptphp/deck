@@ -5,14 +5,14 @@ description: "Load, render, version, cache, and track AI prompts in your Laravel
 
 ## Introduction
 
-Prompt Deck provides a clean, expressive API for loading, rendering, and managing versioned AI prompts in your Laravel application. Prompts are stored as plain files on disk and organised by name, version, and role. They are accessed through the `PromptDeck` facade, which feels like any other first-party Laravel service.
+Deck by PromptPHP provides a clean, expressive API for loading, rendering, and managing versioned AI prompts in your Laravel application. Prompts are stored as plain files on disk and organised by name, version, and role. They are accessed through the `Deck` facade.
 
 A prompt can contain multiple **roles** (system, user, assistant, developer, tool, or any custom role you define). Each role's content supports `{{ $variable }}` interpolation, and the entire prompt can be converted into a messages array ready to send to OpenAI, Anthropic, or any chat-completion API.
 
 ```php
 use PromptPHP\Deck\Facades\Deck;
 
-$prompt = PromptDeck::get('order-summary');
+$prompt = Deck::get('order-summary');
 
 $prompt->system(['tone' => 'friendly']);
 // "You are a friendly AI assistant..."
@@ -23,18 +23,18 @@ $prompt->user(['input' => $request->message]);
 
 ## Retrieving prompts
 
-### The PromptDeck facade
+### The Deck facade
 
-The `PromptDeck` facade is the primary entry point for loading prompts. It delegates to the `PromptManager` singleton registered by the service provider:
+The `Deck` facade is the primary entry point for loading prompts. It delegates to the `PromptManager` singleton registered by the service provider:
 
 ```php
 use PromptPHP\Deck\Facades\Deck;
 
-// Load the active version
-$prompt = PromptDeck::get('order-summary');
+// Load the active version.
+$prompt = Deck::get('order-summary');
 
-// Load a specific version
-$prompt = PromptDeck::get('order-summary', 2);
+// Load a specific version.
+$prompt = Deck::get('order-summary', 2);
 ```
 
 The `get` method returns a `PromptTemplate` instance. If no version is specified, the [active version](#version-resolution-order) is resolved automatically.
@@ -65,7 +65,7 @@ The `PromptManager` is registered as a singleton, so the same instance is reused
 Use the `active` method to explicitly load the active version:
 
 ```php
-$prompt = PromptDeck::active('order-summary');
+$prompt = Deck::active('order-summary');
 
 $prompt->version(); // e.g. 3
 ```
@@ -77,7 +77,7 @@ This is equivalent to calling `get()` without a version number.
 Pass a version number as the second argument to `get` to load a specific version, regardless of which version is currently active:
 
 ```php
-$prompt = PromptDeck::get('order-summary', 1);
+$prompt = Deck::get('order-summary', 1);
 
 $prompt->version(); // 1
 ```
@@ -93,15 +93,15 @@ Once you have a `PromptTemplate` instance, you can render any role's content wit
 The most expressive way to render a role is to call it as a method directly on the prompt instance. This uses PHP's `__call` magic method and works for **any** role — not just `system` and `user`:
 
 ```php
-$prompt = PromptDeck::get('code-reviewer');
+$prompt = Deck::get('code-reviewer');
 
-// Render the system role
+// Render the system role.
 $prompt->system(['tone' => 'professional']);
 
-// Render the user role
+// Render the user role.
 $prompt->user(['input' => $code]);
 
-// Render custom roles
+// Render custom roles.
 $prompt->assistant(['context' => $history]);
 $prompt->developer(['task' => 'review']);
 $prompt->tool(['name' => 'search']);
@@ -184,7 +184,7 @@ $prompt->version(); // 2
 The `toMessages` method builds a messages array compatible with OpenAI, Anthropic, and other chat-completion APIs. It renders every role with the given variables and returns them in definition order:
 
 ```php
-$messages = PromptDeck::get('chat-agent')->toMessages([
+$messages = Deck::get('chat-agent')->toMessages([
     'tone'  => 'helpful',
     'input' => $userMessage,
 ]);
@@ -229,7 +229,7 @@ Roles specified in the filter that don't exist in the prompt are silently skippe
 
 ### Syntax
 
-Prompt Deck supports two placeholder syntaxes within prompt files:
+Deck by PromptPHP supports two placeholder syntaxes within prompt files:
 
 | Syntax               | Example       |
 | -------------------- | ------------- |
@@ -301,7 +301,7 @@ Each version directory can contain:
 Retrieve all versions for a prompt programmatically:
 
 ```php
-$versions = PromptDeck::versions('order-summary');
+$versions = Deck::versions('order-summary');
 
 // [
 //     ['version' => 1, 'path' => '...', 'metadata' => [...]],
@@ -324,7 +324,7 @@ See [Artisan Commands — prompt:list](/core/commands#promptlist) for details.
 Set a specific version as the active version:
 
 ```php
-PromptDeck::activate('order-summary', 2);
+Deck::activate('order-summary', 2);
 ```
 
 **When database tracking is enabled**, this updates the `prompt_versions` table — setting `is_active = false` on all versions of that prompt, then `is_active = true` on the specified version.
@@ -341,7 +341,7 @@ See [Artisan Commands — prompt:activate](/core/commands#promptactivate) for de
 
 ### Version resolution order
 
-When you call `PromptDeck::get('name')` without a version, the active version is resolved in this priority order:
+When you call `Deck::get('name')` without a version, the active version is resolved in this priority order:
 
 1. **Database** — If tracking is enabled, looks for a version marked `is_active = true` in the `prompt_versions` table for that prompt name.
 2. **metadata.json** — Reads the `active_version` key from the prompt's root `metadata.json` file.
@@ -354,12 +354,12 @@ If no versions exist at all, an `InvalidVersionException` is thrown.
 When caching is enabled, loaded prompts are stored in your configured cache store to avoid repeated filesystem reads:
 
 ```php
-// config/prompt-deck.php
+// config/deck.php
 'cache' => [
     'enabled' => env('DECK_CACHE_ENABLED', true),
     'store'   => env('DECK_CACHE_STORE', 'file'),
     'ttl'     => 3600, // seconds
-    'prefix'  => 'prompt-deck:',
+    'prefix'  => 'deck:',
 ],
 ```
 
@@ -374,7 +374,7 @@ See [Configuration — Cache](/getting-started/configuration#cache) for the full
 When database tracking is enabled, you can log prompt executions for performance monitoring, A/B testing, and audit trails:
 
 ```php
-PromptDeck::track('order-summary', 2, [
+Deck::track('order-summary', 2, [
     'input'    => ['message' => 'Summarise order #1234'],
     'output'   => 'Your order contains...',
     'tokens'   => 150,
