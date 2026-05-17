@@ -1,11 +1,11 @@
 ---
-title: "Testing"
+title: "Testing"php
 description: "Testing strategies and examples for prompts, commands, tracking, and AI SDK integration."
 ---
 
 ## Introduction
 
-Prompt Deck is designed to be easily testable. This guide covers strategies for testing prompts, commands, tracking, and AI SDK integration in your Laravel application.
+Deck by PromptPHP is designed to be easily testable. This guide covers strategies for testing prompts, commands, tracking, and AI SDK integration in your Laravel application.
 
 ## Setting up tests
 
@@ -19,21 +19,21 @@ If you're using Orchestra Testbench (recommended for package testing), register 
 namespace Tests;
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use Veeqtoh\PromptDeck\Providers\PromptDeckServiceProvider;
+use PromptPHP\Deck\Providers\DeckServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
     protected function getPackageProviders($app): array
     {
         return [
-            PromptDeckServiceProvider::class,
+            DeckServiceProvider::class,
         ];
     }
 
     protected function getPackageAliases($app): array
     {
         return [
-            'PromptDeck' => \Veeqtoh\PromptDeck\Facades\PromptDeck::class,
+            'Deck' => \PromptPHP\Deck\Facades\Deck::class,
         ];
     }
 }
@@ -46,9 +46,9 @@ For most tests, disable caching and tracking to avoid side effects:
 ```php
 protected function defineEnvironment($app): void
 {
-    $app['config']->set('prompt-deck.cache.enabled', false);
-    $app['config']->set('prompt-deck.tracking.enabled', false);
-    $app['config']->set('prompt-deck.path', $this->getFixturePath('prompts'));
+    $app['config']->set('deck.cache.enabled', false);
+    $app['config']->set('deck.tracking.enabled', false);
+    $app['config']->set('deck.path', $this->getFixturePath('prompts'));
 }
 
 protected function getFixturePath(string $path = ''): string
@@ -90,29 +90,29 @@ Summarise this order: {{ $input }}
 ### Testing prompt loading
 
 ```php
-use Veeqtoh\PromptDeck\Facades\PromptDeck;
+use PromptPHP\Deck\Facades\Deck;
 
 it('loads a prompt by name', function () {
-    $prompt = PromptDeck::get('order-summary', 1);
+    $prompt = Deck::get('order-summary', 1);
 
     expect($prompt->name())->toBe('order-summary');
     expect($prompt->version())->toBe(1);
 });
 
 it('throws when prompt does not exist', function () {
-    PromptDeck::get('non-existent');
-})->throws(\Veeqtoh\PromptDeck\Exceptions\PromptNotFoundException::class);
+    Deck::get('non-existent');
+})->throws(\PromptPHP\Deck\Exceptions\PromptNotFoundException::class);
 
 it('throws when version does not exist', function () {
-    PromptDeck::get('order-summary', 999);
-})->throws(\Veeqtoh\PromptDeck\Exceptions\InvalidVersionException::class);
+    Deck::get('order-summary', 999);
+})->throws(\PromptPHP\Deck\Exceptions\InvalidVersionException::class);
 ```
 
 ### Testing variable interpolation
 
 ```php
 it('interpolates variables in prompt content', function () {
-    $prompt = PromptDeck::get('order-summary', 1);
+    $prompt = Deck::get('order-summary', 1);
 
     $content = $prompt->system(['tone' => 'friendly']);
 
@@ -121,7 +121,7 @@ it('interpolates variables in prompt content', function () {
 });
 
 it('leaves unmatched placeholders intact', function () {
-    $prompt = PromptDeck::get('order-summary', 1);
+    $prompt = Deck::get('order-summary', 1);
 
     $content = $prompt->system([]);
 
@@ -133,26 +133,26 @@ it('leaves unmatched placeholders intact', function () {
 
 ```php
 it('lists available roles', function () {
-    $prompt = PromptDeck::get('order-summary', 1);
+    $prompt = Deck::get('order-summary', 1);
 
     expect($prompt->roles())->toContain('system', 'user');
 });
 
 it('checks if a role exists', function () {
-    $prompt = PromptDeck::get('order-summary', 1);
+    $prompt = Deck::get('order-summary', 1);
 
     expect($prompt->has('system'))->toBeTrue();
     expect($prompt->has('nonexistent'))->toBeFalse();
 });
 
 it('returns empty string for missing roles', function () {
-    $prompt = PromptDeck::get('order-summary', 1);
+    $prompt = Deck::get('order-summary', 1);
 
     expect($prompt->role('nonexistent'))->toBe('');
 });
 
 it('gets raw content without interpolation', function () {
-    $prompt = PromptDeck::get('order-summary', 1);
+    $prompt = Deck::get('order-summary', 1);
 
     $raw = $prompt->raw('system');
 
@@ -164,7 +164,7 @@ it('gets raw content without interpolation', function () {
 
 ```php
 it('builds messages array for AI APIs', function () {
-    $prompt = PromptDeck::get('order-summary', 1);
+    $prompt = Deck::get('order-summary', 1);
 
     $messages = $prompt->toMessages(['tone' => 'friendly', 'input' => 'Order #123']);
 
@@ -174,7 +174,7 @@ it('builds messages array for AI APIs', function () {
 });
 
 it('filters messages to specific roles', function () {
-    $prompt = PromptDeck::get('order-summary', 1);
+    $prompt = Deck::get('order-summary', 1);
 
     $messages = $prompt->toMessages([], ['system']);
 
@@ -188,11 +188,11 @@ it('filters messages to specific roles', function () {
 You can mock the facade in tests where you don't want filesystem access:
 
 ```php
-use Veeqtoh\PromptDeck\Facades\PromptDeck;
-use Veeqtoh\PromptDeck\PromptTemplate;
+use PromptPHP\Deck\Facades\Deck;
+use PromptPHP\Deck\PromptTemplate;
 
 it('uses a mocked prompt', function () {
-    PromptDeck::shouldReceive('get')
+    Deck::shouldReceive('get')
         ->with('order-summary', null)
         ->andReturn(new PromptTemplate(
             'order-summary',
@@ -201,7 +201,7 @@ it('uses a mocked prompt', function () {
             ['description' => 'Test prompt']
         ));
 
-    $prompt = PromptDeck::get('order-summary');
+    $prompt = Deck::get('order-summary');
 
     expect($prompt->system())->toBe('You are a helpful assistant.');
 });
@@ -211,7 +211,7 @@ it('uses a mocked prompt', function () {
 
 ```php
 it('lists all versions for a prompt', function () {
-    $versions = PromptDeck::versions('order-summary');
+    $versions = Deck::versions('order-summary');
 
     expect($versions)->toBeArray();
     expect($versions[0])->toHaveKey('version');
@@ -219,7 +219,7 @@ it('lists all versions for a prompt', function () {
 
 it('activates a specific version', function () {
     // With tracking disabled, this writes to metadata.json
-    $result = PromptDeck::activate('order-summary', 1);
+    $result = Deck::activate('order-summary', 1);
 
     expect($result)->toBeTrue();
 });
@@ -232,7 +232,7 @@ When testing tracking, enable it and run the migrations in your test setup:
 ```php
 protected function defineEnvironment($app): void
 {
-    $app['config']->set('prompt-deck.tracking.enabled', true);
+    $app['config']->set('deck.tracking.enabled', true);
     $app['config']->set('database.default', 'testing');
 }
 
@@ -243,10 +243,10 @@ protected function defineDatabaseMigrations(): void
 ```
 
 ```php
-use Veeqtoh\PromptDeck\Models\PromptExecution;
+use PromptPHP\Deck\Models\PromptExecution;
 
 it('tracks prompt executions', function () {
-    PromptDeck::track('order-summary', 1, [
+    Deck::track('order-summary', 1, [
         'input'  => ['message' => 'test'],
         'output' => 'response',
         'tokens' => 100,
@@ -258,9 +258,9 @@ it('tracks prompt executions', function () {
 });
 
 it('does not track when disabled', function () {
-    config(['prompt-deck.tracking.enabled' => false]);
+    config(['deck.tracking.enabled' => false]);
 
-    PromptDeck::track('order-summary', 1, ['tokens' => 50]);
+    Deck::track('order-summary', 1, ['tokens' => 50]);
 
     expect(PromptExecution::count())->toBe(0);
 });
@@ -271,8 +271,8 @@ it('does not track when disabled', function () {
 Use the included factories to seed test data:
 
 ```php
-use Veeqtoh\PromptDeck\Models\PromptVersion;
-use Veeqtoh\PromptDeck\Models\PromptExecution;
+use PromptPHP\Deck\Models\PromptVersion;
+use PromptPHP\Deck\Models\PromptExecution;
 
 it('queries execution data', function () {
     PromptExecution::factory()
@@ -307,7 +307,7 @@ it('creates a prompt via make:prompt', function () {
     $this->artisan('make:prompt', ['name' => 'test-prompt'])
         ->assertSuccessful();
 
-    $promptPath = config('prompt-deck.path') . '/test-prompt/v1';
+    $promptPath = config('deck.path') . '/test-prompt/v1';
     expect(File::isDirectory($promptPath))->toBeTrue();
     expect(File::exists($promptPath . '/system.md'))->toBeTrue();
 });
@@ -355,7 +355,7 @@ it('shows diff between versions', function () {
 Create a test agent class that uses the trait:
 
 ```php
-use Veeqtoh\PromptDeck\Concerns\HasPromptTemplate;
+use PromptPHP\Deck\Concerns\HasPromptTemplate;
 
 class TestAgent
 {

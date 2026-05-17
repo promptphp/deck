@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Console\Commands;
+namespace PromptPHP\Deck\Console\Commands;
 
 use Illuminate\Console\Command;
-use Veeqtoh\PromptDeck\PromptManager;
+use PromptPHP\Deck\PromptManager;
 
 class ListPromptsCommand extends Command
 {
@@ -23,7 +23,7 @@ class ListPromptsCommand extends Command
 
     public function handle(): int
     {
-        $basePath = config('prompt-deck.path');
+        $basePath = config('deck.path');
         if (! is_dir($basePath)) {
             $this->warn('Prompts directory not found.');
 

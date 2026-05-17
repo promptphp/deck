@@ -6,7 +6,7 @@ sidebarTitle: "Tracking"
 
 ## Introduction
 
-Prompt Deck includes an optional database tracking system that logs prompt versions and execution data. This enables:
+Deck by PromptPHP includes an optional database tracking system that logs prompt versions and execution data. This enables:
 
 - **Performance monitoring** — Track token usage, latency, and cost per prompt version.
 - **A/B testing** — Compare performance metrics across different prompt versions.
@@ -14,25 +14,25 @@ Prompt Deck includes an optional database tracking system that logs prompt versi
 - **Cost analysis** — Monitor API spending per prompt, model, and provider.
 - **User feedback** — Attach ratings and comments to individual executions.
 
-Tracking is entirely optional. Prompt Deck works fully without it.
+Tracking is entirely optional. Deck works fully without it.
 
 ## Setup
 
 ### Enable tracking
 
-Set the tracking configuration in `config/prompt-deck.php`:
+Set the tracking configuration in `config/deck.php`:
 
 ```php
 'tracking' => [
-    'enabled'    => env('PROMPTDECK_TRACKING_ENABLED', true),
-    'connection' => env('PROMPTDECK_DB_CONNECTION'),
+    'enabled'    => env('DECK_TRACKING_ENABLED', true),
+    'connection' => env('DECK_DB_CONNECTION'),
 ],
 ```
 
 Or via environment variable:
 
 ```dotenv
-PROMPTDECK_TRACKING_ENABLED=true
+DECK_TRACKING_ENABLED=true
 ```
 
 By default, tracking is **disabled** when `APP_DEBUG=true` and **enabled** in production.
@@ -42,7 +42,7 @@ By default, tracking is **disabled** when `APP_DEBUG=true` and **enabled** in pr
 Publish and run the migrations to create the required tables:
 
 ```bash
-php artisan vendor:publish --tag=prompt-deck-migrations
+php artisan vendor:publish --tag=deck-migrations
 php artisan migrate
 ```
 
@@ -51,7 +51,7 @@ php artisan migrate
 By default, tracking uses your application's default database connection. To store tracking data on a separate database:
 
 ```dotenv
-PROMPTDECK_DB_CONNECTION=analytics
+DECK_DB_CONNECTION=analytics
 ```
 
 The connection name must match a connection defined in `config/database.php`.
@@ -111,12 +111,12 @@ Logs individual prompt executions with performance data.
 
 ### Manual tracking
 
-Use the `PromptDeck::track()` method to record an execution manually:
+Use the `Deck::track()` method to record an execution manually:
 
 ```php
-use Veeqtoh\PromptDeck\Facades\PromptDeck;
+use PromptPHP\Deck\Facades\Deck;
 
-PromptDeck::track('order-summary', 2, [
+Deck::track('order-summary', 2, [
     'input'    => ['message' => 'Summarise order #1234'],
     'output'   => 'Your order contains 3 items totalling $150.00...',
     'tokens'   => 150,
@@ -132,10 +132,10 @@ All fields in the data array are optional. You can track as little or as much as
 
 ```php
 // Minimal tracking — just record that the prompt was used
-PromptDeck::track('order-summary', 2, []);
+Deck::track('order-summary', 2, []);
 
 // Track only tokens and cost
-PromptDeck::track('order-summary', 2, [
+Deck::track('order-summary', 2, [
     'tokens' => 150,
     'cost'   => 0.002,
 ]);
@@ -162,16 +162,16 @@ When using the [Laravel AI SDK integration](/integrations/ai-sdk), the `TrackPro
 
 ## Eloquent models
 
-Prompt Deck provides two Eloquent models for interacting with tracking data.
+Deck provides two Eloquent models for interacting with tracking data.
 
 ### PromptVersion
 
-`Veeqtoh\PromptDeck\Models\PromptVersion`
+`PromptPHP\Deck\Models\PromptVersion`
 
 Represents a prompt version record in the `prompt_versions` table.
 
 ```php
-use Veeqtoh\PromptDeck\Models\PromptVersion;
+use PromptPHP\Deck\Models\PromptVersion;
 
 // Find the active version
 $active = PromptVersion::where('name', 'order-summary')
@@ -196,12 +196,12 @@ $versions = PromptVersion::where('name', 'order-summary')
 
 ### PromptExecution
 
-`Veeqtoh\PromptDeck\Models\PromptExecution`
+`PromptPHP\Deck\Models\PromptExecution`
 
 Represents an execution record in the `prompt_executions` table.
 
 ```php
-use Veeqtoh\PromptDeck\Models\PromptExecution;
+use PromptPHP\Deck\Models\PromptExecution;
 
 // Get recent executions
 $recent = PromptExecution::where('prompt_name', 'order-summary')
@@ -240,7 +240,7 @@ Both models include factories for testing.
 ### PromptVersionFactory
 
 ```php
-use Veeqtoh\PromptDeck\Models\PromptVersion;
+use PromptPHP\Deck\Models\PromptVersion;
 
 // Create a basic version
 $version = PromptVersion::factory()->create();
@@ -267,7 +267,7 @@ $version = PromptVersion::factory()
 ### PromptExecutionFactory
 
 ```php
-use Veeqtoh\PromptDeck\Models\PromptExecution;
+use PromptPHP\Deck\Models\PromptExecution;
 
 // Create a basic execution
 $execution = PromptExecution::factory()->create();
@@ -299,7 +299,7 @@ $execution = PromptExecution::factory()
 ### Basic queries
 
 ```php
-use Veeqtoh\PromptDeck\Models\PromptExecution;
+use PromptPHP\Deck\Models\PromptExecution;
 
 // Total executions for a prompt
 $count = PromptExecution::where('prompt_name', 'order-summary')->count();
@@ -383,11 +383,11 @@ $dailyCost = PromptExecution::where('prompt_name', 'order-summary')
 
 When tracking is enabled, version activation is managed through the `prompt_versions` table instead of `metadata.json` files. This provides a centralised, queryable record of version history.
 
-The `PromptDeck::activate()` method and `prompt:activate` command automatically use the appropriate storage (database or file) based on your tracking configuration.
+The `Deck::activate()` method and `prompt:activate` command automatically use the appropriate storage (database or file) based on your tracking configuration.
 
 ```php
 // Activate programmatically
-PromptDeck::activate('order-summary', 2);
+Deck::activate('order-summary', 2);
 
 // Query active versions
 $activeVersions = PromptVersion::where('is_active', true)->get();

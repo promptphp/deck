@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Concerns;
+namespace PromptPHP\Deck\Concerns;
 
 use Stringable;
-use Veeqtoh\PromptDeck\PromptManager;
-use Veeqtoh\PromptDeck\PromptTemplate;
+use PromptPHP\Deck\PromptManager;
+use PromptPHP\Deck\PromptTemplate;
 
 /**
- * Trait for integrating PromptDeck templates with Laravel AI SDK agents.
+ * Trait for integrating Deck templates with Laravel AI SDK agents.
  *
  * Provides automatic loading of system instructions and conversation messages
- * from versioned prompt files managed by PromptDeck. Use this trait alongside
+ * from versioned prompt files managed by Deck. Use this trait alongside
  * the Promptable trait in your Agent classes:
  *
  *   class SalesCoach implements Agent, Conversational
@@ -34,7 +34,7 @@ trait HasPromptTemplate
     protected ?PromptTemplate $cachedPromptTemplate = null;
 
     /**
-     * Get the prompt name to load from PromptDeck.
+     * Get the prompt name to load from Deck.
      *
      * Defaults to the kebab-cased class name (e.g. SalesCoach → sales-coach).
      * Override this method to use a custom prompt name.
@@ -95,7 +95,7 @@ trait HasPromptTemplate
     /**
      * Get the agent's system instructions from the prompt template.
      *
-     * Loads the 'system' role content from the PromptDeck template
+     * Loads the 'system' role content from the Deck template
      * and interpolates variables from promptVariables().
      *
      * This satisfies the Laravel AI SDK Agent contract's instructions() method.
@@ -110,7 +110,7 @@ trait HasPromptTemplate
     /**
      * Get prompt roles converted to Laravel AI SDK Message objects.
      *
-     * Converts PromptDeck template roles into Message instances
+     * Converts Deck template roles into Message instances
      * suitable for the Conversational contract's messages() method.
      * By default excludes the 'system' role (which goes through instructions()).
      *

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Veeqtoh\PromptDeck\PromptTemplate;
+use PromptPHP\Deck\PromptTemplate;
 
 // =====================================================================
 // Accessor methods

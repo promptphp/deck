@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Listeners;
+namespace PromptPHP\Deck\Listeners;
 
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Support\Str;
 
 /**
  * Listens for the Laravel AI SDK's `make:agent` command and
- * automatically scaffolds a corresponding PromptDeck prompt.
+ * automatically scaffolds a corresponding Deck prompt.
  *
  * When a developer runs:
  *   php artisan make:agent SalesCoach
@@ -35,7 +35,7 @@ class AfterMakeAgent
         }
 
         // Respect the configuration toggle.
-        if (! config('prompt-deck.scaffold_on_make_agent', true)) {
+        if (! config('deck.scaffold_on_make_agent', true)) {
             return;
         }
 
@@ -50,7 +50,7 @@ class AfterMakeAgent
         // Silently scaffold the prompt — don't fail the agent creation if this errors.
         try {
             // Check if prompt already exists to avoid interactive prompts.
-            $promptPath = config('prompt-deck.path').'/'.$promptName;
+            $promptPath = config('deck.path').'/'.$promptName;
 
             if (is_dir($promptPath)) {
                 return;
@@ -62,12 +62,12 @@ class AfterMakeAgent
 
             if ($exitCode === 0) {
                 $event->output->writeln(
-                    "<info>PromptDeck:</info> Created prompt <comment>{$promptName}</comment> for agent <comment>{$agentName}</comment>."
+                    "<info>Deck:</info> Created prompt <comment>{$promptName}</comment> for agent <comment>{$agentName}</comment>."
                 );
             }
         } catch (\Throwable) {
             // Swallow errors — the agent was already created successfully.
-            // We don't want PromptDeck to break the make:agent workflow.
+            // We don't want Deck to break the make:agent workflow.
         }
     }
 

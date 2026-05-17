@@ -2,6 +2,6 @@
 
 declare(strict_types=1);
 
-use Veeqtoh\PromptDeck\Tests\TestCase;
+use PromptPHP\Deck\Tests\TestCase;
 
 uses(TestCase::class)->in('Feature', 'Unit');

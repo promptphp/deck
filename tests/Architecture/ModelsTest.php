@@ -3,6 +3,6 @@
 use Illuminate\Database\Eloquent\Model;
 
 test('models extends base model')
-    ->expect('Veeqtoh\PromptDeck\Models')
+    ->expect('PromptPHP\Deck\Models')
     ->classes()
     ->toExtend(Model::class);

@@ -5,11 +5,11 @@ test('globals are not used in any classes')
     ->toBeUsedInNothing();
 
 test('all classes use strict types')
-    ->expect('Veeqtoh\PromptDeck')
+    ->expect('PromptPHP\Deck')
     ->toUseStrictTypes();
 
 test('strict equality is enforced in all classes')
-    ->expect('Veeqtoh\PromptDeck')
+    ->expect('PromptPHP\Deck')
     ->toUseStrictEquality();
 
 arch('PHP best practices are adhered to')->preset()->php();

@@ -1,6 +1,6 @@
 ---
 title: "Welcome"
-description: Organise, version, and test your AI agent instructions with Prompt Deck, a powerful Laravel package for seamless AI integration.
+description: Organise, version, and test your AI agent instructions with Deck by PromptPHP, a powerful Laravel & PHP package for seamless AI integration.
 mode: "custom"
 ---
 
@@ -10,16 +10,16 @@ mode: "custom"
     <div className="relative w-full flex flex-col items-center justify-center text-center pt-28 pb-20 px-6">
         {/* Hero Section */}
         <div className="max-w-3xl">
-            {/* <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20 backdrop-blur-md mb-6 animate-pulse">
-                ✨ Now available for Laravel 11+
-            </div> */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20 backdrop-blur-md mb-6 animate-pulse">
+                ✨ Formerly Prompt Deck - Now Deck by PromptPHP
+            </div>
 
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-white dark:via-slate-200 dark:to-white mb-6">
-            Prompt Deck
+            Deck by PromptPHP
         </h1>
 
         <p className="text-xl text-slate-600 dark:text-slate-400 mb-10 leading-relaxed max-w-2xl mx-auto">
-            Organise your AI Agent instructions as structured, version-controlled files in your Laravel application.
+            Organise agent instructions as versioned files, test prompt changes, track performance, and ship better AI workflows with confidence.
         </p>
 
         <div className="flex flex-wrap justify-center gap-4">
@@ -70,7 +70,7 @@ mode: "custom"
     {/* Interactive Code Preview Block */}
     <div className="border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 rounded-3xl p-6 md:p-10 backdrop-blur-sm relative overflow-hidden group">
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all duration-700" />
-    
+
             <div className="max-w-2xl mb-8">
                 <h2 className="text-2xl md:text-3xl font-bold mb-3 text-slate-900 dark:text-white">A workflow natural to you.</h2>
                 <p className="text-slate-600 dark:text-slate-400">Run one artisan command, version your prompts.</p>
@@ -78,7 +78,7 @@ mode: "custom"
 
             <CodeGroup>
                 ```bash Artisan Command
-                # Generate a versioned system prompt template
+                # Generate a versioned system prompt template.
                 php artisan make:prompt order-summary
                 ```
 
@@ -88,10 +88,10 @@ mode: "custom"
                 ```
 
                 ```php Implementation (Controller)
-                use Veeqtoh\PromptDeck\Facades\PromptDeck;
+                use PromptPHP\Deck\Facades\Deck;
 
                 // Loads active markdown context and returns compiled payload arrays
-                $messages = PromptDeck::get('order-summary')
+                $messages = Deck::get('order-summary')
                     ->toMessages([
                         'tone'  => 'friendly',
                         'order' => $orderDetails

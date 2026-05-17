@@ -1,6 +1,6 @@
 # Contribute to the documentation
 
-Thank you for your interest in contributing to Prompt Deck's documentation! This guide will help you get started.
+Thank you for your interest in contributing to the documentation. This guide will help you get started.
 
 ## How to contribute
 

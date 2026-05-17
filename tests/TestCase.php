@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Tests;
+namespace PromptPHP\Deck\Tests;
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use Veeqtoh\PromptDeck\Providers\PromptDeckServiceProvider;
+use PromptPHP\Deck\Providers\DeckServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -15,13 +15,13 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        $this->tempDir = sys_get_temp_dir().'/prompt-deck-tests-'.uniqid();
+        $this->tempDir = sys_get_temp_dir().'/deck-tests-'.uniqid();
         mkdir($this->tempDir, 0755, true);
 
-        $this->app['config']->set('prompt-deck.path', $this->tempDir);
-        $this->app['config']->set('prompt-deck.extension', 'md');
-        $this->app['config']->set('prompt-deck.cache.enabled', false);
-        $this->app['config']->set('prompt-deck.tracking.enabled', false);
+        $this->app['config']->set('deck.path', $this->tempDir);
+        $this->app['config']->set('deck.extension', 'md');
+        $this->app['config']->set('deck.cache.enabled', false);
+        $this->app['config']->set('deck.tracking.enabled', false);
     }
 
     protected function tearDown(): void
@@ -34,7 +34,7 @@ abstract class TestCase extends BaseTestCase
     protected function getPackageProviders($app): array
     {
         return [
-            PromptDeckServiceProvider::class,
+            DeckServiceProvider::class,
         ];
     }
 

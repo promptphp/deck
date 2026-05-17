@@ -1,6 +1,6 @@
 <?php
 
 test('providers extend the base provider class')
-    ->expect('Veeqtoh\PromptDeck\Providers')
+    ->expect('PromptPHP\Deck\Providers')
     ->classes()
     ->toExtend(\Illuminate\Support\ServiceProvider::class);

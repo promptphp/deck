@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Exceptions;
+namespace PromptPHP\Deck\Exceptions;
 
-class PromptNotFoundException extends PromptDeckException
+class PromptNotFoundException extends DeckException
 {
     /**
      * Create a new exception instance for a missing prompt.

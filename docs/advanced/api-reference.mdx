@@ -1,11 +1,11 @@
 ---
 title: "API reference"
-description: "Complete class and method reference for Prompt Deck."
+description: "Complete class and method reference for Deck by PromptPHP."
 ---
 
 ## PromptManager
 
-`Veeqtoh\PromptDeck\PromptManager`
+`PromptPHP\Deck\PromptManager`
 
 The core service class responsible for loading, caching, versioning, and tracking prompts. Registered as a singleton in the service container.
 
@@ -96,7 +96,7 @@ $manager->track('order-summary', 2, [
 
 ## PromptTemplate
 
-`Veeqtoh\PromptDeck\PromptTemplate`
+`PromptPHP\Deck\PromptTemplate`
 
 Represents a loaded prompt with its roles, metadata, and interpolation capabilities. Implements `Illuminate\Contracts\Support\Arrayable`.
 
@@ -212,9 +212,9 @@ $prompt->custom_role();                    // renders 'custom_role' role
 
 ---
 
-## PromptDeck facade
+## Deck facade
 
-`Veeqtoh\PromptDeck\Facades\PromptDeck`
+`PromptPHP\Deck\Facades\Deck`
 
 Static proxy to the `PromptManager` singleton.
 
@@ -222,19 +222,19 @@ Static proxy to the `PromptManager` singleton.
 
 | Method                                                       | Returns          | Description                                 |
 | ------------------------------------------------------------ | ---------------- | ------------------------------------------- |
-| `PromptDeck::get(string $name, ?int $version = null)`        | `PromptTemplate` | Load a prompt by name and optional version. |
-| `PromptDeck::active(string $name)`                           | `PromptTemplate` | Load the active version of a prompt.        |
-| `PromptDeck::versions(string $name)`                         | `array`          | List all versions for a prompt.             |
-| `PromptDeck::activate(string $name, int $version)`           | `bool`           | Activate a specific version.                |
-| `PromptDeck::track(string $name, int $version, array $data)` | `void`           | Record a prompt execution.                  |
+| `Deck::get(string $name, ?int $version = null)`              | `PromptTemplate` | Load a prompt by name and optional version. |
+| `Deck::active(string $name)`                                 | `PromptTemplate` | Load the active version of a prompt.        |
+| `Deck::versions(string $name)`                               | `array`          | List all versions for a prompt.             |
+| `Deck::activate(string $name, int $version)`                 | `bool`           | Activate a specific version.                |
+| `Deck::track(string $name, int $version, array $data)`       | `void`           | Record a prompt execution.                  |
 
 ---
 
 ## HasPromptTemplate trait
 
-`Veeqtoh\PromptDeck\Concerns\HasPromptTemplate`
+`PromptPHP\Deck\Concerns\HasPromptTemplate`
 
-Trait for integrating Prompt Deck templates with Laravel AI SDK agents.
+Trait for integrating Deck templates with Laravel AI SDK agents.
 
 ### Methods
 
@@ -274,7 +274,7 @@ Clear the cached `PromptTemplate`, forcing a fresh load on next access. Returns 
 
 ## TrackPromptMiddleware
 
-`Veeqtoh\PromptDeck\Ai\TrackPromptMiddleware`
+`PromptPHP\Deck\Ai\TrackPromptMiddleware`
 
 Laravel AI SDK agent middleware that automatically tracks prompt executions.
 
@@ -290,9 +290,9 @@ Only tracks agents that use the `HasPromptTemplate` trait (i.e. agents with a `p
 
 ## AfterMakeAgent listener
 
-`Veeqtoh\PromptDeck\Listeners\AfterMakeAgent`
+`PromptPHP\Deck\Listeners\AfterMakeAgent`
 
-Listens for the Laravel AI SDK's `make:agent` command and automatically scaffolds a corresponding Prompt Deck prompt.
+Listens for the Laravel AI SDK's `make:agent` command and automatically scaffolds a corresponding Deck prompt.
 
 ### Methods
 
@@ -306,7 +306,7 @@ Handle the `CommandFinished` event. Only acts on successful `make:agent` command
 
 ### PromptVersion
 
-`Veeqtoh\PromptDeck\Models\PromptVersion`
+`PromptPHP\Deck\Models\PromptVersion`
 
 | Attribute       | Type           | Cast      | Description                         |
 | --------------- | -------------- | --------- | ----------------------------------- |
@@ -319,7 +319,7 @@ Handle the `CommandFinished` event. Only acts on successful `make:agent` command
 
 ### PromptExecution
 
-`Veeqtoh\PromptDeck\Models\PromptExecution`
+`PromptPHP\Deck\Models\PromptExecution`
 
 | Attribute        | Type           | Cast        | Description              |
 | ---------------- | -------------- | ----------- | ------------------------ |
@@ -338,17 +338,17 @@ Handle the `CommandFinished` event. Only acts on successful `make:agent` command
 
 ## Exceptions
 
-All Prompt Deck exceptions extend the base `PromptDeckException` class.
+All Deck exceptions extend the base `DeckException` class.
 
-### PromptDeckException
+### DeckException
 
-`Veeqtoh\PromptDeck\Exceptions\PromptDeckException`
+`PromptPHP\Deck\Exceptions\DeckException`
 
-Abstract base exception for all Prompt Deck errors. Extends PHP's `Exception` class.
+Abstract base exception for all Deck errors. Extends PHP's `Exception` class.
 
 ### PromptNotFoundException
 
-`Veeqtoh\PromptDeck\Exceptions\PromptNotFoundException`
+`PromptPHP\Deck\Exceptions\PromptNotFoundException`
 
 Thrown when a prompt directory does not exist.
 
@@ -358,7 +358,7 @@ Thrown when a prompt directory does not exist.
 
 ### InvalidVersionException
 
-`Veeqtoh\PromptDeck\Exceptions\InvalidVersionException`
+`PromptPHP\Deck\Exceptions\InvalidVersionException`
 
 Thrown when a requested version does not exist or no versions are found.
 
@@ -369,9 +369,9 @@ Thrown when a requested version does not exist or no versions are found.
 
 ### ConfigurationException
 
-`Veeqtoh\PromptDeck\Exceptions\ConfigurationException`
+`PromptPHP\Deck\Exceptions\ConfigurationException`
 
-Thrown when Prompt Deck configuration is invalid.
+Thrown when Deck configuration is invalid.
 
 | Factory Method                    | Description                                                                                      |
 | --------------------------------- | ------------------------------------------------------------------------------------------------ |
@@ -379,7 +379,7 @@ Thrown when Prompt Deck configuration is invalid.
 
 ### PromptRenderingException
 
-`Veeqtoh\PromptDeck\Exceptions\PromptRenderingException`
+`PromptPHP\Deck\Exceptions\PromptRenderingException`
 
 Thrown when prompt rendering fails.
 

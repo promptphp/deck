@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Exceptions;
+namespace PromptPHP\Deck\Exceptions;
 
-class PromptRenderingException extends PromptDeckException
+class PromptRenderingException extends DeckException
 {
     /**
      * Create a new exception for a missing variable during prompt rendering.

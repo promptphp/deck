@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck;
+namespace PromptPHP\Deck;
 
 use Illuminate\Contracts\Support\Arrayable;
 

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Veeqtoh\PromptDeck\Concerns\HasPromptTemplate;
-use Veeqtoh\PromptDeck\PromptManager;
-use Veeqtoh\PromptDeck\PromptTemplate;
+use PromptPHP\Deck\Concerns\HasPromptTemplate;
+use PromptPHP\Deck\PromptManager;
+use PromptPHP\Deck\PromptTemplate;
 
 // =====================================================================
 // Helper: anonymous agent class using the trait

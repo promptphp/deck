@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Exceptions;
+namespace PromptPHP\Deck\Exceptions;
 
-class ConfigurationException extends PromptDeckException
+class ConfigurationException extends DeckException
 {
     /**
      * Create a new exception for an invalid prompts path configuration.

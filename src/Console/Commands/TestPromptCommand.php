@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Veeqtoh\PromptDeck\Console\Commands;
+namespace PromptPHP\Deck\Console\Commands;
 
 use Illuminate\Console\Command;
-use Veeqtoh\PromptDeck\PromptManager;
+use PromptPHP\Deck\PromptManager;
 
 class TestPromptCommand extends Command
 {

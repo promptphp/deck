@@ -45,12 +45,12 @@
       "anchors": [
         {
           "anchor": "GitHub",
-          "href": "https://github.com/promptphp/prompt-deck",
+          "href": "https://github.com/promptphp/deck",
           "icon": "github"
         },
         {
           "anchor": "Packagist",
-          "href": "https://packagist.org/packages/veeqtoh/prompt-deck",
+          "href": "https://packagist.org/packages/promptphp/deck",
           "icon": "box"
         }
       ]
@@ -64,7 +64,7 @@
     "links": [
       {
         "label": "GitHub",
-        "href": "https://github.com/promptphp/prompt-deck"
+        "href": "https://github.com/promptphp/deck"
       },
       {
         "label": "Sponsor",
@@ -86,7 +86,7 @@
   },
   "footer": {
     "socials": {
-      "github": "https://github.com/promptphp/prompt-deck"
+      "github": "https://github.com/promptphp/deck"
     }
   }
 }

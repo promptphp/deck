@@ -1,12 +1,12 @@
 {
-    "name": "veeqtoh/prompt-deck",
-    "description": "A Laravel package that adds versioned, file-based prompt management with variable interpolation, performance tracking, A/B testing, and optional seamless integration with the Laravel AI SDK.",
+    "name": "promptphp/deck",
+    "description": "Deck is a Laravel and PHP package for versioned, file-based AI prompt management with variable interpolation, performance tracking, A/B testing, and optional Laravel AI SDK integration.",
     "type": "library",
-    "homepage": "https://github.com/veeqtoh/prompt-deck",
+    "homepage": "https://github.com/promptphp/deck",
     "license": "MIT",
     "support": {
-        "issues": "https://github.com/veeqtoh/prompt-deck/issues",
-        "source": "https://github.com/veeqtoh/prompt-deck"
+        "issues": "https://github.com/promptphp/deck/issues",
+        "source": "https://github.com/promptphp/deck"
     },
     "authors": [
         {
@@ -15,20 +15,20 @@
         }
     ],
     "keywords": [
+        "promptphp",
+        "deck",
+        "prompt-deck",
         "ai",
-        "laravel",
-        "laravel-package",
-        "laravel-ai",
-        "laravel-ai-sdk",
-        "agentic-prompting",
-        "agentic-ai",
+        "prompts",
         "prompt-management",
         "versioned-prompts",
         "file-based-prompts",
         "variable-interpolation",
         "performance-tracking",
         "ab-testing",
-        "victor-ukam"
+        "laravel",
+        "laravel-ai",
+        "laravel-package"
     ],
     "require": {
         "php": "^8.2",
@@ -50,23 +50,23 @@
     },
     "autoload": {
         "psr-4": {
-            "Veeqtoh\\PromptDeck\\": "src/",
-            "Veeqtoh\\PromptDeck\\Database\\Factories\\": "src/database/factories/",
-            "Veeqtoh\\PromptDeck\\Database\\Seeders\\": "src/database/seeders/"
+            "PromptPHP\\Deck\\": "src/",
+            "PromptPHP\\Deck\\Database\\Factories\\": "src/database/factories/",
+            "PromptPHP\\Deck\\Database\\Seeders\\": "src/database/seeders/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Veeqtoh\\PromptDeck\\Tests\\": "tests/"
+            "PromptPHP\\Deck\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Veeqtoh\\PromptDeck\\Providers\\PromptDeckServiceProvider"
+                "PromptPHP\\Deck\\Providers\\DeckServiceProvider"
             ],
             "aliases": {
-                "PromptDeck": "Veeqtoh\\PromptDeck\\Facades\\PromptDeck"
+                "PromptDeck": "PromptPHP\\Deck\\Facades\\Deck"
             }
         }
     },

@@ -1,38 +1,38 @@
 ---
 title: "Laravel AI SDK integration"
-description: "Use Prompt Deck with Laravel AI SDK agents for automatic prompt loading, version tracking, and performance monitoring."
+description: "Use Deck by PromptPHP with Laravel AI SDK agents for automatic prompt loading, version tracking, and performance monitoring."
 sidebarTitle: "Laravel AI SDK"
 ---
 
 ## Introduction
 
-Prompt Deck provides first-class, optional integration with the [Laravel AI SDK](https://laravel.com/docs/ai-sdk). When the AI SDK is installed, you get:
+Deck by PromptPHP provides first-class, optional integration with the [Laravel AI SDK](https://laravel.com/docs/ai-sdk). When the AI SDK is installed, you get:
 
 - **Automatic prompt scaffolding** — Running `make:agent` automatically creates a matching prompt directory.
 - **The `HasPromptTemplate` trait** — Provides `instructions()` and `promptMessages()` methods that load versioned prompts directly into your AI agents.
-- **The `TrackPromptMiddleware`** — Automatically records prompt executions (tokens, latency, model, etc.) using Prompt Deck's tracking system.
+- **The `TrackPromptMiddleware`** — Automatically records prompt executions (tokens, latency, model, etc.) using Deck's tracking system.
 
-All of this is entirely optional. Prompt Deck works perfectly without the AI SDK.
+All of this is entirely optional. Deck works perfectly without the AI SDK.
 
 ## Installation
 
-Prompt Deck does **not** require the AI SDK — it's listed as a `suggest` dependency. Install it when you're ready:
+Deck does **not** require the AI SDK — it's listed as a `suggest` dependency. Install it when you're ready:
 
 ```bash
 composer require laravel/ai
 ```
 
-Once `laravel/ai` is installed, Prompt Deck's AI SDK features activate automatically. No additional configuration is needed.
+Once `laravel/ai` is installed, Deck's AI SDK features activate automatically. No additional configuration is needed.
 
 ## Automatic prompt scaffolding
 
-When the Laravel AI SDK is installed, Prompt Deck automatically hooks into the `make:agent` command. Whenever you create a new agent:
+When the Laravel AI SDK is installed, Deck automatically hooks into the `make:agent` command. Whenever you create a new agent:
 
 ```bash
 php artisan make:agent SalesCoach
 ```
 
-Prompt Deck detects the successful command and automatically runs:
+Deck detects the successful command and automatically runs:
 
 ```bash
 php artisan make:prompt sales-coach
@@ -42,7 +42,7 @@ This creates a versioned prompt directory ready for the agent to use via the `Ha
 
 ### How it works
 
-Prompt Deck registers a listener (`AfterMakeAgent`) on Laravel's `CommandFinished` event. When `make:agent` completes successfully, the listener:
+Deck registers a listener (`AfterMakeAgent`) on Laravel's `CommandFinished` event. When `make:agent` completes successfully, the listener:
 
 1. Extracts the agent name from the command input.
 2. Converts it to kebab-case (`SalesCoach` → `sales-coach`).
@@ -59,7 +59,7 @@ $ php artisan make:agent SalesCoach
 
    INFO  Agent [app/Ai/Agents/SalesCoach.php] created successfully.
 
-PromptDeck: Created prompt sales-coach for SalesCoach.
+Deck: Created prompt sales-coach for SalesCoach.
 ```
 
 ### Disabling auto-scaffolding
@@ -67,14 +67,14 @@ PromptDeck: Created prompt sales-coach for SalesCoach.
 To disable automatic prompt scaffolding, set the configuration option:
 
 ```php
-// config/prompt-deck.php
+// config/deck.php
 'scaffold_on_make_agent' => false,
 ```
 
 Or via environment variable:
 
 ```dotenv
-PROMPTDECK_SCAFFOLD_ON_MAKE_AGENT=false
+DECK_SCAFFOLD_ON_MAKE_AGENT=false
 ```
 
 ## Quick start
@@ -88,7 +88,7 @@ namespace App\Ai\Agents;
 
 use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Promptable;
-use Veeqtoh\PromptDeck\Concerns\HasPromptTemplate;
+use PromptPHP\Deck\Concerns\HasPromptTemplate;
 
 class SalesCoach implements Agent
 {
@@ -99,15 +99,15 @@ class SalesCoach implements Agent
 }
 ```
 
-That's it. The `HasPromptTemplate` trait provides the `instructions()` method required by the `Agent` contract, loading the system prompt from your Prompt Deck files.
+That's it. The `HasPromptTemplate` trait provides the `instructions()` method required by the `Agent` contract, loading the system prompt from your Deck files.
 
 ## The HasPromptTemplate trait
 
-The `HasPromptTemplate` trait bridges Prompt Deck's file-based templates with the Laravel AI SDK's agent contracts.
+The `HasPromptTemplate` trait bridges Deck's file-based templates with the Laravel AI SDK's agent contracts.
 
 ### How it maps to AI SDK contracts
 
-| Prompt Deck                     | AI SDK                              | Description                                     |
+| Deck                            | AI SDK                              | Description                                     |
 | ------------------------------- | ----------------------------------- | ----------------------------------------------- |
 | `system.md` role file           | `instructions()`                    | Agent's system prompt.                          |
 | `user.md`, `assistant.md`, etc. | `messages()` via `promptMessages()` | Conversation context.                           |
@@ -197,7 +197,7 @@ Variables are interpolated into **all** roles (system, user, assistant, etc.) wh
 
 ## Full agent example
 
-Here's a complete agent using all Prompt Deck features with the AI SDK:
+Here's a complete agent using all Deck features with the AI SDK:
 
 ```php
 <?php
@@ -213,8 +213,8 @@ use Laravel\Ai\Contracts\HasMiddleware;
 use Laravel\Ai\Contracts\HasStructuredOutput;
 use Laravel\Ai\Contracts\HasTools;
 use Laravel\Ai\Promptable;
-use Veeqtoh\PromptDeck\Ai\TrackPromptMiddleware;
-use Veeqtoh\PromptDeck\Concerns\HasPromptTemplate;
+use PromptPHP\Deck\Ai\TrackPromptMiddleware;
+use PromptPHP\Deck\Concerns\HasPromptTemplate;
 
 class SalesCoach implements Agent, Conversational, HasTools, HasStructuredOutput, HasMiddleware
 {
@@ -296,7 +296,7 @@ Analyse transcripts carefully and provide:
 
 ## Conversation context
 
-If your agent implements `Conversational`, you can load pre-defined conversation context from Prompt Deck role files using the `promptMessages()` method.
+If your agent implements `Conversational`, you can load pre-defined conversation context from Deck role files using the `promptMessages()` method.
 
 ### Loading all non-system roles
 
@@ -348,13 +348,13 @@ public function messages(): iterable
 
 ## Performance tracking middleware
 
-The `TrackPromptMiddleware` automatically records prompt executions via Prompt Deck's tracking system.
+The `TrackPromptMiddleware` automatically records prompt executions via Deck's tracking system.
 
 ### Setting up the middleware
 
 <Steps>
   <Step title="Enable tracking">
-    Set the tracking configuration in `config/prompt-deck.php`:
+    Set the tracking configuration in `config/deck.php`:
 
     ```php
     'tracking' => [
@@ -366,14 +366,14 @@ The `TrackPromptMiddleware` automatically records prompt executions via Prompt D
   </Step>
   <Step title="Publish and run migrations">
     ```bash
-    php artisan vendor:publish --tag=prompt-deck-migrations
+    php artisan vendor:publish --tag=deck-migrations
     php artisan migrate
     ```
   </Step>
   <Step title="Add middleware to your agent">
     ```php
     use Laravel\Ai\Contracts\HasMiddleware;
-    use Veeqtoh\PromptDeck\Ai\TrackPromptMiddleware;
+    use PromptPHP\Deck\Ai\TrackPromptMiddleware;
 
     class SalesCoach implements Agent, HasMiddleware
     {
@@ -474,4 +474,4 @@ $messages = $agent->promptMessages();
 // [Message('user', '...'), ...]
 ```
 
-This allows you to use Prompt Deck's template loading in any context, not just with the AI SDK.
+This allows you to use Deck's template loading in any context, not just with the AI SDK.

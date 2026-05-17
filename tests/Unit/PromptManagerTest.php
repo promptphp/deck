@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\DB;
-use Veeqtoh\PromptDeck\Exceptions\InvalidVersionException;
-use Veeqtoh\PromptDeck\Exceptions\PromptNotFoundException;
-use Veeqtoh\PromptDeck\PromptManager;
-use Veeqtoh\PromptDeck\PromptTemplate;
+use PromptPHP\Deck\Exceptions\InvalidVersionException;
+use PromptPHP\Deck\Exceptions\PromptNotFoundException;
+use PromptPHP\Deck\PromptManager;
+use PromptPHP\Deck\PromptTemplate;
 
 // =====================================================================
 // Helper to get a fresh PromptManager bound to the test's temp directory
@@ -22,8 +22,8 @@ function freshManager(?array $configOverrides = []): PromptManager
     }
 
     return new PromptManager(
-        $app['config']->get('prompt-deck.path'),
-        $app['config']->get('prompt-deck.extension', 'md'),
+        $app['config']->get('deck.path'),
+        $app['config']->get('deck.extension', 'md'),
         $app['cache']->store('array'),
         $app['config'],
     );
@@ -106,7 +106,7 @@ test('get() uses custom extension from config', function () {
     file_put_contents("{$versionPath}/system.txt", 'txt system');
     file_put_contents("{$versionPath}/user.txt", 'txt user');
 
-    $this->app['config']->set('prompt-deck.extension', 'txt');
+    $this->app['config']->set('deck.extension', 'txt');
     $prompt = freshManager()->get('custom-ext', 1);
 
     expect($prompt->system())->toBe('txt system')
@@ -120,8 +120,8 @@ test('get() uses custom extension from config', function () {
 test('get() returns from cache when cache is enabled and warm', function () {
     $this->createPromptFixture('cached', 1, 'original system', 'original user');
 
-    $this->app['config']->set('prompt-deck.cache.enabled', true);
-    $this->app['config']->set('prompt-deck.cache.ttl', 3600);
+    $this->app['config']->set('deck.cache.enabled', true);
+    $this->app['config']->set('deck.cache.ttl', 3600);
 
     $manager = freshManager();
 
@@ -140,7 +140,7 @@ test('get() returns from cache when cache is enabled and warm', function () {
 test('get() skips cache when cache.enabled is false', function () {
     $this->createPromptFixture('uncached', 1, 'first', 'user');
 
-    $this->app['config']->set('prompt-deck.cache.enabled', false);
+    $this->app['config']->set('deck.cache.enabled', false);
 
     $manager = freshManager();
 
@@ -307,8 +307,8 @@ test('activate() with tracking enabled updates database', function () {
     $this->createPromptFixture('db-activate', 1, 'sys', 'usr');
     $this->createPromptFixture('db-activate', 2, 'sys', 'usr');
 
-    $this->app['config']->set('prompt-deck.tracking.enabled', true);
-    $this->app['config']->set('prompt-deck.tracking.connection', 'testing');
+    $this->app['config']->set('deck.tracking.enabled', true);
+    $this->app['config']->set('deck.tracking.connection', 'testing');
 
     DB::connection('testing')->table('prompt_versions')->insert([
         ['name' => 'db-activate', 'version' => 1, 'is_active' => true],
@@ -331,8 +331,8 @@ test('activate() with tracking enabled updates database', function () {
 test('activate() with tracking enabled returns false when version not in DB', function () {
     $this->setUpTrackingTables();
 
-    $this->app['config']->set('prompt-deck.tracking.enabled', true);
-    $this->app['config']->set('prompt-deck.tracking.connection', 'testing');
+    $this->app['config']->set('deck.tracking.enabled', true);
+    $this->app['config']->set('deck.tracking.connection', 'testing');
 
     $result = freshManager()->activate('nonexistent', 99);
 
@@ -348,8 +348,8 @@ test('getActiveVersion reads from database when tracking is enabled', function (
     $this->createPromptFixture('db-active', 1, 'sys v1', 'usr v1');
     $this->createPromptFixture('db-active', 2, 'sys v2', 'usr v2');
 
-    $this->app['config']->set('prompt-deck.tracking.enabled', true);
-    $this->app['config']->set('prompt-deck.tracking.connection', 'testing');
+    $this->app['config']->set('deck.tracking.enabled', true);
+    $this->app['config']->set('deck.tracking.connection', 'testing');
 
     DB::connection('testing')->table('prompt_versions')->insert([
         ['name' => 'db-active', 'version' => 1, 'is_active' => false],
@@ -366,8 +366,8 @@ test('getActiveVersion falls back to metadata.json when DB has no active record'
     $this->createPromptFixture('db-fallback', 1, 'sys v1', 'usr v1');
     $this->createPromptFixture('db-fallback', 2, 'sys v2', 'usr v2', null, ['active_version' => 1]);
 
-    $this->app['config']->set('prompt-deck.tracking.enabled', true);
-    $this->app['config']->set('prompt-deck.tracking.connection', 'testing');
+    $this->app['config']->set('deck.tracking.enabled', true);
+    $this->app['config']->set('deck.tracking.connection', 'testing');
 
     // No active record in DB.
     DB::connection('testing')->table('prompt_versions')->insert([
@@ -387,8 +387,8 @@ test('getActiveVersion falls back to metadata.json when DB has no active record'
 test('track() inserts execution record with all fields when tracking enabled', function () {
     $this->setUpTrackingTables();
 
-    $this->app['config']->set('prompt-deck.tracking.enabled', true);
-    $this->app['config']->set('prompt-deck.tracking.connection', 'testing');
+    $this->app['config']->set('deck.tracking.enabled', true);
+    $this->app['config']->set('deck.tracking.connection', 'testing');
 
     $manager = freshManager();
     $manager->track('greeting', 1, [
@@ -416,8 +416,8 @@ test('track() inserts execution record with all fields when tracking enabled', f
 test('track() handles partial data with null fields', function () {
     $this->setUpTrackingTables();
 
-    $this->app['config']->set('prompt-deck.tracking.enabled', true);
-    $this->app['config']->set('prompt-deck.tracking.connection', 'testing');
+    $this->app['config']->set('deck.tracking.enabled', true);
+    $this->app['config']->set('deck.tracking.connection', 'testing');
 
     $manager = freshManager();
     $manager->track('minimal', 2, [
@@ -437,7 +437,7 @@ test('track() handles partial data with null fields', function () {
 test('track() does nothing when tracking is disabled', function () {
     $this->setUpTrackingTables();
 
-    $this->app['config']->set('prompt-deck.tracking.enabled', false);
+    $this->app['config']->set('deck.tracking.enabled', false);
 
     $manager = freshManager();
     $manager->track('ignored', 1, ['input' => 'test', 'output' => 'response']);
