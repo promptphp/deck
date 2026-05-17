@@ -24,6 +24,13 @@ Deck, formerly Prompt Deck, provides AI prompt management for Laravel and PHP.
 
 Organise your AI agent instructions as versioned files, compare prompt performance, and activate the right version across your app with variable interpolation, tracking, A/B testing, and Laravel AI SDK integration.
 
+> [!IMPORTANT]
+> Prompt Deck is now **Deck by PromptPHP**.
+>
+> From `v0.4.0`, the package moved from `veeqtoh/prompt-deck` to `promptphp/deck`, and the namespace changed from `Veeqtoh\PromptDeck` to `PromptPHP\Deck`.
+>
+> Upgrading from `v0.3.x`? See the [upgrade guide](UPGRADE.md).
+
 ## Quick Start
 
 ### Installation
