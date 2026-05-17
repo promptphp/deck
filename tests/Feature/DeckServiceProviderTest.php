@@ -11,24 +11,24 @@ test('PromptManager is registered as a singleton', function () {
     expect($instance1)->toBe($instance2);
 });
 
-test('PromptManager is resolvable via prompt-deck alias', function () {
-    $instance = $this->app->make('prompt-deck');
+test('PromptManager is resolvable via deck alias', function () {
+    $instance = $this->app->make('deck');
 
     expect($instance)->toBeInstanceOf(PromptManager::class);
 });
 
 test('alias resolves to same singleton as class binding', function () {
-    $byAlias = $this->app->make('prompt-deck');
+    $byAlias = $this->app->make('deck');
     $byClass = $this->app->make(PromptManager::class);
 
     expect($byAlias)->toBe($byClass);
 });
 
 test('config is merged from package config file', function () {
-    // The provider merges config/prompt-deck.php.
+    // The provider merges config/deck.php.
     // Our TestCase overrides some values but the merge should have happened.
-    expect(config('prompt-deck.versioning'))->toBe('directory')
-        ->and(config('prompt-deck.cache.ttl'))->toBe(3600);
+    expect(config('deck.versioning'))->toBe('directory')
+        ->and(config('deck.cache.ttl'))->toBe(3600);
 });
 
 test('Artisan commands are registered', function () {
@@ -45,7 +45,7 @@ test('publishable config is registered', function () {
     // Verify the provider has registered publishable resources.
     $publishes = \Illuminate\Support\ServiceProvider::pathsToPublish(
         \PromptPHP\Deck\Providers\DeckServiceProvider::class,
-        'prompt-deck-config'
+        'deck-config'
     );
 
     expect($publishes)->not->toBeEmpty();

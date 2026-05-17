@@ -186,7 +186,7 @@ test('prompt:diff shows added and removed lines for multi-line changes', functio
 // ──────────────────────────────────────────────────────────────
 
 test('prompt:diff respects configured file extension', function () {
-    $this->app['config']->set('prompt-deck.extension', 'txt');
+    $this->app['config']->set('deck.extension', 'txt');
 
     // Create fixtures with .txt extension
     $this->createPromptFixture('diff-ext', 1, null, null, null, null, 'txt');

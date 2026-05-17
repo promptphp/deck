@@ -43,10 +43,10 @@ return [
     |
     */
     'cache' => [
-        'enabled' => env('PROMPTDECK_CACHE_ENABLED', env('APP_DEBUG', false) ? false : true),
-        'store'   => env('PROMPTDECK_CACHE_STORE', 'file'), // null to use default cache
-        'ttl'     => env('PROMPTDECK_CACHE_TTL', 3600), // seconds
-        'prefix'  => env('CACHE_PREFIX', env('PROMPTDECK_CACHE_PREFIX', 'prompt-deck:')),
+        'enabled' => env('DECK_CACHE_ENABLED', env('APP_DEBUG', false) ? false : true),
+        'store'   => env('DECK_CACHE_STORE', 'file'), // null to use default cache
+        'ttl'     => env('DECK_CACHE_TTL', 3600), // seconds
+        'prefix'  => env('CACHE_PREFIX', env('DECK_CACHE_PREFIX', 'deck:')),
     ],
 
     /*
@@ -59,8 +59,8 @@ return [
     |
     */
     'tracking' => [
-        'enabled'    => env('PROMPTDECK_TRACKING_ENABLED', env('APP_DEBUG', false) ? false : true),
-        'connection' => env('PROMPTDECK_DB_CONNECTION'), // null for default
+        'enabled'    => env('DECK_TRACKING_ENABLED', env('APP_DEBUG', false) ? false : true),
+        'connection' => env('DECK_DB_CONNECTION'), // null for default
     ],
 
     /*
@@ -73,5 +73,5 @@ return [
     | whenever you run `php artisan make:agent`. Set to false to disable.
     |
     */
-    'scaffold_on_make_agent' => env('PROMPTDECK_SCAFFOLD_ON_MAKE_AGENT', true),
+    'scaffold_on_make_agent' => env('DECK_SCAFFOLD_ON_MAKE_AGENT', true),
 ];

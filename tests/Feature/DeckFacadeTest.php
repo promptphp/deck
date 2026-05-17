@@ -6,7 +6,7 @@ use PromptPHP\Deck\Facades\Deck;
 use PromptPHP\Deck\PromptManager;
 use PromptPHP\Deck\PromptTemplate;
 
-test('facade accessor returns prompt-deck', function () {
+test('facade accessor returns deck', function () {
     // Resolve via facade accessor.
     $resolved = PromptDeck::getFacadeRoot();
 

@@ -23,7 +23,7 @@ class ListPromptsCommand extends Command
 
     public function handle(): int
     {
-        $basePath = config('prompt-deck.path');
+        $basePath = config('deck.path');
         if (! is_dir($basePath)) {
             $this->warn('Prompts directory not found.');
 

@@ -40,13 +40,13 @@ class PromptDiffCommand extends Command
             return Command::FAILURE;
         }
 
-        $basePath = config('prompt-deck.path').'/'.$name;
+        $basePath = config('deck.path').'/'.$name;
 
         if (! $this->files->isDirectory($basePath)) {
             throw PromptNotFoundException::named($name);
         }
 
-        $ext = config('prompt-deck.extension', 'md');
+        $ext = config('deck.extension', 'md');
 
         $filesToCompare = [];
         if ($type === 'system' || $type === 'all') {

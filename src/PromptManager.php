@@ -32,7 +32,7 @@ class PromptManager
         $this->extension      = ltrim($extension, '.');
         $this->cache          = $cache;
         $this->config         = $config;
-        $this->trackingConfig = $config->get('prompt-deck.tracking');
+        $this->trackingConfig = $config->get('deck.tracking');
     }
 
     /**
@@ -45,10 +45,10 @@ class PromptManager
     public function get(string $name, ?int $version = null): PromptTemplate
     {
         $version ??= $this->getActiveVersion($name);
-        $cacheKey = $this->config->get('prompt-deck.cache.prefix', 'prompt-deck:')."{$name}.v{$version}";
+        $cacheKey = $this->config->get('deck.cache.prefix', 'deck:')."{$name}.v{$version}";
 
         // Attempt to load from cache.
-        if ($this->config->get('prompt-deck.cache.enabled')) {
+        if ($this->config->get('deck.cache.enabled')) {
             $cached = $this->cache->get($cacheKey);
 
             if ($cached) {
@@ -65,8 +65,8 @@ class PromptManager
         $promptData = $this->loadFromFiles($name, $version);
 
         // Cache if enabled.
-        if ($this->config->get('prompt-deck.cache.enabled')) {
-            $this->cache->put($cacheKey, $promptData, now()->addSeconds($this->config->get('prompt-deck.cache.ttl')));
+        if ($this->config->get('deck.cache.enabled')) {
+            $this->cache->put($cacheKey, $promptData, now()->addSeconds($this->config->get('deck.cache.ttl')));
         }
 
         return new PromptTemplate(

@@ -232,7 +232,7 @@ test('make:prompt --from with non-existent stub falls back to default', function
 
 test('make:prompt creates base directory if it does not exist', function () {
     $newPath = "{$this->tempDir}/nested/prompts";
-    $this->app['config']->set('prompt-deck.path', $newPath);
+    $this->app['config']->set('deck.path', $newPath);
 
     // Re-register the singleton with the new path.
     $this->app->forgetInstance(\PromptPHP\Deck\PromptManager::class);
@@ -244,7 +244,7 @@ test('make:prompt creates base directory if it does not exist', function () {
 });
 
 test('make:prompt respects config extension', function () {
-    $this->app['config']->set('prompt-deck.extension', 'txt');
+    $this->app['config']->set('deck.extension', 'txt');
 
     $this->artisan('make:prompt', ['name' => 'txt-prompt'])
         ->assertSuccessful();
@@ -349,8 +349,8 @@ test('make:prompt loads default system stub from package stubs directory', funct
 });
 
 test('make:prompt prefers published stubs over package defaults', function () {
-    // Simulate a published stub in the app's stubs/prompt-deck/ directory.
-    $publishedDir = $this->app->basePath('stubs/prompt-deck');
+    // Simulate a published stub in the app's stubs/deck/ directory.
+    $publishedDir = $this->app->basePath('stubs/deck');
     @mkdir($publishedDir, 0755, true);
     file_put_contents("{$publishedDir}/system-prompt.stub", 'Published system stub for {{ $name }}');
 
@@ -452,7 +452,7 @@ test('make:prompt without --role creates no extra role files', function () {
 });
 
 test('make:prompt --role respects config extension for role files', function () {
-    $this->app['config']->set('prompt-deck.extension', 'txt');
+    $this->app['config']->set('deck.extension', 'txt');
 
     $this->artisan('make:prompt', [
         'name'   => 'ext-role',
@@ -490,7 +490,7 @@ test('make:prompt role stub file exists in package stubs directory', function ()
 });
 
 test('make:prompt prefers published role stub over package default', function () {
-    $publishedDir = $this->app->basePath('stubs/prompt-deck');
+    $publishedDir = $this->app->basePath('stubs/deck');
     @mkdir($publishedDir, 0755, true);
     file_put_contents("{$publishedDir}/role-prompt.stub", 'Custom {{ $role }} stub');
 

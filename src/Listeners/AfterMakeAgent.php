@@ -35,7 +35,7 @@ class AfterMakeAgent
         }
 
         // Respect the configuration toggle.
-        if (! config('prompt-deck.scaffold_on_make_agent', true)) {
+        if (! config('deck.scaffold_on_make_agent', true)) {
             return;
         }
 
@@ -50,7 +50,7 @@ class AfterMakeAgent
         // Silently scaffold the prompt — don't fail the agent creation if this errors.
         try {
             // Check if prompt already exists to avoid interactive prompts.
-            $promptPath = config('prompt-deck.path').'/'.$promptName;
+            $promptPath = config('deck.path').'/'.$promptName;
 
             if (is_dir($promptPath)) {
                 return;

@@ -41,21 +41,21 @@ class DeckServiceProvider extends ServiceProvider
     {
         // Merge config.
         $this->mergeConfigFrom(
-            __DIR__.'/../../config/prompt-deck.php', 'prompt-deck'
+            __DIR__.'/../../config/deck.php', 'deck'
         );
 
         // Register the main manager as a singleton.
         $this->app->singleton(PromptManager::class, function ($app) {
             return new PromptManager(
-                config('prompt-deck.path'),
-                config('prompt-deck.extension'),
-                $app['cache']->store(config('prompt-deck.cache.store')),
+                config('deck.path'),
+                config('deck.extension'),
+                $app['cache']->store(config('deck.cache.store')),
                 $app['config']
             );
         });
 
         // Register a facade alias.
-        $this->app->alias(PromptManager::class, 'prompt-deck');
+        $this->app->alias(PromptManager::class, 'deck');
     }
 
     /**
@@ -67,12 +67,12 @@ class DeckServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/../database/migrations/' => database_path('migrations'),
-            ], 'prompt-deck-migrations');
+            ], 'deck-migrations');
 
             // Publish config.
             $this->publishes([
-                __DIR__.'/../../config/prompt-deck.php' => config_path('prompt-deck.php'),
-            ], 'prompt-deck-config');
+                __DIR__.'/../../config/deck.php' => config_path('deck.php'),
+            ], 'deck-config');
         }
     }
 
@@ -101,7 +101,7 @@ class DeckServiceProvider extends ServiceProvider
             $this->app->singleton(\PromptPHP\Deck\Ai\TrackPromptMiddleware::class);
 
             // Auto-scaffold a prompt when `make:agent` finishes successfully.
-            if (config('prompt-deck.scaffold_on_make_agent', true)) {
+            if (config('deck.scaffold_on_make_agent', true)) {
                 Event::listen(
                     CommandFinished::class,
                     \PromptPHP\Deck\Listeners\AfterMakeAgent::class

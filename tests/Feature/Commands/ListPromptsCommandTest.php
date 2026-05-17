@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 test('prompt:list warns when prompts directory does not exist', function () {
     // Point config at a non-existent path.
-    $this->app['config']->set('prompt-deck.path', $this->tempDir.'/nonexistent');
+    $this->app['config']->set('deck.path', $this->tempDir.'/nonexistent');
 
     $this->artisan('prompt:list')
         ->expectsOutput('Prompts directory not found.')

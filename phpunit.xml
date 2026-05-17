@@ -26,7 +26,7 @@
         <env name="CACHE_DRIVER" value="array"/>
         <env name="DB_CONNECTION" value="testing"/>
         <env name="DB_DATABASE" value=":memory:"/>
-        <env name="PROMPTDECK_CACHE_ENABLED" value="false"/>
-        <env name="PROMPTDECK_TRACKING_ENABLED" value="false"/>
+        <env name="DECK_CACHE_ENABLED" value="false"/>
+        <env name="DECK_TRACKING_ENABLED" value="false"/>
     </php>
 </phpunit>

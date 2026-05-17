@@ -82,17 +82,17 @@ Add the following to your `.env` file to configure Prompt Deck's runtime behavio
 
 ```dotenv
 # Cache
-PROMPTDECK_CACHE_ENABLED=true          # Enable/disable prompt caching (default: true in production, false when APP_DEBUG=true)
-PROMPTDECK_CACHE_STORE=file            # Cache store to use (file, redis, memcached, etc.)
-PROMPTDECK_CACHE_TTL=3600              # Cache time-to-live in seconds
-PROMPTDECK_CACHE_PREFIX=prompt-deck:   # Cache key prefix
+DECK_CACHE_ENABLED=true          # Enable/disable prompt caching (default: true in production, false when APP_DEBUG=true)
+DECK_CACHE_STORE=file            # Cache store to use (file, redis, memcached, etc.)
+DECK_CACHE_TTL=3600              # Cache time-to-live in seconds
+DECK_CACHE_PREFIX=prompt-deck:   # Cache key prefix
 
 # Database Tracking
-PROMPTDECK_TRACKING_ENABLED=true       # Enable/disable database tracking (default: true in production, false when APP_DEBUG=true)
-PROMPTDECK_DB_CONNECTION=              # Database connection name (null for default)
+DECK_TRACKING_ENABLED=true       # Enable/disable database tracking (default: true in production, false when APP_DEBUG=true)
+DECK_DB_CONNECTION=              # Database connection name (null for default)
 
 # AI SDK Integration
-PROMPTDECK_SCAFFOLD_ON_MAKE_AGENT=true # Auto-create prompt when running make:agent
+DECK_SCAFFOLD_ON_MAKE_AGENT=true # Auto-create prompt when running make:agent
 ```
 
 All environment variables are optional as sensible defaults are provided.

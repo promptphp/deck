@@ -356,8 +356,8 @@ When caching is enabled, loaded prompts are stored in your configured cache stor
 ```php
 // config/prompt-deck.php
 'cache' => [
-    'enabled' => env('PROMPTDECK_CACHE_ENABLED', true),
-    'store'   => env('PROMPTDECK_CACHE_STORE', 'file'),
+    'enabled' => env('DECK_CACHE_ENABLED', true),
+    'store'   => env('DECK_CACHE_STORE', 'file'),
     'ttl'     => 3600, // seconds
     'prefix'  => 'prompt-deck:',
 ],

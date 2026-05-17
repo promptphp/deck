@@ -50,7 +50,7 @@ test('handle() ignores make:agent when exit code is non-zero', function () {
 // =====================================================================
 
 test('handle() extracts agent name from input and calls make:prompt', function () {
-    $basePath = config('prompt-deck.path');
+    $basePath = config('deck.path');
 
     // Ensure clean state.
     $promptDir = "{$basePath}/sales-coach";
@@ -87,7 +87,7 @@ test('handle() extracts agent name from input and calls make:prompt', function (
 });
 
 test('handle() converts PascalCase agent names to kebab-case prompts', function () {
-    $basePath = config('prompt-deck.path');
+    $basePath = config('deck.path');
 
     $input = Mockery::mock(\Symfony\Component\Console\Input\InputInterface::class);
     $input->shouldReceive('getArgument')->with('name')->andReturn('DocumentAnalyzer');
@@ -113,7 +113,7 @@ test('handle() converts PascalCase agent names to kebab-case prompts', function 
 // =====================================================================
 
 test('handle() skips when scaffold_on_make_agent config is false', function () {
-    config()->set('prompt-deck.scaffold_on_make_agent', false);
+    config()->set('deck.scaffold_on_make_agent', false);
 
     $input = Mockery::mock(\Symfony\Component\Console\Input\InputInterface::class);
     $input->shouldNotReceive('getArgument');
@@ -171,7 +171,7 @@ test('handle() skips when getArgument throws', function () {
 });
 
 test('handle() does not fail when prompt directory already exists', function () {
-    $basePath = config('prompt-deck.path');
+    $basePath = config('deck.path');
 
     // Pre-create the prompt via make:prompt.
     Artisan::call('make:prompt', ['name' => 'existing-agent']);
@@ -195,7 +195,7 @@ test('handle() does not fail when prompt directory already exists', function () 
 });
 
 test('handle() strips namespace prefix from agent name', function () {
-    $basePath = config('prompt-deck.path');
+    $basePath = config('deck.path');
 
     $input = Mockery::mock(\Symfony\Component\Console\Input\InputInterface::class);
     $input->shouldReceive('getArgument')->with('name')->andReturn('App\\Ai\\Agents\\SupportBot');

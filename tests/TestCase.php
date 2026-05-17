@@ -15,13 +15,13 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        $this->tempDir = sys_get_temp_dir().'/prompt-deck-tests-'.uniqid();
+        $this->tempDir = sys_get_temp_dir().'/deck-tests-'.uniqid();
         mkdir($this->tempDir, 0755, true);
 
-        $this->app['config']->set('prompt-deck.path', $this->tempDir);
-        $this->app['config']->set('prompt-deck.extension', 'md');
-        $this->app['config']->set('prompt-deck.cache.enabled', false);
-        $this->app['config']->set('prompt-deck.tracking.enabled', false);
+        $this->app['config']->set('deck.path', $this->tempDir);
+        $this->app['config']->set('deck.extension', 'md');
+        $this->app['config']->set('deck.cache.enabled', false);
+        $this->app['config']->set('deck.tracking.enabled', false);
     }
 
     protected function tearDown(): void

@@ -24,15 +24,15 @@ Set the tracking configuration in `config/prompt-deck.php`:
 
 ```php
 'tracking' => [
-    'enabled'    => env('PROMPTDECK_TRACKING_ENABLED', true),
-    'connection' => env('PROMPTDECK_DB_CONNECTION'),
+    'enabled'    => env('DECK_TRACKING_ENABLED', true),
+    'connection' => env('DECK_DB_CONNECTION'),
 ],
 ```
 
 Or via environment variable:
 
 ```dotenv
-PROMPTDECK_TRACKING_ENABLED=true
+DECK_TRACKING_ENABLED=true
 ```
 
 By default, tracking is **disabled** when `APP_DEBUG=true` and **enabled** in production.
@@ -51,7 +51,7 @@ php artisan migrate
 By default, tracking uses your application's default database connection. To store tracking data on a separate database:
 
 ```dotenv
-PROMPTDECK_DB_CONNECTION=analytics
+DECK_DB_CONNECTION=analytics
 ```
 
 The connection name must match a connection defined in `config/database.php`.

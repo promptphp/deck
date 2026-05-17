@@ -19,6 +19,6 @@ class Deck extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return 'prompt-deck';
+        return 'deck';
     }
 }
