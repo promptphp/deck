@@ -59,11 +59,14 @@ php artisan make:prompt order-summary
 This creates the following structure
 
 ```txt
-resources/prompts/
-└── order-summary/
-    ├── v1/
-    │   └── system.md
-    └── metadata.json
+resources/prompts/order-summary/
+├── metadata.json
+├── v1/
+│   ├── system.md
+│   └── user.md
+└── v2/
+    ├── system.md
+    └── user.md
 ```
 
 Edit `resources/prompts/order-summary/v1/system.md` with your prompt content. Use `{{ $variable }}` syntax for dynamic values:
