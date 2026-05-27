@@ -7,7 +7,7 @@ namespace PromptPHP\Deck\Facades;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static \PromptPHP\Deck\PromptTemplate get(string $name, ?int $version = null)
+ * @method static \PromptPHP\Deck\PromptTemplate get(string $name, string|int|null $version = null)
  * @method static \PromptPHP\Deck\PromptTemplate active(string $name)
  * @method static array versions(string $name)
  * @method static bool activate(string $name, int $version)
