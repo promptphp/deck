@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.4.2] - 2026-05-27
+
+### Fixed
+
+- Refactored `ActivatePromptCommand` and `PromptManager` to Use `ResolvesVersion` trait for version resolution in prompt retrieval and activation and support mixed types for version signature on `get` and `activate` methods.
+
 ## [0.4.1] - 2026-05-17
 
 ### Fixed
