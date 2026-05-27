@@ -8,11 +8,14 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
+use PromptPHP\Deck\Concerns\ResolvesVersion;
 use PromptPHP\Deck\Exceptions\InvalidVersionException;
 use PromptPHP\Deck\Exceptions\PromptNotFoundException;
 
 class PromptManager
 {
+    use ResolvesVersion;
+
     protected Filesystem $files;
 
     protected string $basePath;
@@ -39,12 +42,19 @@ class PromptManager
      * Get a prompt instance by name and optional version.
      * If version is not provided, the active version will be used.
      *
-     *   Deck::get('order-summary')        // active version.
-     *   Deck::get('order-summary', 2)     // specific version.
+     * Deck::get('order-summary')        // active version.
+     * Deck::get('order-summary', 'v2')  // specific version.
+     * Deck::get('order-summary', 2)     // specific version.
      */
-    public function get(string $name, ?int $version = null): PromptTemplate
+    public function get(string $name, string|int|null $version = null): PromptTemplate
     {
-        $version ??= $this->getActiveVersion($name);
+        if ($version === null) {
+            $version = $this->getActiveVersion($name);
+        } else {
+            $versionInput = (string) $version;
+            $version      = $this->parseVersion($versionInput);
+        }
+
         $cacheKey = $this->config->get('deck.cache.prefix', 'deck:')."{$name}.v{$version}";
 
         // Attempt to load from cache.
@@ -233,7 +243,7 @@ class PromptManager
      * version directory, so any role scaffolded by make:prompt is
      * automatically available at runtime.
      */
-    protected function loadFromFiles(string $name, int $version): array
+    protected function loadFromFiles(string $name, ?int $version): array
     {
         $versionPath = "{$this->basePath}/{$name}/v{$version}";
 

@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace PromptPHP\Deck\Console\Commands;
 
 use Illuminate\Console\Command;
+use PromptPHP\Deck\Concerns\ResolvesVersion;
 use PromptPHP\Deck\PromptManager;
 
 class ActivatePromptCommand extends Command
 {
+    use ResolvesVersion;
+
     protected $signature = 'prompt:activate {name : The prompt name}
                               {version : The version number to activate, e.g. 1 or v1}';
 
@@ -46,23 +49,5 @@ class ActivatePromptCommand extends Command
 
             return Command::FAILURE;
         }
-    }
-
-    /**
-     * Parse the version input and return the version number as an integer.
-     *
-     * @param string $value The version input, e.g. "1" or "v1".
-     *
-     * @return int|null The parsed version number, or null if invalid.
-     */
-    protected function parseVersion(string $value): ?int
-    {
-        $value = trim($value);
-
-        if (! preg_match('/^v?([1-9]\d*)$/i', $value, $matches)) {
-            return null;
-        }
-
-        return (int) $matches[1];
     }
 }
