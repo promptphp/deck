@@ -58,7 +58,8 @@
   },
   "logo": {
     "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "dark": "/logo/dark.svg",
+    "href": "https://deck.promptphp.com/"
   },
   "navbar": {
     "links": [
@@ -86,7 +87,9 @@
   },
   "footer": {
     "socials": {
-      "github": "https://github.com/promptphp/deck"
+      "github": "https://github.com/promptphp/deck",
+      "x": "https://x.com/promptphp"
     }
-  }
+  },
+  "description": "A Laravel package for versioned AI prompt management with variable interpolation, performance tracking & A/B testing."
 }
