@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.4.3] - 2026-07-29
+
+### Fixed
+
+- Widened `sebastian/diff` constraint to allow `v8/v9` To allow pest 5.
+
+### Changed
+
+### Removed
+
 ## [0.4.2] - 2026-05-27
 
 ### Fixed
