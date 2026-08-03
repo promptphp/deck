@@ -6,9 +6,9 @@ namespace PromptPHP\Deck\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use PromptPHP\Deck\Exceptions\PromptNotFoundException;
 use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
-use PromptPHP\Deck\Exceptions\PromptNotFoundException;
 
 class PromptDiffCommand extends Command
 {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PromptPHP\Deck\Listeners;
 
 use Illuminate\Console\Events\CommandFinished;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 
 /**
@@ -56,7 +57,7 @@ class AfterMakeAgent
                 return;
             }
 
-            $exitCode = \Illuminate\Support\Facades\Artisan::call('make:prompt', [
+            $exitCode = Artisan::call('make:prompt', [
                 'name' => $promptName,
             ]);
 

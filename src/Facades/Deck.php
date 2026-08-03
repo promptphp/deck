@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PromptPHP\Deck\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use PromptPHP\Deck\PromptManager;
 
 /**
  * @method static \PromptPHP\Deck\PromptTemplate get(string $name, string|int|null $version = null)
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool activate(string $name, int $version)
  * @method static void track(string $promptName, int $version, array $data)
  *
- * @see \PromptPHP\Deck\PromptManager
+ * @see PromptManager
  */
 class Deck extends Facade
 {

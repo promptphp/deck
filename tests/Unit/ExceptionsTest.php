@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use PromptPHP\Deck\Exceptions\ConfigurationException;
-use PromptPHP\Deck\Exceptions\InvalidVersionException;
 use PromptPHP\Deck\Exceptions\DeckException;
+use PromptPHP\Deck\Exceptions\InvalidVersionException;
 use PromptPHP\Deck\Exceptions\PromptNotFoundException;
 use PromptPHP\Deck\Exceptions\PromptRenderingException;
 
@@ -12,14 +12,14 @@ use PromptPHP\Deck\Exceptions\PromptRenderingException;
 
 test('DeckException extends base Exception', function () {
     expect(DeckException::class)
-        ->toExtend(\Exception::class);
+        ->toExtend(Exception::class);
 });
 
 test('ConfigurationException extends DeckException', function () {
     $e = ConfigurationException::invalidPath('/some/path');
 
     expect($e)->toBeInstanceOf(DeckException::class)
-        ->and($e)->toBeInstanceOf(\Exception::class);
+        ->and($e)->toBeInstanceOf(Exception::class);
 });
 
 test('InvalidVersionException extends DeckException', function () {

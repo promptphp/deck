@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Contracts\Support\Arrayable;
 use PromptPHP\Deck\PromptTemplate;
 
 // =====================================================================
@@ -308,5 +309,5 @@ test('interpolation handles multiline content', function () {
 test('Prompt implements Arrayable', function () {
     $prompt = new PromptTemplate('test', 1, ['system' => 'sys']);
 
-    expect($prompt)->toBeInstanceOf(\Illuminate\Contracts\Support\Arrayable::class);
+    expect($prompt)->toBeInstanceOf(Arrayable::class);
 });

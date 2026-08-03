@@ -3,10 +3,12 @@
 declare(strict_types=1);
 
 use Illuminate\Console\Events\CommandFinished;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Artisan;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
 use PromptPHP\Deck\Listeners\AfterMakeAgent;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 // =====================================================================
 // Listener instantiation
@@ -56,14 +58,14 @@ test('handle() extracts agent name from input and calls make:prompt', function (
     $promptDir = "{$basePath}/sales-coach";
 
     if (is_dir($promptDir)) {
-        (new \Illuminate\Filesystem\Filesystem)->deleteDirectory($promptDir);
+        (new Filesystem)->deleteDirectory($promptDir);
     }
 
     $input  = new ArrayInput(['name' => 'SalesCoach']);
     $output = new BufferedOutput;
 
     // Bind the 'name' argument explicitly since ArrayInput needs definition.
-    $input = Mockery::mock(\Symfony\Component\Console\Input\InputInterface::class);
+    $input = Mockery::mock(InputInterface::class);
     $input->shouldReceive('getArgument')->with('name')->andReturn('SalesCoach');
 
     $output = new BufferedOutput;
@@ -83,13 +85,13 @@ test('handle() extracts agent name from input and calls make:prompt', function (
     expect($text)->toContain('SalesCoach');
 
     // Cleanup.
-    (new \Illuminate\Filesystem\Filesystem)->deleteDirectory("{$basePath}/sales-coach");
+    (new Filesystem)->deleteDirectory("{$basePath}/sales-coach");
 });
 
 test('handle() converts PascalCase agent names to kebab-case prompts', function () {
     $basePath = config('deck.path');
 
-    $input = Mockery::mock(\Symfony\Component\Console\Input\InputInterface::class);
+    $input = Mockery::mock(InputInterface::class);
     $input->shouldReceive('getArgument')->with('name')->andReturn('DocumentAnalyzer');
 
     $output = new BufferedOutput;
@@ -105,7 +107,7 @@ test('handle() converts PascalCase agent names to kebab-case prompts', function 
     expect($text)->toContain('document-analyzer');
 
     // Cleanup.
-    (new \Illuminate\Filesystem\Filesystem)->deleteDirectory("{$basePath}/document-analyzer");
+    (new Filesystem)->deleteDirectory("{$basePath}/document-analyzer");
 });
 
 // =====================================================================
@@ -115,7 +117,7 @@ test('handle() converts PascalCase agent names to kebab-case prompts', function 
 test('handle() skips when scaffold_on_make_agent config is false', function () {
     config()->set('deck.scaffold_on_make_agent', false);
 
-    $input = Mockery::mock(\Symfony\Component\Console\Input\InputInterface::class);
+    $input = Mockery::mock(InputInterface::class);
     $input->shouldNotReceive('getArgument');
 
     $output = new BufferedOutput;
@@ -129,7 +131,7 @@ test('handle() skips when scaffold_on_make_agent config is false', function () {
 });
 
 test('handle() skips when input returns null for name argument', function () {
-    $input = Mockery::mock(\Symfony\Component\Console\Input\InputInterface::class);
+    $input = Mockery::mock(InputInterface::class);
     $input->shouldReceive('getArgument')->with('name')->andReturn(null);
 
     $output = new BufferedOutput;
@@ -143,7 +145,7 @@ test('handle() skips when input returns null for name argument', function () {
 });
 
 test('handle() skips when agent name argument is empty', function () {
-    $input = Mockery::mock(\Symfony\Component\Console\Input\InputInterface::class);
+    $input = Mockery::mock(InputInterface::class);
     $input->shouldReceive('getArgument')->with('name')->andReturn('');
 
     $output = new BufferedOutput;
@@ -157,8 +159,8 @@ test('handle() skips when agent name argument is empty', function () {
 });
 
 test('handle() skips when getArgument throws', function () {
-    $input = Mockery::mock(\Symfony\Component\Console\Input\InputInterface::class);
-    $input->shouldReceive('getArgument')->with('name')->andThrow(new \RuntimeException('No such argument'));
+    $input = Mockery::mock(InputInterface::class);
+    $input->shouldReceive('getArgument')->with('name')->andThrow(new RuntimeException('No such argument'));
 
     $output = new BufferedOutput;
 
@@ -176,7 +178,7 @@ test('handle() does not fail when prompt directory already exists', function () 
     // Pre-create the prompt via make:prompt.
     Artisan::call('make:prompt', ['name' => 'existing-agent']);
 
-    $input = Mockery::mock(\Symfony\Component\Console\Input\InputInterface::class);
+    $input = Mockery::mock(InputInterface::class);
     $input->shouldReceive('getArgument')->with('name')->andReturn('ExistingAgent');
 
     $output = new BufferedOutput;
@@ -191,13 +193,13 @@ test('handle() does not fail when prompt directory already exists', function () 
     expect($output->fetch())->not->toContain('Deck');
 
     // Cleanup.
-    (new \Illuminate\Filesystem\Filesystem)->deleteDirectory("{$basePath}/existing-agent");
+    (new Filesystem)->deleteDirectory("{$basePath}/existing-agent");
 });
 
 test('handle() strips namespace prefix from agent name', function () {
     $basePath = config('deck.path');
 
-    $input = Mockery::mock(\Symfony\Component\Console\Input\InputInterface::class);
+    $input = Mockery::mock(InputInterface::class);
     $input->shouldReceive('getArgument')->with('name')->andReturn('App\\Ai\\Agents\\SupportBot');
 
     $output = new BufferedOutput;
@@ -214,5 +216,5 @@ test('handle() strips namespace prefix from agent name', function () {
     expect($text)->toContain('support-bot');
 
     // Cleanup.
-    (new \Illuminate\Filesystem\Filesystem)->deleteDirectory("{$basePath}/support-bot");
+    (new Filesystem)->deleteDirectory("{$basePath}/support-bot");
 });
