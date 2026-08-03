@@ -1,0 +1,134 @@
+---
+title: "Changelog"
+description: "New features, fixes, and breaking changes in Deck by PromptPHP."
+rss: true
+---
+
+Deck follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Subscribe to the [RSS feed](https://deck.promptphp.com/changelog/rss.xml) to be notified of new releases, or browse the [full history on GitHub](https://github.com/promptphp/deck/blob/0.x/CHANGELOG.md).
+
+<Update label="v0.4.4" description="3 August 2026" tags={["Fixed", "Added"]}>
+
+**Fixed**
+
+- **Migrations now publish on case-sensitive filesystems.** `vendor:publish --tag=deck-migrations` reported success without copying anything on Linux and case-sensitive macOS volumes. If your `database/migrations` directory came up empty after installing Deck, publish again after upgrading.
+- **Creating a version no longer changes which version is live.** `make:prompt` rewrote the prompt's root `metadata.json` from scratch, discarding the `active_version` key, so scaffolding a draft silently promoted it to active. The file is now merged: `active_version`, your description, the original `created_at`, a populated `variables` list, and any keys you added by hand all survive.
+- **Prompt metadata is now readable.** `make:prompt` recorded the name, description, and roles in the prompt's root `metadata.json`, but Deck only ever read the version-level `v{n}/metadata.json`. `PromptTemplate::metadata()` was always empty and the `prompt:list` description column was always blank. `make:prompt` now writes version-level metadata too, and reads merge the two files with version keys winning. See [Metadata](/core/prompts#metadata).
+- **`prompt:test --ver=v2` renders the version you asked for.** The `v` prefix was discarded during parsing, so the command quietly rendered the active version while reporting the wrong number in its header. Both `2` and `v2` now work, and an unparseable value fails with a clear message.
+- Corrected the `PromptPHP\Deck\Database\Factories\` PSR-4 mapping, which pointed at a directory that does not exist.
+- Corrected the README downloads badge, which reported the deprecated `veeqtoh/prompt-deck` package, and the stale repository and licence links.
+
+**Added**
+
+- `make:prompt` now tells you how to promote a new version when a different one is active:
+
+  ```
+  Version 2 of the [order-summary] prompt has been created successfully with the following roles: system.
+
+  v1 is still the active version.
+  Run `php artisan prompt:activate order-summary v2` to make v2 live.
+  ```
+
+**Removed**
+
+- Removed the `PromptPHP\Deck\Database\Seeders\` autoload mapping, which pointed at a directory that does not exist.
+
+</Update>
+
+<Update label="v0.4.3" description="29 July 2026" tags={["Fixed"]}>
+
+**Fixed**
+
+- Widened the `sebastian/diff` constraint to allow `v8` and `v9`, so Deck can be installed alongside Pest 5. [#12](https://github.com/promptphp/deck/pull/12)
+
+</Update>
+
+<Update label="v0.4.2" description="27 May 2026" tags={["Fixed"]}>
+
+**Fixed**
+
+- `Deck::get()` and `Deck::activate()` now accept mixed version types, resolving versions through the shared `ResolvesVersion` trait.
+
+</Update>
+
+<Update label="v0.4.1" description="17 May 2026" tags={["Fixed"]}>
+
+**Fixed**
+
+- `prompt:activate` now accepts both `1` and `v1` version formats.
+
+</Update>
+
+<Update label="v0.4.0" description="17 May 2026" tags={["Breaking", "Changed"]}>
+
+<Warning>
+  This release renamed the package and its namespace. See the [upgrade guide](https://github.com/promptphp/deck/blob/0.x/UPGRADE.md) before upgrading from `v0.3.x`.
+</Warning>
+
+**Changed**
+
+- Renamed the package from `veeqtoh/prompt-deck` to `promptphp/deck`.
+- Renamed the PHP namespace from `Veeqtoh\PromptDeck` to `PromptPHP\Deck`.
+- Renamed the public package identity from Prompt Deck to Deck by PromptPHP.
+- Updated installation, usage, README, badges, documentation links, and package metadata for the new PromptPHP organisation. [#7](https://github.com/promptphp/deck/pull/7)
+
+**Removed**
+
+- Removed the old `Veeqtoh\PromptDeck` public namespace.
+- Removed old Prompt Deck naming from the main public API.
+
+</Update>
+
+<Update label="v0.3.1" description="17 May 2026" tags={["Added", "Changed", "Fixed"]}>
+
+**Added**
+
+- Published this documentation site, built on Mintlify. [#5](https://github.com/promptphp/deck/pull/5)
+- Added dedicated pages for installation, configuration, commands, prompt management, Laravel AI SDK integration, tracking, testing, and the API reference.
+
+**Changed**
+
+- Reworked the documentation from flat markdown files into organised MDX pages. [#6](https://github.com/promptphp/deck/pull/6)
+
+**Fixed**
+
+- Fixed stale documentation links and navigation paths.
+
+</Update>
+
+<Update label="v0.2.1" description="28 March 2026" tags={["Added", "Changed"]}>
+
+**Added**
+
+- Added a `CHANGELOG` to the repository.
+- Added a GitHub Actions workflow for automated testing.
+- Added a `.gitattributes` file to manage text handling and export-ignore rules.
+
+**Changed**
+
+- Refined the Composer package keywords for discoverability.
+
+</Update>
+
+<Update label="v0.2.0" description="27 March 2026" tags={["Added"]}>
+
+**Added**
+
+- Added support for Laravel 13. [#3](https://github.com/promptphp/deck/pull/3)
+- Added the `scaffold_on_make_agent` option to toggle auto-scaffolding of prompts when you run `make:agent`. See [Configuration](/getting-started/configuration).
+
+</Update>
+
+<Update label="v0.1.0" description="4 March 2026" tags={["Added"]}>
+
+The first release. [#1](https://github.com/promptphp/deck/pull/1)
+
+**Added**
+
+- Versioned prompt management with file-based storage in structured prompt directories.
+- Variable interpolation for prompt templates.
+- Artisan commands for creating, listing, testing, diffing, and activating prompts. See [Commands](/core/commands).
+- Prompt execution tracking. See [Tracking](/advanced/tracking).
+- A/B testing through versioned prompt activation and tracking.
+- Optional Laravel AI SDK integration. See [Laravel AI SDK](/integrations/ai-sdk).
+
+</Update>

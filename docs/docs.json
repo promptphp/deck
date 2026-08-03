@@ -39,6 +39,12 @@
           "advanced/testing",
           "advanced/api-reference"
         ]
+      },
+      {
+        "group": "Releases",
+        "pages": [
+          "changelog"
+        ]
       }
     ],
     "global": {
