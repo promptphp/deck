@@ -274,8 +274,6 @@ test('activate() creates metadata.json if it does not exist', function () {
     expect($meta['active_version'])->toBe(1);
 });
 
-use InvalidArgumentException;
-
 test('activate() preserves existing metadata keys when updating active_version', function () {
     $this->createPromptFixture('preserve-meta', 1, 'sys', 'usr', null, [
         'name'           => 'preserve-meta',
@@ -572,4 +570,74 @@ test('versions() merges prompt-level metadata into every version', function () {
     expect($versions[0]['metadata']['description'])->toBe('Shared')
         ->and($versions[0]['metadata']['author'])->toBe('Alice')
         ->and($versions[1]['metadata']['description'])->toBe('Shared');
+});
+
+// =====================================================================
+// Version input formats — get() and activate() must agree
+// =====================================================================
+
+test('activate() accepts a v-prefixed version string', function () {
+    $this->createPromptFixture('str-activate', 1, 'sys');
+    $this->createPromptFixture('str-activate', 2, 'sys');
+
+    expect(freshManager()->activate('str-activate', 'v2'))->toBeTrue();
+
+    $meta = json_decode(file_get_contents("{$this->tempDir}/str-activate/metadata.json"), true);
+    expect($meta['active_version'])->toBe(2);
+});
+
+test('activate() accepts a numeric version string', function () {
+    $this->createPromptFixture('num-str-activate', 1, 'sys');
+    $this->createPromptFixture('num-str-activate', 2, 'sys');
+
+    expect(freshManager()->activate('num-str-activate', '2'))->toBeTrue();
+
+    $meta = json_decode(file_get_contents("{$this->tempDir}/num-str-activate/metadata.json"), true);
+    expect($meta['active_version'])->toBe(2);
+});
+
+test('activate() still accepts an integer version', function () {
+    $this->createPromptFixture('int-activate', 1, 'sys');
+    $this->createPromptFixture('int-activate', 2, 'sys');
+
+    expect(freshManager()->activate('int-activate', 2))->toBeTrue();
+
+    $meta = json_decode(file_get_contents("{$this->tempDir}/int-activate/metadata.json"), true);
+    expect($meta['active_version'])->toBe(2);
+});
+
+test('activate() reports the offending value for an unparseable version', function () {
+    $this->createPromptFixture('bad-activate', 1, 'sys');
+
+    freshManager()->activate('bad-activate', 'banana');
+})->throws(
+    InvalidVersionException::class,
+    'Invalid version [banana] for prompt [bad-activate]. Use a positive number like [1] or [v1].'
+);
+
+test('activate() rejects a zero version', function () {
+    $this->createPromptFixture('zero-activate', 1, 'sys');
+
+    freshManager()->activate('zero-activate', 'v0');
+})->throws(InvalidVersionException::class, 'Invalid version [v0]');
+
+test('get() reports the offending value for an unparseable version', function () {
+    $this->createPromptFixture('bad-get', 1, 'sys');
+
+    freshManager()->get('bad-get', 'banana');
+})->throws(
+    InvalidVersionException::class,
+    'Invalid version [banana] for prompt [bad-get]. Use a positive number like [1] or [v1].'
+);
+
+test('get() and activate() accept the same version formats', function () {
+    $this->createPromptFixture('parity', 1, 'sys v1');
+    $this->createPromptFixture('parity', 2, 'sys v2');
+
+    $manager = freshManager();
+
+    foreach (['v2', '2', 2] as $input) {
+        expect($manager->get('parity', $input)->version())->toBe(2)
+            ->and($manager->activate('parity', $input))->toBeTrue();
+    }
 });

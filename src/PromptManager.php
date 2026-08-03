@@ -53,8 +53,8 @@ class PromptManager
         if ($version === null) {
             $version = $this->getActiveVersion($name);
         } else {
-            $versionInput = (string) $version;
-            $version      = $this->parseVersion($versionInput);
+            $version = $this->parseVersion((string) $version)
+                ?? throw InvalidVersionException::unparseable($name, $version);
         }
 
         $cacheKey = $this->config->get('deck.cache.prefix', 'deck:')."{$name}.v{$version}";
@@ -132,11 +132,23 @@ class PromptManager
     /**
      * Activate a specific version.
      *
-     * For simplicity, we'll store in a JSON file or use the database if tracking is enabled.
-     * We'll assume we have a "prompt_versions" table with an "is_active" column.
+     * Accepts the same version formats as get(), so both of these work:
+     *
+     *   Deck::activate('order-summary', 'v2')
+     *   Deck::activate('order-summary', 2)
+     *
+     * The active version is recorded in the database when tracking is enabled,
+     * and in the prompt's root metadata.json either way.
+     *
+     * @param string|int $version The version to activate, e.g. 2 or 'v2'.
+     *
+     * @throws InvalidVersionException if the version cannot be parsed.
      */
-    public function activate(string $name, int $version): bool
+    public function activate(string $name, string|int $version): bool
     {
+        $version = $this->parseVersion((string) $version)
+            ?? throw InvalidVersionException::unparseable($name, $version);
+
         $this->ensureVersionExists($name, $version);
 
         if ($this->trackingConfig['enabled'] ?? false) {
