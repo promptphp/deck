@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace PromptPHP\Deck\Console\Commands;
 
 use Illuminate\Console\Command;
+use PromptPHP\Deck\Concerns\ResolvesVersion;
 use PromptPHP\Deck\PromptManager;
 
 class TestPromptCommand extends Command
 {
+    use ResolvesVersion;
+
     protected $signature = 'prompt:test {name : The prompt name}
-                              {--ver= : Specific version (defaults to active)}
+                              {--ver= : Specific version, e.g. 2 or v2 (defaults to active)}
                               {--input= : The input to test}
                               {--variables= : JSON string of variables}';
 
@@ -27,7 +30,7 @@ class TestPromptCommand extends Command
     public function handle(): int
     {
         $name          = $this->argument('name');
-        $version       = $this->option('ver') ? (int) $this->option('ver') : null;
+        $versionInput  = $this->option('ver');
         $input         = $this->option('input') ?? 'Sample user input';
         $variablesJson = $this->option('variables') ?? '{}';
 
@@ -38,8 +41,21 @@ class TestPromptCommand extends Command
             return Command::FAILURE;
         }
 
+        // A null version means "use whichever version is active".
+        $version = null;
+
+        if ($versionInput !== null && $versionInput !== '') {
+            $version = $this->parseVersion((string) $versionInput);
+
+            if ($version === null) {
+                $this->error("Invalid version [{$versionInput}] provided. Use a positive number like [1] or [v1].");
+
+                return Command::FAILURE;
+            }
+        }
+
         try {
-            $prompt = $version
+            $prompt = $version !== null
                 ? $this->manager->get($name, $version)
                 : $this->manager->active($name);
 
