@@ -47,8 +47,7 @@
     "autoload": {
         "psr-4": {
             "PromptPHP\\Deck\\": "src/",
-            "PromptPHP\\Deck\\Database\\Factories\\": "src/database/factories/",
-            "PromptPHP\\Deck\\Database\\Seeders\\": "src/database/seeders/"
+            "PromptPHP\\Deck\\Database\\Factories\\": "src/Database/Factories/"
         }
     },
     "autoload-dev": {
