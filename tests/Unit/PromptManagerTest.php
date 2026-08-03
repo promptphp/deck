@@ -499,3 +499,77 @@ test('constructor strips leading dot from extension', function () {
 
     expect($prompt->system())->toBe('dotted');
 });
+
+// =====================================================================
+// Metadata merging — prompt-level + version-level
+// =====================================================================
+
+test('get() merges prompt-level metadata into the version metadata', function () {
+    $this->createPromptFixture(
+        'merged-meta',
+        1,
+        'sys',
+        'usr',
+        ['author'      => 'Alice'],
+        ['description' => 'Summarises an order', 'active_version' => 1],
+    );
+
+    $metadata = freshManager()->get('merged-meta', 1)->metadata();
+
+    expect($metadata['description'])->toBe('Summarises an order')
+        ->and($metadata['author'])->toBe('Alice');
+});
+
+test('get() lets version metadata win over prompt-level metadata', function () {
+    $this->createPromptFixture(
+        'meta-precedence',
+        1,
+        'sys',
+        'usr',
+        ['description' => 'Version specific'],
+        ['description' => 'Prompt wide'],
+    );
+
+    expect(freshManager()->get('meta-precedence', 1)->metadata()['description'])
+        ->toBe('Version specific');
+});
+
+test('get() excludes active_version from metadata', function () {
+    $this->createPromptFixture(
+        'no-active-key',
+        1,
+        'sys',
+        'usr',
+        null,
+        ['description' => 'Has an active version', 'active_version' => 1],
+    );
+
+    $metadata = freshManager()->get('no-active-key', 1)->metadata();
+
+    expect($metadata)->not->toHaveKey('active_version')
+        ->and($metadata['description'])->toBe('Has an active version');
+});
+
+test('get() still returns empty metadata when neither metadata file exists', function () {
+    $this->createPromptFixture('truly-no-meta', 1, 'sys', 'usr');
+
+    expect(freshManager()->get('truly-no-meta', 1)->metadata())->toBe([]);
+});
+
+test('get() ignores malformed metadata JSON instead of failing', function () {
+    $this->createPromptFixture('bad-json', 1, 'sys', 'usr');
+    file_put_contents("{$this->tempDir}/bad-json/metadata.json", '{not valid json');
+
+    expect(freshManager()->get('bad-json', 1)->metadata())->toBe([]);
+});
+
+test('versions() merges prompt-level metadata into every version', function () {
+    $this->createPromptFixture('shared-desc', 1, 'sys', 'usr', ['author' => 'Alice']);
+    $this->createPromptFixture('shared-desc', 2, 'sys', 'usr', null, ['description' => 'Shared']);
+
+    $versions = freshManager()->versions('shared-desc');
+
+    expect($versions[0]['metadata']['description'])->toBe('Shared')
+        ->and($versions[0]['metadata']['author'])->toBe('Alice')
+        ->and($versions[1]['metadata']['description'])->toBe('Shared');
+});

@@ -174,3 +174,44 @@ test('prompt:list returns success exit code', function () {
     $this->artisan('prompt:list')
         ->assertExitCode(0);
 });
+
+// =====================================================================
+// Descriptions scaffolded by make:prompt
+// =====================================================================
+
+test('prompt:list shows the description recorded by make:prompt', function () {
+    // End-to-end: make:prompt writes the description to the prompt-level
+    // metadata.json, and prompt:list must be able to read it back.
+    $this->artisan('make:prompt', ['name' => 'scaffolded', '--desc' => 'Summarises an order'])
+        ->assertSuccessful();
+
+    $this->artisan('prompt:list')
+        ->expectsTable(
+            ['Prompt', 'Active Version', 'Active', 'Description'],
+            [['scaffolded', 'v1', '✅', 'Summarises an order']]
+        )
+        ->assertSuccessful();
+});
+
+test('prompt:list --all shows the description for every version', function () {
+    $this->artisan('make:prompt', ['name' => 'all-versions', '--desc' => 'Shared description'])
+        ->assertSuccessful();
+
+    $this->artisan('make:prompt', ['name' => 'all-versions'])
+        ->expectsChoice('What would you like to do?', 'version', [
+            'version'   => 'Create a new version (v2)',
+            'overwrite' => 'Overwrite version 1',
+            'cancel'    => 'Cancel',
+        ])
+        ->assertSuccessful();
+
+    $this->artisan('prompt:list', ['--all' => true])
+        ->expectsTable(
+            ['Prompt', 'Active Version', 'Active', 'Description'],
+            [
+                ['all-versions', 'v1', '', 'Shared description'],
+                ['all-versions', 'v2', '✅', 'Shared description'],
+            ]
+        )
+        ->assertSuccessful();
+});

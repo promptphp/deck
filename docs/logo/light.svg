@@ -1,8 +1,8 @@
-<svg width="180" height="36" viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="104" height="36" viewBox="0 0 104 36" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect width="36" height="36" rx="10" fill="#6366F1"/>
   <path d="M11 10.5H24.5C27.5 10.5 29.5 12.5 29.5 15.4C29.5 18.3 27.5 20.3 24.5 20.3H17.5V26H11V10.5Z" fill="white"/>
   <path d="M17.5 15.2V18H23.6C24.5 18 25.1 17.4 25.1 16.6C25.1 15.8 24.5 15.2 23.6 15.2H17.5Z" fill="#6366F1"/>
   <text x="48" y="23.5" font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="700" fill="#0F172A">
-    Prompt Deck
+    Deck
   </text>
 </svg>

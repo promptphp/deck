@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace PromptPHP\Deck\Concerns;
 
-use Stringable;
+use Laravel\Ai\Messages\Message;
 use PromptPHP\Deck\PromptManager;
 use PromptPHP\Deck\PromptTemplate;
+use Stringable;
 
 /**
  * Trait for integrating Deck templates with Laravel AI SDK agents.
@@ -135,9 +136,9 @@ trait HasPromptTemplate
         );
 
         // Convert to Laravel AI SDK Message objects if available.
-        if (class_exists(\Laravel\Ai\Messages\Message::class)) {
+        if (class_exists(Message::class)) {
             return array_map(
-                fn (array $msg) => new \Laravel\Ai\Messages\Message($msg['role'], $msg['content']),
+                fn (array $msg) => new Message($msg['role'], $msg['content']),
                 $rawMessages
             );
         }

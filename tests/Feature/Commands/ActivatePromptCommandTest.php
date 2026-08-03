@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use PromptPHP\Deck\PromptManager;
 
 test('prompt:activate activates version and outputs success message', function () {
     $this->createPromptFixture('act-prompt', 1, 'sys v1', 'usr v1');
@@ -16,12 +17,12 @@ test('prompt:activate activates version and outputs success message', function (
 
 test('prompt:activate returns failure when exception is thrown', function () {
     // We mock the PromptManager to throw an exception.
-    $mock = \Mockery::mock(\PromptPHP\Deck\PromptManager::class);
+    $mock = Mockery::mock(PromptManager::class);
     $mock->shouldReceive('activate')
         ->with('bad-prompt', 1)
-        ->andThrow(new \Exception('Something went wrong'));
+        ->andThrow(new Exception('Something went wrong'));
 
-    $this->app->instance(\PromptPHP\Deck\PromptManager::class, $mock);
+    $this->app->instance(PromptManager::class, $mock);
 
     $this->artisan('prompt:activate', ['name' => 'bad-prompt', 'version' => 1])
         ->expectsOutput('Something went wrong')

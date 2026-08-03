@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use PromptPHP\Deck\PromptManager;
 
 // =====================================================================
 // Interactive name prompt tests
@@ -235,7 +236,7 @@ test('make:prompt creates base directory if it does not exist', function () {
     $this->app['config']->set('deck.path', $newPath);
 
     // Re-register the singleton with the new path.
-    $this->app->forgetInstance(\PromptPHP\Deck\PromptManager::class);
+    $this->app->forgetInstance(PromptManager::class);
 
     $this->artisan('make:prompt', ['name' => 'nested-prompt'])
         ->assertSuccessful();
@@ -595,5 +596,161 @@ test('make:prompt version number appears in success message', function () {
             'cancel'    => 'Cancel',
         ])
         ->expectsOutputToContain('Version 2 of the [msg-test] prompt')
+        ->assertSuccessful();
+});
+
+// =====================================================================
+// Metadata preservation across versions
+// =====================================================================
+
+test('make:prompt preserves active_version when creating a new version', function () {
+    $this->artisan('make:prompt', ['name' => 'preserve-active'])->assertSuccessful();
+
+    app(PromptManager::class)->activate('preserve-active', 1);
+
+    $this->artisan('make:prompt', ['name' => 'preserve-active'])
+        ->expectsChoice('What would you like to do?', 'version', [
+            'version'   => 'Create a new version (v2)',
+            'overwrite' => 'Overwrite version 1',
+            'cancel'    => 'Cancel',
+        ])
+        ->assertSuccessful();
+
+    $meta = json_decode(file_get_contents("{$this->tempDir}/preserve-active/metadata.json"), true);
+
+    // Scaffolding a new version must never change what the application serves.
+    expect($meta['active_version'])->toBe(1)
+        ->and(app(PromptManager::class)->active('preserve-active')->version())->toBe(1);
+});
+
+test('make:prompt preserves the existing description when no new one is given', function () {
+    $this->artisan('make:prompt', ['name' => 'keep-desc', '--desc' => 'Summarises an order'])
+        ->assertSuccessful();
+
+    $this->artisan('make:prompt', ['name' => 'keep-desc'])
+        ->expectsChoice('What would you like to do?', 'version', [
+            'version'   => 'Create a new version (v2)',
+            'overwrite' => 'Overwrite version 1',
+            'cancel'    => 'Cancel',
+        ])
+        ->assertSuccessful();
+
+    $meta = json_decode(file_get_contents("{$this->tempDir}/keep-desc/metadata.json"), true);
+
+    expect($meta['description'])->toBe('Summarises an order');
+});
+
+test('make:prompt overrides the description when --desc is given', function () {
+    $this->artisan('make:prompt', ['name' => 'new-desc', '--desc' => 'Original'])->assertSuccessful();
+
+    $this->artisan('make:prompt', ['name' => 'new-desc', '--desc' => 'Updated'])
+        ->expectsChoice('What would you like to do?', 'version', [
+            'version'   => 'Create a new version (v2)',
+            'overwrite' => 'Overwrite version 1',
+            'cancel'    => 'Cancel',
+        ])
+        ->assertSuccessful();
+
+    $meta = json_decode(file_get_contents("{$this->tempDir}/new-desc/metadata.json"), true);
+
+    expect($meta['description'])->toBe('Updated');
+});
+
+test('make:prompt preserves hand-edited metadata keys', function () {
+    $this->artisan('make:prompt', ['name' => 'hand-edited'])->assertSuccessful();
+
+    // Simulate a user editing the file by hand.
+    $path              = "{$this->tempDir}/hand-edited/metadata.json";
+    $meta              = json_decode(file_get_contents($path), true);
+    $meta['variables'] = ['tone', 'order'];
+    $meta['owner']     = 'platform-team';
+    $originalCreatedAt = $meta['created_at'];
+    file_put_contents($path, json_encode($meta, JSON_PRETTY_PRINT));
+
+    $this->artisan('make:prompt', ['name' => 'hand-edited'])
+        ->expectsChoice('What would you like to do?', 'version', [
+            'version'   => 'Create a new version (v2)',
+            'overwrite' => 'Overwrite version 1',
+            'cancel'    => 'Cancel',
+        ])
+        ->assertSuccessful();
+
+    $meta = json_decode(file_get_contents($path), true);
+
+    expect($meta['variables'])->toBe(['tone', 'order'])
+        ->and($meta['owner'])->toBe('platform-team')
+        ->and($meta['created_at'])->toBe($originalCreatedAt);
+});
+
+// =====================================================================
+// Version-level metadata
+// =====================================================================
+
+test('make:prompt writes version-level metadata for the created version', function () {
+    $this->artisan('make:prompt', [
+        'name'   => 'ver-meta',
+        '--user' => true,
+        '--role' => ['assistant'],
+    ])->assertSuccessful();
+
+    $meta = json_decode(file_get_contents("{$this->tempDir}/ver-meta/v1/metadata.json"), true);
+
+    expect($meta['version'])->toBe(1)
+        ->and($meta['roles'])->toBe(['system', 'user', 'assistant'])
+        ->and($meta['created_at'])->not->toBeEmpty();
+});
+
+test('make:prompt records each version roles separately', function () {
+    $this->artisan('make:prompt', ['name' => 'per-version'])->assertSuccessful();
+
+    $this->artisan('make:prompt', ['name' => 'per-version', '--user' => true])
+        ->expectsChoice('What would you like to do?', 'version', [
+            'version'   => 'Create a new version (v2)',
+            'overwrite' => 'Overwrite version 1',
+            'cancel'    => 'Cancel',
+        ])
+        ->assertSuccessful();
+
+    $v1 = json_decode(file_get_contents("{$this->tempDir}/per-version/v1/metadata.json"), true);
+    $v2 = json_decode(file_get_contents("{$this->tempDir}/per-version/v2/metadata.json"), true);
+
+    expect($v1['roles'])->toBe(['system'])
+        ->and($v2['roles'])->toBe(['system', 'user']);
+});
+
+// =====================================================================
+// Activation hint
+// =====================================================================
+
+test('make:prompt hints how to activate when another version is live', function () {
+    $this->artisan('make:prompt', ['name' => 'hint-me'])->assertSuccessful();
+
+    app(PromptManager::class)->activate('hint-me', 1);
+
+    $this->artisan('make:prompt', ['name' => 'hint-me'])
+        ->expectsChoice('What would you like to do?', 'version', [
+            'version'   => 'Create a new version (v2)',
+            'overwrite' => 'Overwrite version 1',
+            'cancel'    => 'Cancel',
+        ])
+        ->expectsOutputToContain('v1 is still the active version.')
+        ->expectsOutputToContain('php artisan prompt:activate hint-me v2')
+        ->assertSuccessful();
+});
+
+test('make:prompt does not hint for a brand new prompt', function () {
+    $this->artisan('make:prompt', ['name' => 'no-hint'])
+        ->doesntExpectOutputToContain('is still the active version')
+        ->assertSuccessful();
+});
+
+test('make:prompt does not hint when the created version is already active', function () {
+    $this->artisan('make:prompt', ['name' => 'same-version'])->assertSuccessful();
+
+    app(PromptManager::class)->activate('same-version', 1);
+
+    // --force overwrites v1, which is the version already active.
+    $this->artisan('make:prompt', ['name' => 'same-version', '--force' => true])
+        ->doesntExpectOutputToContain('is still the active version')
         ->assertSuccessful();
 });

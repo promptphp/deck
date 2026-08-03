@@ -15,9 +15,7 @@
         }
     ],
     "keywords": [
-        "promptphp",
-        "deck",
-        "prompt-deck",
+        "laravel",
         "ai",
         "prompts",
         "prompt-management",
@@ -26,9 +24,7 @@
         "variable-interpolation",
         "performance-tracking",
         "ab-testing",
-        "laravel",
-        "laravel-ai",
-        "laravel-package"
+        "promptphp"
     ],
     "require": {
         "php": "^8.2",
@@ -51,8 +47,7 @@
     "autoload": {
         "psr-4": {
             "PromptPHP\\Deck\\": "src/",
-            "PromptPHP\\Deck\\Database\\Factories\\": "src/database/factories/",
-            "PromptPHP\\Deck\\Database\\Seeders\\": "src/database/seeders/"
+            "PromptPHP\\Deck\\Database\\Factories\\": "src/Database/Factories/"
         }
     },
     "autoload-dev": {
@@ -71,9 +66,11 @@
         }
     },
     "scripts": {
-        "test": [
-            "vendor/bin/pint --test",
-            "vendor/bin/pest"
+        "test": "vendor/bin/pest",
+        "test:architecture": "vendor/bin/pest tests/Architecture",
+        "format": "vendor/bin/pint",
+        "test:lint": [
+            "vendor/bin/pint --parallel --test"
         ]
     },
     "minimum-stability": "dev",

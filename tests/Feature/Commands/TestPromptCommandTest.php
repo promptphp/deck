@@ -128,3 +128,46 @@ test('prompt:test fails when prompt does not exist', function () {
     $this->artisan('prompt:test', ['name' => 'nonexistent'])
         ->assertFailed();
 });
+
+// =====================================================================
+// prompt:test — version resolution
+// =====================================================================
+
+test('prompt:test renders a v-prefixed version rather than the active one', function () {
+    $this->createPromptFixture('v-prefixed', 1, 'SYSTEM FROM V1', 'usr v1', null, ['active_version' => 1]);
+    $this->createPromptFixture('v-prefixed', 2, 'SYSTEM FROM V2', 'usr v2');
+
+    $this->artisan('prompt:test', ['name' => 'v-prefixed', '--ver' => 'v2'])
+        ->expectsOutputToContain('Testing prompt [v-prefixed] version 2')
+        ->expectsOutputToContain('SYSTEM FROM V2')
+        ->doesntExpectOutputToContain('SYSTEM FROM V1')
+        ->assertSuccessful();
+});
+
+test('prompt:test renders a numeric version rather than the active one', function () {
+    $this->createPromptFixture('numeric-ver', 1, 'SYSTEM FROM V1', 'usr v1', null, ['active_version' => 1]);
+    $this->createPromptFixture('numeric-ver', 2, 'SYSTEM FROM V2', 'usr v2');
+
+    $this->artisan('prompt:test', ['name' => 'numeric-ver', '--ver' => '2'])
+        ->expectsOutputToContain('Testing prompt [numeric-ver] version 2')
+        ->expectsOutputToContain('SYSTEM FROM V2')
+        ->assertSuccessful();
+});
+
+test('prompt:test fails with a clear message for an unparseable version', function () {
+    $this->createPromptFixture('bad-ver', 1, 'sys', 'usr', null, ['active_version' => 1]);
+
+    $this->artisan('prompt:test', ['name' => 'bad-ver', '--ver' => 'banana'])
+        ->expectsOutput('Invalid version [banana] provided. Use a positive number like [1] or [v1].')
+        ->assertFailed();
+});
+
+test('prompt:test falls back to the active version when --ver is omitted', function () {
+    $this->createPromptFixture('no-ver', 1, 'SYSTEM FROM V1', 'usr v1', null, ['active_version' => 1]);
+    $this->createPromptFixture('no-ver', 2, 'SYSTEM FROM V2', 'usr v2');
+
+    $this->artisan('prompt:test', ['name' => 'no-ver'])
+        ->expectsOutputToContain('Testing prompt [no-ver] version 1')
+        ->expectsOutputToContain('SYSTEM FROM V1')
+        ->assertSuccessful();
+});

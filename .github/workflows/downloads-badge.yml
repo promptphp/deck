@@ -1,0 +1,114 @@
+name: downloads badge
+
+# Deck ships under two Packagist names: the current `promptphp/deck` and the
+# deprecated `veeqtoh/prompt-deck`, which still receives a large share of
+# installs. Shields cannot sum packages, so this job publishes a combined
+# total to a shields endpoint JSON on the orphan `badges` branch.
+#
+# Scheduled runs only fire from the default branch.
+
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: downloads-badge
+  cancel-in-progress: false
+
+jobs:
+  badge:
+    name: Publish combined download count
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Sum Packagist downloads
+        id: totals
+        run: |
+          set -euo pipefail
+
+          fetch_total() {
+            curl -fsSL --retry 3 --retry-delay 5 \
+              "https://packagist.org/packages/$1.json" \
+              | jq -e '.package.downloads.total'
+          }
+
+          current=$(fetch_total "promptphp/deck")
+          legacy=$(fetch_total "veeqtoh/prompt-deck")
+          total=$((current + legacy))
+
+          echo "promptphp/deck: ${current}"
+          echo "veeqtoh/prompt-deck: ${legacy}"
+          echo "combined: ${total}"
+
+          # Format the way shields does: 1234 -> 1.2k, 1234567 -> 1.2M,
+          # dropping a trailing .0 so we render "15k" rather than "15.0k".
+          # The unit is promoted after rounding, so 999999 reads "1M" not "1000k".
+          message=$(awk -v n="${total}" 'BEGIN {
+            if (n < 1000) { printf "%d", n; exit }
+
+            v = n / 1000; u = "k"
+
+            if (v >= 999.95) { v = v / 1000; u = "M" }
+
+            s = sprintf("%.1f", v)
+            sub(/\.0$/, "", s)
+            printf "%s%s", s, u
+          }')
+
+          echo "message=${message}" >> "$GITHUB_OUTPUT"
+
+      - name: Skip when the badge is unchanged
+        id: check
+        run: |
+          set -euo pipefail
+
+          existing=$(curl -fsSL \
+            "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/badges/downloads.json" \
+            | jq -r '.message' 2>/dev/null || echo "")
+
+          if [ "${existing}" = "${{ steps.totals.outputs.message }}" ]; then
+            echo "Badge already reads [${existing}] — nothing to publish."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to the badges branch
+        if: steps.check.outputs.changed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MESSAGE: ${{ steps.totals.outputs.message }}
+        run: |
+          set -euo pipefail
+
+          mkdir badges && cd badges
+
+          jq -n \
+            --arg message "${MESSAGE}" \
+            '{
+              schemaVersion: 1,
+              label: "total downloads",
+              message: $message,
+              color: "blue"
+            }' > downloads.json
+
+          cat downloads.json
+
+          # A single-commit orphan branch: force-pushing keeps the badge
+          # history from growing without bound and never touches 0.x.
+          git init -q
+          git checkout -q -b badges
+          git remote add origin \
+            "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+          git add downloads.json
+          git \
+            -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Update combined download count to ${MESSAGE}"
+
+          git push -q --force origin badges

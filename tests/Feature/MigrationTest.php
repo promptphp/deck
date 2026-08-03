@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use PromptPHP\Deck\Models\PromptExecution;
@@ -132,7 +133,7 @@ test('prompt_versions enforces unique constraint on name + version', function ()
         'created_at'  => now(),
         'updated_at'  => now(),
     ]);
-})->throws(\Illuminate\Database\QueryException::class);
+})->throws(QueryException::class);
 
 test('prompt_versions allows same name with different versions', function () {
     runMigrations();

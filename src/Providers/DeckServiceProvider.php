@@ -7,11 +7,14 @@ namespace PromptPHP\Deck\Providers;
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Ai\AiServiceProvider;
+use PromptPHP\Deck\Ai\TrackPromptMiddleware;
 use PromptPHP\Deck\Console\Commands\ActivatePromptCommand;
 use PromptPHP\Deck\Console\Commands\ListPromptsCommand;
 use PromptPHP\Deck\Console\Commands\MakePromptCommand;
 use PromptPHP\Deck\Console\Commands\PromptDiffCommand;
 use PromptPHP\Deck\Console\Commands\TestPromptCommand;
+use PromptPHP\Deck\Listeners\AfterMakeAgent;
 use PromptPHP\Deck\PromptManager;
 
 class DeckServiceProvider extends ServiceProvider
@@ -66,7 +69,7 @@ class DeckServiceProvider extends ServiceProvider
         // Publish migrations.
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../database/migrations/' => database_path('migrations'),
+                __DIR__.'/../Database/migrations/' => database_path('migrations'),
             ], 'deck-migrations');
 
             // Publish config.
@@ -97,14 +100,14 @@ class DeckServiceProvider extends ServiceProvider
      */
     protected function registerAiSdkIntegration(): void
     {
-        if (class_exists(\Laravel\Ai\AiServiceProvider::class)) {
-            $this->app->singleton(\PromptPHP\Deck\Ai\TrackPromptMiddleware::class);
+        if (class_exists(AiServiceProvider::class)) {
+            $this->app->singleton(TrackPromptMiddleware::class);
 
             // Auto-scaffold a prompt when `make:agent` finishes successfully.
             if (config('deck.scaffold_on_make_agent', true)) {
                 Event::listen(
                     CommandFinished::class,
-                    \PromptPHP\Deck\Listeners\AfterMakeAgent::class
+                    AfterMakeAgent::class
                 );
             }
         }

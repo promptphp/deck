@@ -13,6 +13,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.4.4] - 2026-08-03
+
+### Fixed
+
+- Fixed migration publishing, which silently failed on case-sensitive filesystems. `DeckServiceProvider` pointed at `src/database/migrations` while the directory is `src/Database/migrations`, so `vendor:publish --tag=deck-migrations` reported success whilst failing on Linux and macOS case-sensitive volumes.
+- Fixed `make:prompt` overwriting the `active_version` key by rewriting the prompt's root `metadata.json`. Creating a new version silently promoted it to active. The file is now merged, preserving `active_version`, the existing description, the original `created_at`, a populated `variables` list, and any keys added by hand.
+- Fixed prompt metadata being unreachable. `make:prompt` wrote the name, description, and roles to the prompt's root `metadata.json`, but `PromptManager` only ever read the version-level `v{n}/metadata.json`, so `PromptTemplate::metadata()` was always empty and the `prompt:list` description column was always blank. `make:prompt` now writes version-level metadata, and metadata reads merge the prompt-level file with the version-level file, version keys winning. The `active_version` key is excluded from `metadata()`.
+- Fixed `prompt:test --ver=v2` silently rendering the active version instead of the one requested. `(int) 'v2'` evaluated to a falsy `0`, so the command fell through to `active()` while reporting the wrong version number in its header. The command now uses the `ResolvesVersion` trait, accepts both `2` and `v2`, and fails with a clear message on unparseable input.
+- Fixed the `PromptPHP\Deck\Database\Factories\` PSR-4 mapping pointing at the non-existent lowercase `src/database/factories/`.
+
+- Fixed the README downloads badge reporting the deprecated `veeqtoh/prompt-deck` package instead of a combined figure.
+- Fixed the docs landing page linking to the pre-rename `promptphp/prompt-deck` repository, and the README licence link pointing at a `master` branch that does not exist.
+
+### Added
+
+- `make:prompt` now prints how to activate the version it just created when a different version is live.
+- Added a scheduled `downloads badge` workflow that publishes the combined Packagist download count for `promptphp/deck` and the deprecated `veeqtoh/prompt-deck` to a shields endpoint on the orphan `badges` branch.
+- Added a changelog page to the documentation site, under a new Releases group, with an RSS feed at `/changelog/rss.xml`.
+
+### Removed
+
+- Removed the `PromptPHP\Deck\Database\Seeders\` autoload mapping, which pointed at a directory that does not exist.
+
 ## [0.4.3] - 2026-07-29
 
 ### Fixed
