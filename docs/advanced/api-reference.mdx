@@ -225,7 +225,7 @@ Static proxy to the `PromptManager` singleton.
 | `Deck::get(string $name, ?int $version = null)`              | `PromptTemplate` | Load a prompt by name and optional version. |
 | `Deck::active(string $name)`                                 | `PromptTemplate` | Load the active version of a prompt.        |
 | `Deck::versions(string $name)`                               | `array`          | List all versions for a prompt.             |
-| `Deck::activate(string $name, string $version)`              | `bool`           | Activate a specific version.                |
+| `Deck::activate(string $name, int $version)`                 | `bool`           | Activate a specific version.                |
 | `Deck::track(string $name, int $version, array $data)`       | `void`           | Record a prompt execution.                  |
 
 ---
