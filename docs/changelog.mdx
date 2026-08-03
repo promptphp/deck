@@ -6,6 +6,31 @@ rss: true
 
 Deck follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Subscribe to the [RSS feed](https://deck.promptphp.com/changelog/rss.xml) to be notified of new releases, or browse the [full history on GitHub](https://github.com/promptphp/deck/blob/0.x/CHANGELOG.md).
 
+<Update label="v0.4.5" description="3 August 2026" tags={["Changed", "Fixed", "Added"]}>
+
+**Added**
+
+- A `quality` CI workflow now checks formatting with Pint on every push and pull request, and asserts that every release in the repository `CHANGELOG.md` has a matching entry on this page. Formatting was never checked in CI before, and the two changelogs could drift apart unnoticed.
+- The test workflow now runs `composer test` rather than calling Pest directly, so CI and the documented contributor command cannot diverge.
+
+**Changed**
+
+- **`Deck::activate()` now accepts string versions.** `'v2'`, `'2'`, and `2` are all valid, matching what `Deck::get()` has accepted since `v0.4.2`. Only `get()` was widened at the time, so `Deck::activate('order-summary', 'v2')` raised a `TypeError` despite the release notes describing both. Passing an integer continues to work unchanged.
+
+  ```php
+  Deck::activate('order-summary', 'v2');
+  Deck::activate('order-summary', 2);
+  ```
+
+**Fixed**
+
+- **Unparseable versions now name the offending value.** Both `Deck::get()` and `Deck::activate()` threw a message with the version missing entirely — `Version  for prompt [order-summary] does not exist.` They now throw `InvalidVersionException` reading `Invalid version [banana] for prompt [order-summary]. Use a positive number like [1] or [v1].`
+- Corrected the prompt structure diagrams throughout the documentation and README. They omitted the version-level `metadata.json` introduced in `v0.4.4`, and the README showed a `user.md` that `make:prompt` does not create without `--user` alongside a second version that a single run does not create.
+- Corrected the README describing new versions as becoming active automatically. Creating a version has not changed the active version since `v0.4.4`.
+- Corrected the documented `Deck::get()` signature, which read `?int` rather than `string|int|null`.
+
+</Update>
+
 <Update label="v0.4.4" description="3 August 2026" tags={["Fixed", "Added"]}>
 
 **Fixed**

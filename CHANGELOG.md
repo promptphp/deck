@@ -13,6 +13,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.4.5] - 2026-08-03
+
+### Added
+
+- Added a `quality` workflow running the Pint formatting check on every push and pull request, and asserting that every release in `CHANGELOG.md` has a matching entry in the documentation site's changelog. Formatting was previously never checked in CI, and the two changelogs could drift silently.
+
+### Changed
+
+- `Deck::activate()` now accepts `string|int` versions, so `'v2'`, `'2'`, and `2` are all valid. Only `Deck::get()` was widened in `0.4.2`, despite the changelog describing both.
+- The `tests` workflow now runs `composer test` rather than calling `vendor/bin/pest` directly, so CI and the documented contributor command cannot diverge.
+
+### Fixed
+
+- Fixed an unparseable version producing a message with an empty version number, such as `Version  for prompt [order-summary] does not exist.` Both `Deck::get()` and `Deck::activate()` now throw `InvalidVersionException` naming the offending value.
+- Fixed the README prompt structure diagram, which showed a `user.md` that `make:prompt` does not create without `--user`, a second version that a single run does not create, and omitted the version-level `metadata.json` added in `0.4.4`.
+- Fixed the prompt structure diagrams on the introduction, configuration, prompts, and make:prompt documentation pages, which all omitted the version-level `metadata.json`.
+- Fixed the README describing new versions as activating automatically. Creating a version has not changed the active version since `0.4.4`.
+- Fixed the documented `Deck::get()` signature, which described `?int` rather than `string|int|null`.
+
+### Removed
+
 ## [0.4.4] - 2026-08-03
 
 ### Fixed
