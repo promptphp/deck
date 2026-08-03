@@ -6,9 +6,12 @@ namespace PromptPHP\Deck\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use PromptPHP\Deck\Concerns\ReadsJsonFiles;
 
 class MakePromptCommand extends Command
 {
+    use ReadsJsonFiles;
+
     protected $signature = 'make:prompt {name? : The name of the prompt}
                             {--from= : Path to a stub file to use as template}
                             {--desc= : A short description of what this prompt does}
@@ -89,28 +92,61 @@ class MakePromptCommand extends Command
             $this->files->put($roleFile, $this->getRoleStubContent($roleName));
         }
 
-        // Create metadata.json
+        // Build the role list for this version.
         $allRoles = ['system'];
 
         if ($createUser) {
             $allRoles[] = 'user';
         }
 
-        $allRoles = array_merge($allRoles, array_map([$this, 'toKebabCase'], $roles));
+        $allRoles = array_values(array_merge($allRoles, array_map([$this, 'toKebabCase'], $roles)));
 
-        $metadata = [
+        // Merge into the prompt-level metadata rather than replacing it, so keys
+        // this command does not own survive — above all `active_version`, which
+        // decides which version the application actually serves.
+        $existing = $this->readJson("{$promptPath}/metadata.json");
+
+        $metadata = array_merge($existing, [
             'name'        => $name,
-            'description' => $description,
-            'roles'       => array_values($allRoles),
-            'variables'   => [],
-            'created_at'  => now()->toIso8601String(),
-        ];
+            'description' => $description !== '' ? $description : ($existing['description'] ?? ''),
+            'roles'       => $allRoles,
+            'variables'   => $existing['variables'] ?? [],
+            'created_at'  => $existing['created_at'] ?? now()->toIso8601String(),
+        ]);
+
         $this->files->put("{$promptPath}/metadata.json", json_encode($metadata, JSON_PRETTY_PRINT));
+
+        // Write this version's own metadata — the file PromptManager reads when
+        // resolving a template's metadata.
+        $this->files->put("{$versionPath}/metadata.json", json_encode([
+            'version'    => $version,
+            'roles'      => $allRoles,
+            'created_at' => now()->toIso8601String(),
+        ], JSON_PRETTY_PRINT));
 
         $roleList = implode(', ', $allRoles);
         $this->info("Version {$version} of the [{$name}] prompt has been created successfully with the following roles: {$roleList}.");
 
+        $this->hintActivation($name, $version, $existing['active_version'] ?? null);
+
         return Command::SUCCESS;
+    }
+
+    /**
+     * Tell the user how to promote the version just created.
+     *
+     * Scaffolding a version deliberately leaves the active version alone, so
+     * without this hint a newly created version can look like it did nothing.
+     */
+    protected function hintActivation(string $name, int $version, mixed $activeVersion): void
+    {
+        if ($activeVersion === null || (int) $activeVersion === $version) {
+            return;
+        }
+
+        $this->newLine();
+        $this->comment("v{$activeVersion} is still the active version.");
+        $this->comment("Run `php artisan prompt:activate {$name} v{$version}` to make v{$version} live.");
     }
 
     /**

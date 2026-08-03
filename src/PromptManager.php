@@ -8,12 +8,14 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
+use PromptPHP\Deck\Concerns\ReadsJsonFiles;
 use PromptPHP\Deck\Concerns\ResolvesVersion;
 use PromptPHP\Deck\Exceptions\InvalidVersionException;
 use PromptPHP\Deck\Exceptions\PromptNotFoundException;
 
 class PromptManager
 {
+    use ReadsJsonFiles;
     use ResolvesVersion;
 
     protected Filesystem $files;
@@ -160,9 +162,7 @@ class PromptManager
         // Fallback: store in a JSON file in the prompt directory.
         $metadataFile = "{$this->basePath}/{$name}/metadata.json";
 
-        $metadata     = $this->files->exists($metadataFile)
-            ? json_decode($this->files->get($metadataFile), true) ?? []
-            : [];
+        $metadata = $this->readJson($metadataFile);
 
         $metadata['active_version'] = $version;
 
@@ -216,14 +216,10 @@ class PromptManager
         }
 
         // Fallback to metadata.json.
-        $metadataFile = "{$this->basePath}/{$name}/metadata.json";
+        $metadata = $this->readJson("{$this->basePath}/{$name}/metadata.json");
 
-        if ($this->files->exists($metadataFile)) {
-            $metadata = json_decode($this->files->get($metadataFile), true);
-
-            if (isset($metadata['active_version'])) {
-                return (int) $metadata['active_version'];
-            }
+        if (isset($metadata['active_version'])) {
+            return (int) $metadata['active_version'];
         }
 
         // If no active version set, return the highest version number.
@@ -261,31 +257,41 @@ class PromptManager
             }
         }
 
-        // Load metadata.json if present.
-        $metadata = [];
-
-        if ($this->files->exists($metaFile = "{$versionPath}/metadata.json")) {
-            $metadata = json_decode($this->files->get($metaFile), true) ?? [];
-        }
-
         return [
             'roles'    => $roles,
-            'metadata' => $metadata,
+            'metadata' => $this->loadMetadata($name, $version),
         ];
     }
 
     /**
      * Load metadata for a specific prompt version.
+     *
+     * Prompt-level metadata (name, description, and anything else recorded in
+     * the prompt's root metadata.json) forms the base, with the version's own
+     * metadata.json layered on top so version-specific keys win.
      */
-    protected function loadMetadata(string $name, int $version): array
+    protected function loadMetadata(string $name, ?int $version): array
     {
-        $metaFile = "{$this->basePath}/{$name}/v{$version}/metadata.json";
+        return array_merge(
+            $this->loadPromptMetadata($name),
+            $this->readJson("{$this->basePath}/{$name}/v{$version}/metadata.json")
+        );
+    }
 
-        if ($this->files->exists($metaFile)) {
-            return json_decode($this->files->get($metaFile), true) ?? [];
-        }
+    /**
+     * Load the prompt-level metadata shared by every version.
+     *
+     * `active_version` is stripped: it records which version the application
+     * serves, which is prompt-level routing state rather than metadata about
+     * the template being rendered.
+     */
+    protected function loadPromptMetadata(string $name): array
+    {
+        $metadata = $this->readJson("{$this->basePath}/{$name}/metadata.json");
 
-        return [];
+        unset($metadata['active_version']);
+
+        return $metadata;
     }
 
     /**

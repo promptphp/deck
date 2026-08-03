@@ -86,17 +86,22 @@ resources/prompts/
     │   ├── system.md          # Always created
     │   ├── user.md            # Created with --user or -u
     │   ├── assistant.md       # Created with --role=assistant
-    │   └── developer.md       # Created with --role=developer
+    │   ├── developer.md       # Created with --role=developer
+    │   └── metadata.json      # This version's metadata
     ├── v2/
     │   └── ...
-    └── metadata.json
+    └── metadata.json          # Prompt-level metadata
 ```
 
 The file extension is controlled by the `deck.extension` configuration value (default: `md`). For example, setting it to `txt` produces `system.txt`, `user.txt`, etc.
 
 ### Metadata
 
-A `metadata.json` file is written to the prompt root directory each time the command runs. It captures:
+The command writes two metadata files: one at the prompt root describing the prompt as a whole, and one inside the version directory describing that version.
+
+#### Prompt metadata
+
+`<prompt-name>/metadata.json` is **merged**, never replaced, each time the command runs:
 
 ```json
 {
@@ -111,10 +116,33 @@ A `metadata.json` file is written to the prompt root directory each time the com
 | Field         | Description                                                                     |
 | ------------- | ------------------------------------------------------------------------------- |
 | `name`        | The kebab-case prompt name.                                                     |
-| `description` | A human-readable summary. Populated via `--desc=` or the interactive flow.      |
-| `roles`       | An ordered list of every role that was scaffolded. Always starts with `system`. |
-| `variables`   | Reserved for future use (template variable extraction).                         |
-| `created_at`  | ISO 8601 timestamp of creation.                                                 |
+| `description` | A human-readable summary. Populated via `--desc=` or the interactive flow. Kept as-is when you create a new version without supplying a new description. |
+| `roles`       | An ordered list of every role scaffolded for the version just created. Always starts with `system`. |
+| `variables`   | Reserved for future use (template variable extraction). Never reset once you populate it. |
+| `created_at`  | ISO 8601 timestamp of when the **prompt** was first created.                     |
+
+Any other keys you add by hand are preserved — including `active_version`, so **scaffolding a new version never changes which version your application serves**. When another version is active, the command tells you how to promote the one you just created:
+
+```
+Version 2 of the [order-summary] prompt has been created successfully with the following roles: system.
+
+v1 is still the active version.
+Run `php artisan prompt:activate order-summary v2` to make v2 live.
+```
+
+#### Version metadata
+
+`<prompt-name>/v{n}/metadata.json` records that version alone:
+
+```json
+{
+    "version": 2,
+    "roles": ["system", "user"],
+    "created_at": "2025-01-20T09:12:00+00:00"
+}
+```
+
+Add your own keys here to override prompt-level metadata for a single version — see [Metadata](/core/prompts#metadata) for how the two files merge.
 
 ## Roles
 

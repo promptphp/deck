@@ -161,14 +161,23 @@ if ($prompt->has('assistant')) {
 
 ### Metadata
 
-Each prompt version can carry metadata (stored in `metadata.json` at the version level). Access it via the `metadata` method:
+Metadata comes from two files, and `metadata` returns them merged:
+
+1. The prompt's root `metadata.json` — shared by every version (name, description, and anything else you record there).
+2. The version's own `v{n}/metadata.json` — specific to that one version.
+
+Version-level keys win when both files define the same key, so a version can override the shared description without affecting its siblings.
 
 ```php
 $prompt->metadata();
 // ['description' => 'Summarises customer orders', 'variables' => ['tone', 'input'], ...]
 ```
 
-Metadata is an associative array. If no `metadata.json` exists in the version directory, an empty array is returned.
+Metadata is an associative array. If neither file exists, an empty array is returned.
+
+<Note>
+  The `active_version` key is never included. It records which version your application serves, which is routing state rather than metadata about the template you loaded. Read it with `Deck::active()` instead.
+</Note>
 
 ### Name and version
 

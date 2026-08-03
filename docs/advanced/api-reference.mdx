@@ -185,7 +185,7 @@ $prompt->name(); // 'order-summary'
 
 #### `metadata(): array`
 
-Get the prompt metadata. Returns an empty array if no metadata is defined.
+Get the prompt metadata: the prompt's root `metadata.json` merged with the version's own `metadata.json`, version-level keys winning. The `active_version` key is excluded. Returns an empty array if no metadata is defined.
 
 ```php
 $prompt->metadata(); // ['description' => '...', 'variables' => [...]]
