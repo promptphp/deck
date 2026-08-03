@@ -44,4 +44,4 @@ jobs:
             --with="orchestra/testbench=${{ matrix.testbench }}"
 
       - name: Execute tests
-        run: vendor/bin/pest
+        run: composer test

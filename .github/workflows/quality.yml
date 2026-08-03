@@ -1,0 +1,82 @@
+name: quality
+
+on:
+  push:
+    branches:
+      - main
+      - "*.x"
+  pull_request:
+
+jobs:
+  pint:
+    name: Code style
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          tools: composer:v2
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Check formatting
+        run: composer test:lint
+
+  changelog:
+    name: Changelog parity
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      # CHANGELOG.md and the documentation site's changelog page are written
+      # separately and drift silently. Every released version must appear in
+      # both, in the same order.
+      - name: Compare CHANGELOG.md against the documentation changelog
+        run: |
+          python3 - <<'PY'
+          import re, sys
+          from pathlib import Path
+
+          repo = Path("CHANGELOG.md").read_text()
+          docs = Path("docs/changelog.mdx").read_text()
+
+          # "## [0.4.5] - 2026-08-03" -> 0.4.5, ignoring [Unreleased].
+          in_repo = re.findall(r"^## \[(\d[^\]]*)\]", repo, re.M)
+
+          # '<Update label="v0.4.5" ...>' -> 0.4.5
+          in_docs = [v.lstrip("v") for v in re.findall(r'<Update\s+label="([^"]+)"', docs)]
+
+          problems = []
+
+          for missing in [v for v in in_repo if v not in in_docs]:
+              problems.append(f"{missing} is in CHANGELOG.md but has no <Update> in docs/changelog.mdx")
+
+          for missing in [v for v in in_docs if v not in in_repo]:
+              problems.append(f"{missing} has an <Update> in docs/changelog.mdx but no CHANGELOG.md entry")
+
+          if not problems and in_repo != in_docs:
+              problems.append(
+                  "both files list the same versions in a different order\n"
+                  f"  CHANGELOG.md       : {' '.join(in_repo)}\n"
+                  f"  docs/changelog.mdx : {' '.join(in_docs)}"
+              )
+
+          if problems:
+              print("Changelog parity check failed:\n")
+              for p in problems:
+                  print(f"  - {p}")
+              print("\nUpdate both files so each release appears in each, newest first.")
+              sys.exit(1)
+
+          print(f"OK - {len(in_repo)} releases match across both changelogs.")
+          print(f"  {' '.join(in_repo)}")
+          PY
