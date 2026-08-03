@@ -67,12 +67,14 @@ Currently, only the `directory` strategy is supported. Each version is stored in
 
 ```
 resources/prompts/order-summary/
-├── v1/
+├── metadata.json          # "active_version": 1
+├── v1/                    # live
+│   ├── metadata.json
 │   └── system.md
-├── v2/
-│   ├── system.md
-│   └── user.md
-└── metadata.json
+└── v2/                    # drafted, not serving traffic yet
+    ├── metadata.json
+    ├── system.md
+    └── user.md
 ```
 
 ## Cache

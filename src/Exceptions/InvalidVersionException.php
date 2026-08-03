@@ -24,4 +24,17 @@ class InvalidVersionException extends DeckException
     {
         return new self("No versions found for prompt [{$name}].");
     }
+
+    /**
+     * Create an exception for a version that could not be parsed.
+     *
+     * @param string $name The name of the prompt.
+     * @param string|int $version The version input that could not be parsed.
+     */
+    public static function unparseable(string $name, string|int $version): self
+    {
+        return new self(
+            "Invalid version [{$version}] for prompt [{$name}]. Use a positive number like [1] or [v1]."
+        );
+    }
 }

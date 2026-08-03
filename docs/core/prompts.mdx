@@ -290,15 +290,19 @@ Prompts are versioned using directory-based versioning. Each version lives in it
 ```
 resources/prompts/
 └── order-summary/
-    ├── v1/
+    ├── metadata.json          # "active_version": 1
+    ├── v1/                    # live
+    │   ├── metadata.json
     │   ├── system.md
     │   └── user.md
-    ├── v2/
-    │   ├── system.md
-    │   ├── user.md
-    │   └── assistant.md
-    └── metadata.json
+    └── v2/                    # drafted, not serving traffic yet
+        ├── metadata.json
+        ├── system.md
+        ├── user.md
+        └── assistant.md
 ```
+
+Only the active version is served. Creating a new version leaves `active_version` untouched, so you can draft in production and promote with [`prompt:activate`](/core/commands#promptactivate) when ready.
 
 Each version directory can contain:
 
@@ -334,7 +338,10 @@ Set a specific version as the active version:
 
 ```php
 Deck::activate('order-summary', 2);
+Deck::activate('order-summary', 'v2');
 ```
+
+The version accepts the same formats as `Deck::get()` — `2`, `'2'`, and `'v2'` are equivalent. Anything that cannot be parsed throws `InvalidVersionException`.
 
 **When database tracking is enabled**, this updates the `prompt_versions` table — setting `is_active = false` on all versions of that prompt, then `is_active = true` on the specified version.
 
