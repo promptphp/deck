@@ -22,12 +22,13 @@ This generates the following structure inside your configured prompts directory 
 ```
 resources/prompts/
 └── order-summary/
-    ├── v1/
-    │   └── system.md
-    └── metadata.json
+    ├── metadata.json          # Prompt-level: name, description, roles, active version
+    └── v1/
+        ├── metadata.json      # This version's own metadata
+        └── system.md
 ```
 
-A **system prompt** file is always created. A `metadata.json` file is placed at the prompt root to record the prompt's name, description, roles, and creation timestamp.
+A **system prompt** file is always created. Two `metadata.json` files are written: one at the prompt root recording the prompt's name, description, roles, and creation timestamp, and one inside the version directory recording that version alone.
 
 ### Interactive mode
 

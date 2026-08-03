@@ -33,9 +33,10 @@ This creates the following structure:
 ```
 resources/prompts/
 └── order-summary/
-    ├── v1/
-    │   └── system.md
-    └── metadata.json
+    ├── metadata.json          # Prompt-level: name, description, roles, active version
+    └── v1/
+        ├── metadata.json      # This version's own metadata
+        └── system.md
 ```
 
 Edit `resources/prompts/order-summary/v1/system.md` with your prompt content. Use `{{ $variable }}` syntax for dynamic values:

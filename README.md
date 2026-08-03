@@ -50,13 +50,26 @@ This creates the following structure
 
 ```txt
 resources/prompts/order-summary/
+├── metadata.json          # Prompt-level: name, description, roles, active version
+└── v1/
+    ├── metadata.json      # This version's own metadata
+    └── system.md
+```
+
+Pass `--user` to add a user prompt, or `--role=` for any other role
+
+```bash
+php artisan make:prompt order-summary --user --role=assistant
+```
+
+```txt
+resources/prompts/order-summary/
 ├── metadata.json
-├── v1/
-│   ├── system.md
-│   └── user.md
-└── v2/
+└── v1/
+    ├── metadata.json
     ├── system.md
-    └── user.md
+    ├── user.md
+    └── assistant.md
 ```
 
 Edit `resources/prompts/order-summary/v1/system.md` with your prompt content. Use `{{ $variable }}` syntax for dynamic values:
@@ -87,14 +100,46 @@ $messages = $prompt->toMessages(['tone' => 'friendly', 'order' => $orderDetails]
 
 ### Versioning
 
-Create a new version of an existing prompt
+Run the command again on an existing prompt and Deck offers to create the next version or overwrite the current one
 
 ```bash
 php artisan make:prompt order-summary
-# Automatically creates v2, v3, etc.
+
+# Prompt [order-summary] already exists at version 1.
+# What would you like to do?
+#   [version  ] Create a new version (v2)
+#   [overwrite] Overwrite version 1
 ```
 
-Activate a specific version
+Creating a version never changes which one your application serves, so you can draft freely in production
+
+```txt
+resources/prompts/order-summary/
+├── metadata.json          # "active_version": 1
+├── v1/                    # live: what Deck::get('order-summary') returns
+│   ├── metadata.json
+│   └── system.md
+└── v2/                    # drafted, not serving traffic yet
+    ├── metadata.json
+    └── system.md
+```
+
+Check which version is live at any time
+
+```bash
+php artisan prompt:list --all
+```
+
+```txt
++---------------+----------------+--------+-------------+
+| Prompt        | Active Version | Active | Description |
++---------------+----------------+--------+-------------+
+| order-summary | v1             | ✅     |             |
+| order-summary | v2             |        |             |
++---------------+----------------+--------+-------------+
+```
+
+Promote the new version when you are ready
 
 ```bash
 php artisan prompt:activate order-summary v2
@@ -104,10 +149,17 @@ php artisan prompt:activate order-summary v2
 php artisan prompt:activate order-summary 2
 ```
 
-Or load a specific version programmatically
+The `active_version` key in the prompt's root `metadata.json` flips to `2`, and every `Deck::get('order-summary')` call starts returning v2. Roll back by activating v1 again.
+
+Both formats work programmatically too
 
 ```php
+// Load a specific version.
 $prompt = Deck::get('order-summary', 'v2');
+
+// Promote a version.
+Deck::activate('order-summary', 'v2');
+Deck::activate('order-summary', 2);
 ```
 
 ### Laravel AI SDK Integration

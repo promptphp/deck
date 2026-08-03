@@ -64,15 +64,18 @@ $versions = $manager->versions('order-summary');
 // ]
 ```
 
-#### `activate(string $name, int $version): bool`
+#### `activate(string $name, string|int $version): bool`
 
 Activate a specific version of a prompt. Returns `true` on success.
+
+Accepts the same version formats as `get()`, so `2`, `'2'`, and `'v2'` are equivalent. A version that cannot be parsed throws `InvalidVersionException`.
 
 - **With tracking enabled:** Updates the `prompt_versions` database table.
 - **Without tracking:** Writes to `metadata.json` in the prompt directory.
 
 ```php
 $manager->activate('order-summary', 2);
+$manager->activate('order-summary', 'v2');
 ```
 
 #### `track(string $promptName, int $version, array $data): void`
@@ -222,10 +225,10 @@ Static proxy to the `PromptManager` singleton.
 
 | Method                                                       | Returns          | Description                                 |
 | ------------------------------------------------------------ | ---------------- | ------------------------------------------- |
-| `Deck::get(string $name, ?int $version = null)`              | `PromptTemplate` | Load a prompt by name and optional version. |
+| `Deck::get(string $name, string\|int\|null $version = null)` | `PromptTemplate` | Load a prompt by name and optional version. |
 | `Deck::active(string $name)`                                 | `PromptTemplate` | Load the active version of a prompt.        |
 | `Deck::versions(string $name)`                               | `array`          | List all versions for a prompt.             |
-| `Deck::activate(string $name, int $version)`                 | `bool`           | Activate a specific version.                |
+| `Deck::activate(string $name, string\|int $version)`         | `bool`           | Activate a specific version.                |
 | `Deck::track(string $name, int $version, array $data)`       | `void`           | Record a prompt execution.                  |
 
 ---
