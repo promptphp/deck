@@ -29,9 +29,9 @@ public function __construct(
 
 ### Methods
 
-#### `get(string $name, ?int $version = null): PromptTemplate`
+#### `get(string $name, string|int|null $version = null): PromptTemplate`
 
-Load a prompt by name and optional version. If version is `null`, the [active version](/core/prompts#version-resolution-order) is resolved automatically. Returns a `PromptTemplate` instance.
+Load a prompt by name and optional version. Accepts `2`, `'2'`, or `'v2'`. If version is `null`, the [active version](/core/prompts#version-resolution-order) is resolved automatically. Returns a `PromptTemplate` instance.
 
 Caches the loaded prompt if caching is enabled.
 
