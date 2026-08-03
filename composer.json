@@ -67,9 +67,11 @@
         }
     },
     "scripts": {
-        "test": [
-            "vendor/bin/pint --test",
-            "vendor/bin/pest"
+        "test": "vendor/bin/pest",
+        "test:architecture": "vendor/bin/pest tests/Architecture",
+        "format": "vendor/bin/pint",
+        "test:lint": [
+            "vendor/bin/pint --parallel --test"
         ]
     },
     "minimum-stability": "dev",
