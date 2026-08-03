@@ -15,9 +15,7 @@
         }
     ],
     "keywords": [
-        "promptphp",
-        "deck",
-        "prompt-deck",
+        "laravel",
         "ai",
         "prompts",
         "prompt-management",
@@ -26,9 +24,7 @@
         "variable-interpolation",
         "performance-tracking",
         "ab-testing",
-        "laravel",
-        "laravel-ai",
-        "laravel-package"
+        "promptphp"
     ],
     "require": {
         "php": "^8.2",
