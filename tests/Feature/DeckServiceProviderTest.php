@@ -83,8 +83,14 @@ test('migrations are publishable and the source directory holds the migrations',
 
     $source = array_key_first($publishes);
 
+    // Asserted by name rather than by count, so adding a migration does not
+    // break the guard. What matters is that the directory really resolves and
+    // really holds the table definitions.
+    $migrations = array_map('basename', glob(rtrim($source, '/').'/*.php'));
+
     expect(is_dir($source))->toBeTrue()
-        ->and(glob(rtrim($source, '/').'/*.php'))->toHaveCount(2);
+        ->and($migrations)->toContain('2025_02_28_0000001_create_prompt_versions.php')
+        ->and($migrations)->toContain('2025_02_28_0000001_create_prompt_executions.php');
 });
 
 test('stubs are not included in default provider publishing', function () {
@@ -96,4 +102,18 @@ test('stubs are not included in default provider publishing', function () {
     $stubPaths = array_filter($allPublishes, fn ($path) => str_contains($path, '.stub'));
 
     expect($stubPaths)->toBeEmpty();
+});
+
+test('tracking defaults to off in the package config', function () {
+    // Tracking needs migrations that are published in a separate, opt-in step,
+    // so it must not default on: prompt rendering would depend on tables that
+    // may not exist.
+    //
+    // Asserted against the source rather than the evaluated value, because
+    // phpunit.xml pins DECK_TRACKING_ENABLED for the whole suite, which would
+    // mask the default either way.
+    $source = file_get_contents(__DIR__.'/../../config/deck.php');
+
+    expect($source)->toContain("'enabled'    => env('DECK_TRACKING_ENABLED', false)")
+        ->and($source)->not->toContain("env('DECK_TRACKING_ENABLED', env('APP_DEBUG'");
 });

@@ -557,3 +557,21 @@ test('PromptExecution factory provider is one of the expected values', function 
 
     expect($execution->provider)->toBeIn(['openai', 'anthropic']);
 });
+
+test('prompt_versions user_prompt is nullable so activate() can record a version', function () {
+    runMigrations();
+
+    DB::connection('testing')->table('prompt_versions')->insert([
+        'name'       => 'content-free',
+        'version'    => 1,
+        'is_active'  => true,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    $record = DB::connection('testing')->table('prompt_versions')
+        ->where('name', 'content-free')->first();
+
+    expect($record->user_prompt)->toBeNull()
+        ->and($record->system_prompt)->toBeNull();
+});

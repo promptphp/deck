@@ -209,7 +209,10 @@ class MakePromptCommand extends Command
         $latest = 0;
 
         foreach ($this->files->directories($promptPath) as $dir) {
-            if (preg_match('/v(\d+)$/', $dir, $matches)) {
+            // Anchored against the directory name alone, matching
+            // PromptManager::versions(). The two must agree on what counts as
+            // a version, or the command scaffolds over an existing one.
+            if (preg_match('/^v(\d+)$/', basename($dir), $matches)) {
                 $latest = max($latest, (int) $matches[1]);
             }
         }
