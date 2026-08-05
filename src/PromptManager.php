@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use PromptPHP\Deck\Concerns\ReadsJsonFiles;
 use PromptPHP\Deck\Concerns\ResolvesVersion;
+use PromptPHP\Deck\Concerns\ValidatesPromptNames;
 use PromptPHP\Deck\Exceptions\InvalidPromptNameException;
 use PromptPHP\Deck\Exceptions\InvalidVersionException;
 use PromptPHP\Deck\Exceptions\PromptNotFoundException;
@@ -23,15 +24,7 @@ class PromptManager
 {
     use ReadsJsonFiles;
     use ResolvesVersion;
-
-    /**
-     * Characters permitted in a prompt name.
-     *
-     * Names are interpolated into filesystem paths, so anything that could
-     * escape the prompts directory is rejected. A leading dot is disallowed,
-     * which also rules out '..'.
-     */
-    protected const NAME_PATTERN = '/^[A-Za-z0-9_-][A-Za-z0-9._-]*$/';
+    use ValidatesPromptNames;
 
     protected Filesystem $files;
 
@@ -243,8 +236,9 @@ class PromptManager
      */
     public function track(string $promptName, int $version, array $data): void
     {
-        $this->assertValidName($promptName);
-
+        // Deliberately not validated: track() builds no path, the name is only
+        // a column value, so a guard here would protect nothing while breaking
+        // the promise above.
         if (! ($connection = $this->trackingConnection())) {
             return;
         }
@@ -386,7 +380,7 @@ class PromptManager
      */
     protected function assertValidName(string $name): void
     {
-        if (preg_match(self::NAME_PATTERN, $name) !== 1) {
+        if (! $this->isValidPromptName($name)) {
             throw InvalidPromptNameException::named($name);
         }
     }

@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed prompt names being interpolated into filesystem paths without validation. A name containing `..` or a directory separator could read files outside the configured prompts path. Names are now validated and `InvalidPromptNameException` is thrown otherwise.
 - Fixed the version directory pattern matching far more than intended. Being unanchored and applied to the full path, `/v(\d+)$/` treated directories such as `rev2`, `dev3`, and `archive-v9` as versions 2, 3, and 9 — advertised by `prompt:list --all` and then failing to load. Both `PromptManager` and `make:prompt` now anchor the match against the directory name.
 - Fixed `getActiveVersion()` returning the version column unordered and uncast, which picked arbitrarily between multiple active rows and could raise a `TypeError` on drivers that return integers as strings.
+- Fixed `make:prompt` creating prompts that could not be loaded back. Kebab-casing passed path separators straight through, so `make:prompt Support/Reply` scaffolded a nested `support/reply` that `PromptManager` refuses to resolve and `prompt:list` shows as a broken `support` entry. The command now validates the name it generated against the same pattern the loader applies, sharing one definition so the two cannot drift apart.
+- Fixed `Deck::track()` throwing on an invalid prompt name, contradicting its own documented promise never to throw. It builds no path — the name is only a column value — so the guard protected nothing.
+- Fixed the prompt name pattern accepting a trailing newline, since `$` also matches before one. It is now anchored with `\z`.
 
 ### Changed
 

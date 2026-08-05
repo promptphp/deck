@@ -847,11 +847,13 @@ test('name validation rejects separators and leading dots but allows ordinary na
     }
 });
 
-test('activate() and track() reject invalid names too', function () {
+test('activate() rejects invalid names, track() does not', function () {
+    // activate() resolves a path and so must validate. track() only writes a
+    // column value, and is documented never to throw.
     $manager = freshManager();
 
     expect(fn () => $manager->activate('../evil', 1))->toThrow(InvalidPromptNameException::class)
-        ->and(fn () => $manager->track('../evil', 1, []))->toThrow(InvalidPromptNameException::class);
+        ->and(fn () => $manager->track('../evil', 1, []))->not->toThrow(InvalidPromptNameException::class);
 });
 
 // =====================================================================
@@ -870,3 +872,26 @@ test('versions() ignores directories that merely end in a version-like suffix', 
 
     expect($found)->toBe([1, 10]);
 });
+
+// =====================================================================
+// track() must never throw — it runs after a paid-for AI call
+// =====================================================================
+
+test('track() does not throw on a name it would otherwise reject', function () {
+    // track() builds no path; the name is only a column value. Validating it
+    // here would guard nothing while breaking the never-throws promise.
+    config()->set('deck.tracking.enabled', true);
+
+    freshManager()->track('../not/a/real/name', 1, ['output' => 'hi']);
+})->throwsNoExceptions();
+
+test('track() does not throw when the name is valid but the table is absent', function () {
+    config()->set('deck.tracking.enabled', true);
+
+    freshManager()->track('order-summary', 1, ['output' => 'hi']);
+})->throwsNoExceptions();
+
+test('prompt names are rejected when padded with a trailing newline', function () {
+    // $ matches before a final newline, so the pattern is \z-anchored.
+    freshManager()->versions("order-summary\n");
+})->throws(InvalidPromptNameException::class);
