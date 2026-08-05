@@ -13,6 +13,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.4.6] - 2026-08-04
+
+### Fixed
+
+- Fixed tracking making prompt rendering fail. Tracking defaulted to on whenever `APP_DEBUG` was false, but its tables are published in a separate opt-in step, so the natural production install threw `no such table: prompt_versions` on the first `Deck::get()`. Caching gave no protection, because the active version is resolved before the cache is consulted. Tracking now defaults to off, and every database interaction degrades to `metadata.json` with a single logged warning rather than throwing. `Deck::track()` never throws at all — it runs after a completed, paid-for AI call.
+- Fixed `Deck::activate()` never recording anything in `prompt_versions`. It only ever issued an `UPDATE`, which matched no rows because nothing inserted them, so the table stayed empty and the lookup in `getActiveVersion()` could fail but never succeed. It now upserts, with explicit timestamps, making runtime version switching work as documented.
+- Fixed prompt names being interpolated into filesystem paths without validation. A name containing `..` or a directory separator could read files outside the configured prompts path. Names are now validated and `InvalidPromptNameException` is thrown otherwise.
+- Fixed the version directory pattern matching far more than intended. Being unanchored and applied to the full path, `/v(\d+)$/` treated directories such as `rev2`, `dev3`, and `archive-v9` as versions 2, 3, and 9 — advertised by `prompt:list --all` and then failing to load. Both `PromptManager` and `make:prompt` now anchor the match against the directory name.
+- Fixed `getActiveVersion()` returning the version column unordered and uncast, which picked arbitrarily between multiple active rows and could raise a `TypeError` on drivers that return integers as strings.
+
+### Changed
+
+- **Tracking now defaults to off.** If you published `config/deck.php` you are unaffected. If you did not and you rely on tracking, set `DECK_TRACKING_ENABLED=true`. See [UPGRADE.md](UPGRADE.md).
+- `prompt_versions.user_prompt` is now nullable, so activation can be recorded without prompt content. Existing tracking installs must re-publish and run the migrations.
+- Once a version has been activated with tracking enabled, the database takes precedence over `metadata.json`. Editing `active_version` in the file and deploying no longer changes what is served. Activation is environment state; the file is the bootstrap default.
+
+### Removed
+
 ## [0.4.5] - 2026-08-03
 
 ### Added
