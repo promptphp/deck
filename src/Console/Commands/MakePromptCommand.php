@@ -7,10 +7,12 @@ namespace PromptPHP\Deck\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use PromptPHP\Deck\Concerns\ReadsJsonFiles;
+use PromptPHP\Deck\Concerns\ValidatesPromptNames;
 
 class MakePromptCommand extends Command
 {
     use ReadsJsonFiles;
+    use ValidatesPromptNames;
 
     protected $signature = 'make:prompt {name? : The name of the prompt}
                             {--from= : Path to a stub file to use as template}
@@ -41,7 +43,18 @@ class MakePromptCommand extends Command
             return Command::FAILURE;
         }
 
-        $name     = $this->toKebabCase($rawName);
+        $name = $this->toKebabCase($rawName);
+
+        // toKebabCase() passes separators straight through, so 'Support/Reply'
+        // became 'support/reply' — scaffolded into a nested directory that
+        // PromptManager then refuses to resolve, and that prompt:list cannot
+        // display. Fail here rather than writing a prompt nothing can read.
+        if (! $this->isValidPromptName($name)) {
+            $this->error("Prompt name [{$name}] is not valid. Names may contain letters, numbers, dots, dashes, and underscores, and may not begin with a dot.");
+
+            return Command::FAILURE;
+        }
+
         $basePath = config('deck.path');
 
         // Resolve description.
@@ -209,7 +222,10 @@ class MakePromptCommand extends Command
         $latest = 0;
 
         foreach ($this->files->directories($promptPath) as $dir) {
-            if (preg_match('/v(\d+)$/', $dir, $matches)) {
+            // Anchored against the directory name alone, matching
+            // PromptManager::versions(). The two must agree on what counts as
+            // a version, or the command scaffolds over an existing one.
+            if (preg_match('/^v(\d+)$/', basename($dir), $matches)) {
                 $latest = max($latest, (int) $matches[1]);
             }
         }

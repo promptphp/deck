@@ -754,3 +754,37 @@ test('make:prompt does not hint when the created version is already active', fun
         ->doesntExpectOutputToContain('is still the active version')
         ->assertSuccessful();
 });
+
+// =====================================================================
+// The generator may only create names the loader can resolve
+// =====================================================================
+
+test('make:prompt refuses a name containing a path separator', function () {
+    // kebab-casing passed '/' straight through, scaffolding a nested prompt
+    // that PromptManager refuses to load and prompt:list cannot display.
+    $this->artisan('make:prompt', ['name' => 'Support/Reply'])
+        ->expectsOutputToContain('is not valid')
+        ->assertFailed();
+
+    expect(is_dir("{$this->tempDir}/support"))->toBeFalse();
+});
+
+test('make:prompt refuses a traversing name', function () {
+    $this->artisan('make:prompt', ['name' => '../escape'])
+        ->expectsOutputToContain('is not valid')
+        ->assertFailed();
+});
+
+test('every name make:prompt accepts can be loaded back', function () {
+    // Distinct after kebab-casing, so none collides with an earlier one and
+    // triggers the interactive "already exists" prompt.
+    foreach (['order-summary', 'BillingReminder', 'ops_alert', 'weekly.digest'] as $input) {
+        $this->artisan('make:prompt', ['name' => $input])->assertSuccessful();
+    }
+
+    // Whatever the generator wrote, the manager must resolve.
+    foreach (glob("{$this->tempDir}/*", GLOB_ONLYDIR) as $dir) {
+        $name = basename($dir);
+        expect(app(PromptManager::class)->get($name)->version())->toBe(1);
+    }
+});

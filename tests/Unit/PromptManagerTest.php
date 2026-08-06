@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use PromptPHP\Deck\Exceptions\InvalidPromptNameException;
 use PromptPHP\Deck\Exceptions\InvalidVersionException;
 use PromptPHP\Deck\Exceptions\PromptNotFoundException;
 use PromptPHP\Deck\PromptManager;
@@ -641,3 +643,255 @@ test('get() and activate() accept the same version formats', function () {
             ->and($manager->activate('parity', $input))->toBeTrue();
     }
 });
+
+// =====================================================================
+// Tracking enabled without its tables — must degrade, never throw
+// =====================================================================
+
+test('get() falls back to metadata.json when the tracking tables are absent', function () {
+    // Deliberately does NOT call setUpTrackingTables().
+    config()->set('deck.tracking.enabled', true);
+
+    $this->createPromptFixture('no-tables', 1, 'sys v1', null, null, ['active_version' => 1]);
+    $this->createPromptFixture('no-tables', 2, 'sys v2');
+
+    $prompt = freshManager()->get('no-tables');
+
+    expect($prompt->version())->toBe(1)
+        ->and($prompt->system())->toBe('sys v1');
+});
+
+test('track() is a silent no-op when the tracking table is absent', function () {
+    config()->set('deck.tracking.enabled', true);
+
+    freshManager()->track('anything', 1, ['output' => 'hello']);
+})->throwsNoExceptions();
+
+test('activate() still writes metadata.json when the tracking table is absent', function () {
+    config()->set('deck.tracking.enabled', true);
+
+    $this->createPromptFixture('no-tables-activate', 1, 'sys');
+    $this->createPromptFixture('no-tables-activate', 2, 'sys');
+
+    expect(freshManager()->activate('no-tables-activate', 2))->toBeTrue();
+
+    $meta = json_decode(file_get_contents("{$this->tempDir}/no-tables-activate/metadata.json"), true);
+    expect($meta['active_version'])->toBe(2);
+});
+
+test('an undefined tracking connection degrades instead of throwing', function () {
+    // Throws InvalidArgumentException from the connection resolver rather
+    // than a QueryException, so a QueryException-only guard would miss it.
+    config()->set('deck.tracking.enabled', true);
+    config()->set('deck.tracking.connection', 'does-not-exist');
+
+    $this->createPromptFixture('bad-connection', 1, 'sys', null, null, ['active_version' => 1]);
+
+    expect(freshManager()->get('bad-connection')->version())->toBe(1);
+});
+
+test('an unusable tracking database is attempted once, not on every load', function () {
+    config()->set('deck.tracking.enabled', true);
+    Log::spy();
+
+    $this->createPromptFixture('latched', 1, 'sys', null, null, ['active_version' => 1]);
+
+    $manager = freshManager();
+    $manager->get('latched');
+    $manager->get('latched');
+    $manager->get('latched');
+
+    Log::shouldHaveReceived('warning')->once();
+});
+
+// =====================================================================
+// Tracking enabled with its tables — activation is recorded
+// =====================================================================
+
+test('activate() inserts a prompt_versions row with timestamps', function () {
+    $this->setUpTrackingTables();
+    config()->set('deck.tracking.enabled', true);
+
+    $this->createPromptFixture('db-activate', 1, 'sys v1');
+    $this->createPromptFixture('db-activate', 2, 'sys v2');
+
+    freshManager()->activate('db-activate', 2);
+
+    $row = DB::connection('testing')->table('prompt_versions')
+        ->where('name', 'db-activate')->where('version', 2)->first();
+
+    expect($row)->not->toBeNull()
+        ->and((bool) $row->is_active)->toBeTrue()
+        ->and($row->created_at)->not->toBeNull()
+        ->and($row->updated_at)->not->toBeNull();
+});
+
+test('getActiveVersion() reads the version back from the database', function () {
+    $this->setUpTrackingTables();
+    config()->set('deck.tracking.enabled', true);
+
+    $this->createPromptFixture('db-roundtrip', 1, 'sys v1');
+    $this->createPromptFixture('db-roundtrip', 2, 'sys v2');
+
+    $manager = freshManager();
+    $manager->activate('db-roundtrip', 2);
+
+    expect($manager->get('db-roundtrip')->version())->toBe(2)
+        ->and($manager->get('db-roundtrip')->system())->toBe('sys v2');
+});
+
+test('activate() deactivates sibling versions of the same prompt', function () {
+    $this->setUpTrackingTables();
+    config()->set('deck.tracking.enabled', true);
+
+    $this->createPromptFixture('siblings', 1, 'sys');
+    $this->createPromptFixture('siblings', 2, 'sys');
+
+    $manager = freshManager();
+    $manager->activate('siblings', 1);
+    $manager->activate('siblings', 2);
+
+    $active = DB::connection('testing')->table('prompt_versions')
+        ->where('name', 'siblings')->where('is_active', true)->pluck('version')->all();
+
+    expect($active)->toBe([2]);
+});
+
+test('activating the same version twice updates rather than duplicating', function () {
+    $this->setUpTrackingTables();
+    config()->set('deck.tracking.enabled', true);
+
+    $this->createPromptFixture('twice', 1, 'sys');
+
+    $manager = freshManager();
+    $manager->activate('twice', 1);
+    $manager->activate('twice', 1);
+
+    $count = DB::connection('testing')->table('prompt_versions')->where('name', 'twice')->count();
+
+    expect($count)->toBe(1);
+});
+
+test('the database wins over metadata.json once a version has been activated', function () {
+    // Activation is environment state; the file is the bootstrap default.
+    $this->setUpTrackingTables();
+    config()->set('deck.tracking.enabled', true);
+
+    $this->createPromptFixture('precedence', 1, 'sys v1');
+    $this->createPromptFixture('precedence', 2, 'sys v2');
+
+    $manager = freshManager();
+    $manager->activate('precedence', 2);
+
+    // Simulate someone editing active_version in git and deploying.
+    file_put_contents(
+        "{$this->tempDir}/precedence/metadata.json",
+        json_encode(['active_version' => 1]),
+    );
+
+    expect($manager->get('precedence')->version())->toBe(2);
+});
+
+test('get() with an explicit version performs no database query', function () {
+    $this->setUpTrackingTables();
+    config()->set('deck.tracking.enabled', true);
+
+    $this->createPromptFixture('hot-path', 2, 'sys v2');
+
+    $manager = freshManager();
+
+    DB::connection('testing')->enableQueryLog();
+    $manager->get('hot-path', 2);
+
+    expect(DB::connection('testing')->getQueryLog())->toBe([]);
+});
+
+// =====================================================================
+// Prompt name validation
+// =====================================================================
+
+test('get() rejects a traversing prompt name', function () {
+    freshManager()->get('../elsewhere', 1);
+})->throws(InvalidPromptNameException::class);
+
+test('traversal cannot read a prompt outside the configured path', function () {
+    $outside = dirname($this->tempDir).'/deck-outside-'.uniqid();
+    mkdir($outside.'/v1', 0755, true);
+    file_put_contents($outside.'/v1/system.md', 'SECRET');
+
+    try {
+        freshManager()->get('../'.basename($outside), 1);
+        $leaked = true;
+    } catch (InvalidPromptNameException) {
+        $leaked = false;
+    } finally {
+        unlink($outside.'/v1/system.md');
+        rmdir($outside.'/v1');
+        rmdir($outside);
+    }
+
+    expect($leaked)->toBeFalse();
+});
+
+test('name validation rejects separators and leading dots but allows ordinary names', function () {
+    $manager = freshManager();
+
+    foreach (['../secrets', '..', 'a/b', 'a\\b', '.hidden', ''] as $bad) {
+        expect(fn () => $manager->versions($bad))->toThrow(InvalidPromptNameException::class);
+    }
+
+    // Kebab, snake, and dotted names must keep working.
+    foreach (['order-summary', 'order_summary', 'order.summary.v2', 'OrderSummary'] as $good) {
+        $this->createPromptFixture($good, 1, 'sys');
+        expect($manager->versions($good))->toHaveCount(1);
+    }
+});
+
+test('activate() rejects invalid names, track() does not', function () {
+    // activate() resolves a path and so must validate. track() only writes a
+    // column value, and is documented never to throw.
+    $manager = freshManager();
+
+    expect(fn () => $manager->activate('../evil', 1))->toThrow(InvalidPromptNameException::class)
+        ->and(fn () => $manager->track('../evil', 1, []))->not->toThrow(InvalidPromptNameException::class);
+});
+
+// =====================================================================
+// Version directory detection
+// =====================================================================
+
+test('versions() ignores directories that merely end in a version-like suffix', function () {
+    $this->createPromptFixture('phantom', 1, 'sys');
+    $this->createPromptFixture('phantom', 10, 'sys');
+
+    foreach (['rev2', 'dev3', 'archive-v9', 'drafts', 'v'] as $decoy) {
+        mkdir("{$this->tempDir}/phantom/{$decoy}", 0755, true);
+    }
+
+    $found = array_column(freshManager()->versions('phantom'), 'version');
+
+    expect($found)->toBe([1, 10]);
+});
+
+// =====================================================================
+// track() must never throw — it runs after a paid-for AI call
+// =====================================================================
+
+test('track() does not throw on a name it would otherwise reject', function () {
+    // track() builds no path; the name is only a column value. Validating it
+    // here would guard nothing while breaking the never-throws promise.
+    config()->set('deck.tracking.enabled', true);
+
+    freshManager()->track('../not/a/real/name', 1, ['output' => 'hi']);
+})->throwsNoExceptions();
+
+test('track() does not throw when the name is valid but the table is absent', function () {
+    config()->set('deck.tracking.enabled', true);
+
+    freshManager()->track('order-summary', 1, ['output' => 'hi']);
+})->throwsNoExceptions();
+
+test('prompt names are rejected when padded with a trailing newline', function () {
+    // $ matches before a final newline, so the pattern is \z-anchored.
+    freshManager()->versions("order-summary\n");
+})->throws(InvalidPromptNameException::class);

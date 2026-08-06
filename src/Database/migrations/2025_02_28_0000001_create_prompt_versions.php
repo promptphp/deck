@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('name');
             $table->unsignedInteger('version');
             $table->text('system_prompt')->nullable();
-            $table->text('user_prompt');
+            $table->text('user_prompt')->nullable();
             $table->json('metadata')->nullable();
             $table->boolean('is_active')->default(false);
             $table->timestamps();

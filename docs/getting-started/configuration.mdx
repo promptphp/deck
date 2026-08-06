@@ -148,27 +148,41 @@ The `tracking` section controls whether prompt versions and executions are logge
 
 ```php
 'tracking' => [
-    'enabled'    => env('DECK_TRACKING_ENABLED', env('APP_DEBUG', false) ? false : true),
+    'enabled'    => env('DECK_TRACKING_ENABLED', false),
     'connection' => env('DECK_DB_CONNECTION'),
 ],
 ```
 
 ### Enabling / disabling
 
-```php
-'enabled' => env('DECK_TRACKING_ENABLED', env('APP_DEBUG', false) ? false : true),
-```
+Tracking is **off by default**, because it needs database tables that are published in a separate step. Turning it on takes three:
 
-Like caching, tracking is **disabled** in debug mode and **enabled** in production by default. When enabled:
+<Steps>
+  <Step title="Publish the migrations">
+    ```bash
+    php artisan vendor:publish --tag=deck-migrations
+    ```
+  </Step>
+  <Step title="Run them">
+    ```bash
+    php artisan migrate
+    ```
+  </Step>
+  <Step title="Enable the flag">
+    ```dotenv
+    DECK_TRACKING_ENABLED=true
+    ```
+  </Step>
+</Steps>
 
-- **Version activation** is stored in the `prompt_versions` database table (instead of `metadata.json`).
+When enabled:
+
+- **Version activation** is recorded in the `prompt_versions` table *as well as* `metadata.json`, and the table takes precedence. See [Tracking — Activation precedence](/advanced/tracking#activation-precedence).
 - **Execution tracking** via `Deck::track()` inserts records into the `prompt_executions` table.
 
-<Warning>
-    You must publish and run the migrations before enabling tracking. See
-    [Installation — Publishing
-    migrations](/getting-started/installation#publishing-migrations).
-</Warning>
+<Note>
+  Prompt rendering never depends on tracking. If the tables are missing or the database is unreachable, Deck falls back to `metadata.json` and logs a warning once, rather than failing. `Deck::track()` never throws at all — it runs after a completed AI call, and no analytics failure is worth discarding that response.
+</Note>
 
 ### Database connection
 

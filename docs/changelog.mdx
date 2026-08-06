@@ -6,6 +6,35 @@ rss: true
 
 Deck follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Subscribe to the [RSS feed](https://deck.promptphp.com/changelog/rss.xml) to be notified of new releases, or browse the [full history on GitHub](https://github.com/promptphp/deck/blob/0.x/CHANGELOG.md).
 
+<Update label="v0.4.6" description="4 August 2026" tags={["Fixed", "Changed"]}>
+
+<Warning>
+  Tracking now defaults to **off**. If you published `config/deck.php` you are unaffected. If you did not and you rely on tracking, set `DECK_TRACKING_ENABLED=true`. If you use tracking, re-publish and run the migrations.
+
+  If you organised prompts into subdirectories such as `support/reply`, those names no longer load — flatten them to `support-reply`. Nested prompts never worked properly: `prompt:list` scans only the top level and showed them as a broken entry. See the [upgrade guide](https://github.com/promptphp/deck/blob/0.x/UPGRADE.md).
+</Warning>
+
+**Fixed**
+
+- **Tracking no longer breaks prompt rendering.** Tracking defaulted to on whenever `APP_DEBUG` was false, but its tables are published in a separate opt-in step — so the natural production install (`composer require`, publish config, deploy) threw `no such table: prompt_versions` on the very first `Deck::get()`. Caching gave no protection, because the active version is resolved before the cache is consulted.
+
+  Tracking now defaults to off, and every database interaction degrades to `metadata.json` with a single logged warning instead of throwing. `Deck::track()` never throws under any circumstances: it runs after a completed, paid-for AI call, and no analytics failure is worth discarding that response.
+
+- **`Deck::activate()` now records the version it activated.** It only ever issued an `UPDATE`, which matched no rows because nothing ever inserted them — so `prompt_versions` stayed empty and the lookup that read it could fail but never succeed. Activation is now an upsert, making runtime version switching work as documented.
+- **Prompt names are validated.** A name was interpolated straight into a filesystem path, so one containing `..` or a directory separator could read files outside your prompts directory. Names now throw `InvalidPromptNameException` unless they contain only letters, numbers, dots, dashes, and underscores.
+- **Version directories are matched precisely.** The pattern was unanchored and applied to the full path, so `rev2`, `dev3`, and `archive-v9` registered as versions 2, 3, and 9 — advertised by `prompt:list --all`, then failing to load.
+- **`make:prompt` can no longer create a prompt that will not load.** Kebab-casing passed path separators through, so `make:prompt Support/Reply` scaffolded a nested `support/reply` that the manager refuses to resolve and `prompt:list` displays as a broken `support` entry. The generator and the loader now share one definition of a valid name, so they cannot drift apart.
+- **`Deck::track()` no longer throws on an invalid name**, which contradicted its own documented promise. It builds no path — the name is only a column value — so the guard protected nothing.
+- `getActiveVersion()` no longer picks arbitrarily between multiple active rows, and casts the version it reads.
+- The name pattern no longer accepts a trailing newline, since `$` matches before one.
+
+**Changed**
+
+- `prompt_versions.user_prompt` is nullable, so activation can be recorded without prompt content. Deck is file-based; content lives on disk.
+- Once a version has been activated with tracking enabled, the database takes precedence over `metadata.json`. Editing `active_version` in the file and deploying no longer changes what is served — activation is environment state, the file is the bootstrap default. See [Tracking — Activation precedence](/advanced/tracking#activation-precedence).
+
+</Update>
+
 <Update label="v0.4.5" description="3 August 2026" tags={["Changed", "Fixed", "Added"]}>
 
 **Added**

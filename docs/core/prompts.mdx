@@ -39,6 +39,18 @@ $prompt = Deck::get('order-summary', 2);
 
 The `get` method returns a `PromptTemplate` instance. If no version is specified, the [active version](#version-resolution-order) is resolved automatically.
 
+### Prompt names
+
+A prompt name becomes a directory path, so names are validated before they are resolved. They may contain letters, numbers, dots, dashes, and underscores, and may not begin with a dot. Anything else — most importantly a name containing `/`, `\`, or `..` — throws `InvalidPromptNameException`.
+
+```php
+Deck::get('order-summary');      // fine
+Deck::get('order_summary');      // fine
+Deck::get('../../.env');         // InvalidPromptNameException
+```
+
+This matters if a prompt name ever comes from user input, where an unvalidated name could otherwise read files outside your prompts directory.
+
 ### Dependency injection
 
 You can also inject the `PromptManager` directly via Laravel's service container:

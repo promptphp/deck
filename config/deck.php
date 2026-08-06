@@ -57,9 +57,19 @@ return [
     | If enabled, prompt versions and executions will be logged to the database,
     | enabling performance tracking and audit trails.
     |
+    | Tracking is off by default because it requires the package migrations to
+    | have been published and run. Prompt rendering never depends on it: if the
+    | tables are missing or the database is unreachable, Deck falls back to
+    | metadata.json and logs a warning rather than failing.
+    |
+    | To enable it:
+    |   1. php artisan vendor:publish --tag=deck-migrations
+    |   2. php artisan migrate
+    |   3. DECK_TRACKING_ENABLED=true
+    |
     */
     'tracking' => [
-        'enabled'    => env('DECK_TRACKING_ENABLED', env('APP_DEBUG', false) ? false : true),
+        'enabled'    => env('DECK_TRACKING_ENABLED', false),
         'connection' => env('DECK_DB_CONNECTION'), // null for default
     ],
 

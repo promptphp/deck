@@ -14,36 +14,36 @@ Deck by PromptPHP includes an optional database tracking system that logs prompt
 - **Cost analysis** — Monitor API spending per prompt, model, and provider.
 - **User feedback** — Attach ratings and comments to individual executions.
 
-Tracking is entirely optional. Deck works fully without it.
+Tracking is entirely optional and **off by default**. Deck works fully without it.
+
+<Note>
+  Prompt rendering never depends on tracking. If you enable it without running the migrations, or the database becomes unreachable, Deck falls back to `metadata.json` and logs a warning once rather than failing. `Deck::track()` never throws under any circumstances — it runs after a completed, paid-for AI call.
+</Note>
 
 ## Setup
 
-### Enable tracking
+Publish and run the migrations **before** enabling the flag, or tracking has no tables to write to.
 
-Set the tracking configuration in `config/deck.php`:
+### Publish and run the migrations
 
-```php
-'tracking' => [
-    'enabled'    => env('DECK_TRACKING_ENABLED', true),
-    'connection' => env('DECK_DB_CONNECTION'),
-],
+```bash
+php artisan vendor:publish --tag=deck-migrations
+php artisan migrate
 ```
 
-Or via environment variable:
+### Enable tracking
 
 ```dotenv
 DECK_TRACKING_ENABLED=true
 ```
 
-By default, tracking is **disabled** when `APP_DEBUG=true` and **enabled** in production.
+Or set it directly in `config/deck.php`:
 
-### Publish migrations
-
-Publish and run the migrations to create the required tables:
-
-```bash
-php artisan vendor:publish --tag=deck-migrations
-php artisan migrate
+```php
+'tracking' => [
+    'enabled'    => env('DECK_TRACKING_ENABLED', false),
+    'connection' => env('DECK_DB_CONNECTION'),
+],
 ```
 
 ### Database connection
@@ -54,7 +54,7 @@ By default, tracking uses your application's default database connection. To sto
 DECK_DB_CONNECTION=analytics
 ```
 
-The connection name must match a connection defined in `config/database.php`.
+The connection name must match a connection defined in `config/database.php`. If it does not, Deck logs a warning and falls back to `metadata.json` rather than failing.
 
 ## Database schema
 
@@ -381,9 +381,19 @@ $dailyCost = PromptExecution::where('prompt_name', 'order-summary')
 
 ## Version management via database
 
-When tracking is enabled, version activation is managed through the `prompt_versions` table instead of `metadata.json` files. This provides a centralised, queryable record of version history.
+When tracking is enabled, `Deck::activate()` and `prompt:activate` record the active version in the `prompt_versions` table **in addition to** `metadata.json`, giving you a centralised, queryable record of version history.
 
-The `Deck::activate()` method and `prompt:activate` command automatically use the appropriate storage (database or file) based on your tracking configuration.
+### Activation precedence
+
+Once a version has been activated with tracking enabled, **the database wins**. `metadata.json` is consulted only when the table holds no record for that prompt.
+
+The practical consequence: editing `active_version` in `metadata.json`, committing it, and deploying **will not change which version is served**. Activation is environment state — it is how you promote a version in staging without touching production, and how you roll back without a deploy. The file is the bootstrap default, used until the first activation in that environment.
+
+To go back to file-based control for a prompt, delete its rows from `prompt_versions`.
+
+<Note>
+  The table only ever holds versions that have been **activated**. It is not a mirror of your prompt library — a version you have created but never activated has no row. The `system_prompt` and `user_prompt` columns are nullable and are written as `NULL`: Deck is file-based, and content lives on disk.
+</Note>
 
 ```php
 // Activate programmatically

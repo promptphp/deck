@@ -6,17 +6,25 @@ namespace PromptPHP\Deck;
 
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Database\Connection;
+use Illuminate\Database\QueryException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use PromptPHP\Deck\Concerns\ReadsJsonFiles;
 use PromptPHP\Deck\Concerns\ResolvesVersion;
+use PromptPHP\Deck\Concerns\ValidatesPromptNames;
+use PromptPHP\Deck\Exceptions\InvalidPromptNameException;
 use PromptPHP\Deck\Exceptions\InvalidVersionException;
 use PromptPHP\Deck\Exceptions\PromptNotFoundException;
+use Throwable;
 
 class PromptManager
 {
     use ReadsJsonFiles;
     use ResolvesVersion;
+    use ValidatesPromptNames;
 
     protected Filesystem $files;
 
@@ -29,6 +37,19 @@ class PromptManager
     protected Config $config;
 
     protected ?array $trackingConfig;
+
+    /**
+     * Whether the tracking database has been found unusable this instance.
+     *
+     * Latched on the first failure so a missing table or unreachable host is
+     * attempted once rather than on every prompt load — an unreachable host
+     * would otherwise cost a connection timeout per render.
+     *
+     * The manager is a singleton, so this is once per request under FPM. Under
+     * Octane or a queue worker it lives for the worker's lifetime, so a
+     * misconfigured worker warns once and then stays quiet.
+     */
+    protected bool $trackingUnavailable = false;
 
     public function __construct(string $basePath, string $extension, Cache $cache, Config $config)
     {
@@ -50,6 +71,8 @@ class PromptManager
      */
     public function get(string $name, string|int|null $version = null): PromptTemplate
     {
+        $this->assertValidName($name);
+
         if ($version === null) {
             $version = $this->getActiveVersion($name);
         } else {
@@ -94,6 +117,8 @@ class PromptManager
      */
     public function active(string $name): PromptTemplate
     {
+        $this->assertValidName($name);
+
         return $this->get($name, $this->getActiveVersion($name));
     }
 
@@ -102,6 +127,8 @@ class PromptManager
      */
     public function versions(string $name): array
     {
+        $this->assertValidName($name);
+
         $promptPath = "{$this->basePath}/{$name}";
 
         if (! $this->files->isDirectory($promptPath)) {
@@ -110,11 +137,14 @@ class PromptManager
 
         $versions = [];
 
-        // Scan for version directories (v1, v2, etc.) or version files.
+        // Scan for version directories (v1, v2, etc.).
         $items = $this->files->directories($promptPath);
 
         foreach ($items as $dir) {
-            if (preg_match('/v(\d+)$/', $dir, $matches)) {
+            // Anchored against the directory name alone: an unanchored match
+            // on the full path treats 'rev2', 'dev3' and 'archive-v9' as
+            // versions 2, 3 and 9.
+            if (preg_match('/^v(\d+)$/', basename($dir), $matches)) {
                 $version    = (int) $matches[1];
                 $versions[] = [
                     'version'  => $version,
@@ -146,29 +176,44 @@ class PromptManager
      */
     public function activate(string $name, string|int $version): bool
     {
+        $this->assertValidName($name);
+
         $version = $this->parseVersion((string) $version)
             ?? throw InvalidVersionException::unparseable($name, $version);
 
         $this->ensureVersionExists($name, $version);
 
-        if ($this->trackingConfig['enabled'] ?? false) {
-            $connection = DB::connection(
-                $this->trackingConfig['connection'] ?? config('database.default')
-            );
+        if ($connection = $this->trackingConnection()) {
+            try {
+                $connection->transaction(function () use ($connection, $name, $version): void {
+                    // Deactivate every other version of this prompt.
+                    $connection
+                        ->table('prompt_versions')
+                        ->where('name', $name)
+                        ->update(['is_active' => false]);
 
-            // Update database.
-            $connection->transaction(function () use ($connection, $name, $version): void {
-                $connection
-                    ->table('prompt_versions')
-                    ->where('name', $name)
-                    ->update(['is_active' => false]);
+                    // Record this one, inserting it if it has not been activated
+                    // before. Timestamps are passed explicitly: this is a query
+                    // builder call, so Eloquent does not maintain them.
+                    $connection
+                        ->table('prompt_versions')
+                        ->updateOrInsert(
+                            ['name' => $name, 'version' => $version],
+                            ['is_active' => true, 'updated_at' => now(), 'created_at' => now()],
+                        );
+                });
+            } catch (QueryException $e) {
+                // Only a missing table is a degradable condition. A deadlock, a
+                // constraint violation from concurrent activations, or a full
+                // disk must surface: swallowing them would write metadata.json,
+                // return true, and leave the database — which getActiveVersion()
+                // prefers — still pointing at the previous version.
+                if (! $this->trackingTableMissing($connection, 'prompt_versions')) {
+                    throw $e;
+                }
 
-                $connection
-                    ->table('prompt_versions')
-                    ->where('name', $name)
-                    ->where('version', $version)
-                    ->update(['is_active' => true]);
-            });
+                $this->markTrackingUnavailable($e);
+            }
         }
 
         // Fallback: store in a JSON file in the prompt directory.
@@ -185,45 +230,69 @@ class PromptManager
 
     /**
      * Track an execution for performance monitoring.
+     *
+     * Never throws. This runs after a completed — and paid for — AI call, so
+     * no analytics failure is worth destroying the response that triggered it.
      */
     public function track(string $promptName, int $version, array $data): void
     {
-        if (! ($this->trackingConfig['enabled'] ?? false)) {
+        // Deliberately not validated: track() builds no path, the name is only
+        // a column value, so a guard here would protect nothing while breaking
+        // the promise above.
+        if (! ($connection = $this->trackingConnection())) {
             return;
         }
 
-        DB::connection($this->trackingConfig['connection'] ?? config('database.default'))
-            ->table('prompt_executions')
-            ->insert([
-                'prompt_name'    => $promptName,
-                'prompt_version' => $version,
-                'input'          => json_encode($data['input'] ?? null),
-                'output'         => $data['output'] ?? null,
-                'tokens'         => $data['tokens'] ?? null,
-                'latency_ms'     => $data['latency'] ?? null,
-                'cost'           => $data['cost'] ?? null,
-                'model'          => $data['model'] ?? null,
-                'provider'       => $data['provider'] ?? null,
-                'feedback'       => isset($data['feedback']) ? json_encode($data['feedback']) : null,
-                'created_at'     => now(),
-            ]);
+        try {
+            $connection
+                ->table('prompt_executions')
+                ->insert([
+                    'prompt_name'    => $promptName,
+                    'prompt_version' => $version,
+                    'input'          => json_encode($data['input'] ?? null),
+                    'output'         => $data['output'] ?? null,
+                    'tokens'         => $data['tokens'] ?? null,
+                    'latency_ms'     => $data['latency'] ?? null,
+                    'cost'           => $data['cost'] ?? null,
+                    'model'          => $data['model'] ?? null,
+                    'provider'       => $data['provider'] ?? null,
+                    'feedback'       => isset($data['feedback']) ? json_encode($data['feedback']) : null,
+                    'created_at'     => now(),
+                ]);
+        } catch (Throwable $e) {
+            // Deliberately broad: a missing table, an unreachable host, or a
+            // json_encode failure on non-UTF-8 input must all be swallowed.
+            $this->markTrackingUnavailable($e);
+        }
     }
 
     /**
      * Get the active version number for a prompt.
+     *
+     * The database wins when it holds a record, so a version activated at
+     * runtime takes precedence over the active_version committed alongside
+     * the prompt files.
      */
     protected function getActiveVersion(string $name): int
     {
         // Check database first if tracking enabled.
-        if ($this->trackingConfig['enabled'] ?? false) {
-            $record = DB::connection($this->trackingConfig['connection'] ?? config('database.default'))
-                ->table('prompt_versions')
-                ->where('name', $name)
-                ->where('is_active', true)
-                ->first();
+        if ($connection = $this->trackingConnection()) {
+            try {
+                $record = $connection
+                    ->table('prompt_versions')
+                    ->where('name', $name)
+                    ->where('is_active', true)
+                    ->orderByDesc('version')
+                    ->first();
 
-            if ($record) {
-                return $record->version;
+                if ($record) {
+                    return (int) $record->version;
+                }
+            } catch (QueryException $e) {
+                // Rendering must survive any database problem, not only a
+                // missing table: serving the version on disk beats not serving
+                // at all. Latched, so this is attempted once per instance.
+                $this->markTrackingUnavailable($e);
             }
         }
 
@@ -242,6 +311,78 @@ class PromptManager
         }
 
         return max(array_column($versions, 'version'));
+    }
+
+    /**
+     * Resolve the connection tracking should write to, or null when tracking
+     * is disabled or the database has already been found unusable.
+     *
+     * Catching Throwable is deliberate: an undefined DECK_DB_CONNECTION throws
+     * InvalidArgumentException from the connection resolver rather than a
+     * QueryException, and is a likely misconfiguration.
+     */
+    protected function trackingConnection(): ?Connection
+    {
+        if (! ($this->trackingConfig['enabled'] ?? false) || $this->trackingUnavailable) {
+            return null;
+        }
+
+        try {
+            return DB::connection($this->trackingConfig['connection'] ?? config('database.default'));
+        } catch (Throwable $e) {
+            $this->markTrackingUnavailable($e);
+
+            return null;
+        }
+    }
+
+    /**
+     * Record that tracking is unusable, warning once for this instance.
+     *
+     * The latch keeps a broken database from being retried on every prompt
+     * load, and doubles as the guard against flooding the log.
+     */
+    protected function markTrackingUnavailable(Throwable $e): void
+    {
+        if ($this->trackingUnavailable) {
+            return;
+        }
+
+        $this->trackingUnavailable = true;
+
+        Log::warning(
+            'Deck tracking is enabled but the tracking database is unavailable. '
+            .'Prompt rendering has fallen back to metadata.json. Publish and run '
+            .'the Deck migrations, or set DECK_TRACKING_ENABLED=false. '
+            .$e->getMessage()
+        );
+    }
+
+    /**
+     * Determine whether a tracking table is genuinely absent, as opposed to
+     * present but erroring for some other reason.
+     */
+    protected function trackingTableMissing(Connection $connection, string $table): bool
+    {
+        try {
+            return ! Schema::connection($connection->getName())->hasTable($table);
+        } catch (Throwable) {
+            // If the schema cannot be inspected either, the database is not in
+            // a usable state — treat it as absent so callers degrade.
+            return true;
+        }
+    }
+
+    /**
+     * Ensure a prompt name is safe to interpolate into a filesystem path.
+     *
+     * @throws InvalidPromptNameException
+     */
+    protected function assertValidName(string $name): void
+    {
+        if (! $this->isValidPromptName($name)) {
+            throw InvalidPromptNameException::named($name);
+        }
     }
 
     /**
