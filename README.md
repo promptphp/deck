@@ -131,12 +131,12 @@ php artisan prompt:list --all
 ```
 
 ```txt
-+---------------+----------------+--------+-------------+
-| Prompt        | Active Version | Active | Description |
-+---------------+----------------+--------+-------------+
-| order-summary | v1             | ✅     |             |
-| order-summary | v2             |        |             |
-+---------------+----------------+--------+-------------+
++---------------------+----------------+--------+------------------------------------------------------+
+| Prompt              | Active Version | Active | Description                                          |
++---------------------+----------------+--------+------------------------------------------------------+
+| order-summary       | v1             | ✅     | Summarises an order for the customer who placed it.  |
+| order-summary       | v2             |        | Summarises an order for the customer who placed it.  |
++---------------------+----------------+--------+------------------------------------------------------+
 ```
 
 Promote the new version when you are ready
