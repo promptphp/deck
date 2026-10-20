@@ -85,7 +85,7 @@ What would you like to do?
 
 With `--force`, the latest version is overwritten without prompting.
 
-See [Creating Prompts](/core/make-prompt) for comprehensive documentation.
+See [Creating prompts](/core/make-prompt) for comprehensive documentation.
 
 ## prompt:list
 
@@ -140,8 +140,8 @@ Output:
 
 ### Notes
 
-- If the prompts directory does not exist, a warning is displayed.
-- If no prompts are found, an informational message is shown.
+- If the prompts directory does not exist, the command displays a warning.
+- If the command finds no prompts, it shows an informational message.
 - Descriptions come from the prompt's root `metadata.json`, and a version may override the shared description in its own `metadata.json`.
 
 ## prompt:activate
@@ -177,12 +177,12 @@ Version 2 of prompt [order-summary] activated.
 
 ### How it works
 
-- **With database tracking enabled**: Updates the `prompt_versions` table — sets `is_active = false` on all versions for that prompt, then `is_active = true` on the specified version.
+- **With database tracking enabled**: Updates the `prompt_versions` table. It sets `is_active = false` on all versions for that prompt, then `is_active = true` on the specified version.
 - **Without tracking**: Writes the `active_version` key to the prompt's root `metadata.json` file.
 
 ### Error handling
 
-If the prompt or version does not exist, an error message is displayed:
+If the prompt or version does not exist, the command displays an error message:
 
 ```
 Version 5 for prompt [order-summary] does not exist.
@@ -335,6 +335,6 @@ php artisan prompt:test order-summary --input="Order #5678 with 3 items"
 ### Notes
 
 - The `--variables` option expects valid JSON. Invalid JSON produces an error: `Invalid JSON for --variables`.
-- Expected variables (from `metadata.json`) are displayed as a hint, if available.
-- Both the rendered system and user prompts are displayed.
+- The command displays expected variables (from `metadata.json`) as a hint, if available.
+- The command displays both the rendered system and user prompts.
 - Unmatched variables remain as placeholders in the output, making it easy to spot missing values.

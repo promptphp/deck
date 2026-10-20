@@ -16,7 +16,7 @@ All of this is entirely optional. Deck works perfectly without the AI SDK.
 
 ## Installation
 
-Deck does **not** require the AI SDK — it's listed as a `suggest` dependency. Install it when you're ready:
+Deck does **not** require the AI SDK. It's listed as a `suggest` dependency. Install it when you're ready:
 
 ```bash
 composer require laravel/ai
@@ -38,7 +38,7 @@ Deck detects the successful command and automatically runs:
 php artisan make:prompt sales-coach
 ```
 
-This creates a versioned prompt directory ready for the agent to use via the `HasPromptTemplate` trait — zero extra setup required.
+This creates a versioned prompt directory ready for the agent to use via the `HasPromptTemplate` trait, with zero extra setup required.
 
 ### How it works
 
@@ -50,7 +50,7 @@ Deck registers a listener (`AfterMakeAgent`) on Laravel's `CommandFinished` even
 4. Checks if the prompt already exists (skips if it does).
 5. Runs `make:prompt` with the derived name.
 
-The listener is only registered when `laravel/ai` is installed. If the prompt creation fails for any reason, it does **not** break the `make:agent` workflow — the agent is still created successfully.
+The listener is only registered when `laravel/ai` is installed. If the prompt creation fails for any reason, it does **not** break the `make:agent` workflow. The agent is still created successfully.
 
 ### Example output
 
@@ -163,7 +163,7 @@ public function promptVersion(): ?int
 }
 ```
 
-Return `null` (the default) to always load the active version — useful for A/B testing and gradual rollouts.
+Return `null` (the default) to always load the active version. This is useful for A/B testing and gradual rollouts.
 
 ### Variable interpolation
 
@@ -415,7 +415,7 @@ The middleware:
 3. Uses the response's `then()` hook to record execution data after the response completes.
 4. Calls `PromptManager::track()` with the collected data.
 
-The middleware only tracks agents that use the `HasPromptTemplate` trait. If the agent doesn't have a `promptName()` method, the tracking is silently skipped.
+The middleware only tracks agents that use the `HasPromptTemplate` trait. If the agent doesn't have a `promptName()` method, the middleware silently skips tracking.
 
 ## Accessing the template directly
 

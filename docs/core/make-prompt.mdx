@@ -28,7 +28,7 @@ resources/prompts/
         └── system.md
 ```
 
-A **system prompt** file is always created. Two `metadata.json` files are written: one at the prompt root recording the prompt's name, description, roles, and creation timestamp, and one inside the version directory recording that version alone.
+The command always creates a **system prompt** file. It also writes two `metadata.json` files. The one at the prompt root records the prompt's name, description, roles, and creation timestamp. The one inside the version directory records that version alone.
 
 ### Interactive mode
 
@@ -38,7 +38,7 @@ Run the command without any arguments to enter a fully interactive flow:
 php artisan make:prompt
 ```
 
-You will be guided through a series of questions:
+The command guides you through a series of questions:
 
 1. **What should the prompt be named?** — Provide a name (automatically converted to kebab-case).
 2. **Briefly describe this prompt (press Enter to skip)** — An optional description stored in `metadata.json`.
@@ -46,8 +46,8 @@ You will be guided through a series of questions:
 4. **Would you like to create prompt files for additional roles?** — Confirm, then enter comma-separated role names (e.g. `assistant, developer`).
 
 <Note>
-    The interactive description and user-prompt questions are only asked when
-    the name argument is omitted. When passing a name directly, use the
+    The command only asks the interactive description and user-prompt questions
+    when you omit the name argument. When passing a name directly, use the
     `--desc`, `--user`, and `--interactive` options instead.
 </Note>
 
@@ -122,7 +122,7 @@ The command writes two metadata files: one at the prompt root describing the pro
 | `variables`   | Reserved for future use (template variable extraction). Never reset once you populate it. |
 | `created_at`  | ISO 8601 timestamp of when the **prompt** was first created.                     |
 
-Any other keys you add by hand are preserved — including `active_version`, so **scaffolding a new version never changes which version your application serves**. When another version is active, the command tells you how to promote the one you just created:
+The command preserves any other keys you add by hand, including `active_version`. **Scaffolding a new version never changes which version your application serves**. When another version is active, the command tells you how to promote the one you just created:
 
 ```
 Version 2 of the [order-summary] prompt has been created successfully with the following roles: system.
@@ -143,13 +143,13 @@ Run `php artisan prompt:activate order-summary v2` to make v2 live.
 }
 ```
 
-Add your own keys here to override prompt-level metadata for a single version — see [Metadata](/core/prompts#metadata) for how the two files merge.
+Add your own keys here to override prompt-level metadata for a single version. See [Metadata](/core/prompts#metadata) for how the two files merge.
 
 ## Roles
 
 ### System role (default)
 
-A `system.md` file is **always** created. This is the primary prompt file and represents the system-level instructions for your AI agent. No flag is needed:
+The command **always** creates a `system.md` file. This is the primary prompt file and represents the system-level instructions for your AI agent. No flag is needed:
 
 ```bash
 php artisan make:prompt code-reviewer
@@ -176,7 +176,7 @@ php artisan make:prompt code-reviewer --user
 # Creates: system.md + user.md
 ```
 
-In the interactive flow (name omitted), you are asked whether to create a user prompt via a confirmation question.
+In the interactive flow (name omitted), the command asks whether to create a user prompt.
 
 The default user prompt stub contains:
 
@@ -218,8 +218,8 @@ php artisan make:prompt code-reviewer -i
 ```
 
 <Note>
-    When `--role` values are provided explicitly, the interactive role prompt is
-    skipped — explicit values always take precedence.
+    When you provide `--role` values explicitly, the command skips the
+    interactive role prompt. Explicit values always take precedence.
 </Note>
 
 All scaffolded roles (including `system` and optionally `user`) are recorded in the `roles` array of `metadata.json`.
@@ -230,7 +230,7 @@ Deck uses directory-based versioning. Each version lives in its own sub-director
 
 ### Auto-increment
 
-When you run the command for a prompt that already has one or more versions, you are presented with a choice:
+When you run the command for a prompt that already has one or more versions, the command presents a choice:
 
 ```bash
 php artisan make:prompt code-reviewer
@@ -257,7 +257,7 @@ In non-interactive environments (CI pipelines, scripts), use `--force` (or `-f`)
 php artisan make:prompt code-reviewer --force
 ```
 
-If version 2 exists, `--force` overwrites `v2/` directly. It will **never** create a new version automatically — its purpose is to regenerate the latest version.
+If version 2 exists, `--force` overwrites `v2/` directly. It **never** creates a new version automatically. Its purpose is to regenerate the latest version.
 
 For brand-new prompts, `--force` has no special effect; `v1/` is created as normal.
 
@@ -288,7 +288,7 @@ your-app/
         └── role-prompt.stub
 ```
 
-Published stubs **always take precedence** over the package defaults. You only need to publish the stubs you want to override — any missing stubs fall back to the package defaults.
+Published stubs **always take precedence** over the package defaults. You only need to publish the stubs you want to override. Any missing stubs fall back to the package defaults.
 
 ### Using a one-off template
 
@@ -346,7 +346,7 @@ php artisan make:prompt email-drafter --user
 php artisan make:prompt email-drafter --role=assistant --role=reviewer
 ```
 
-**Create a prompt with everything — user, roles, and a description:**
+**Create a prompt with everything (user, roles, and a description):**
 
 ```bash
 php artisan make:prompt email-drafter -u --role=assistant --desc="Drafts professional emails"

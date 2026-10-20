@@ -92,7 +92,7 @@ $prompt = Deck::get('order-summary', 'v2');
 
 ### Laravel AI SDK integration
 
-If you use the [Laravel AI SDK](https://laravel.com/docs/ai-sdk), add the `HasPromptTemplate` trait to your agents. This way, you do not need to define the `instructions()` method as it is provided automatically.
+If you use the [Laravel AI SDK](https://laravel.com/docs/ai-sdk), add the `HasPromptTemplate` trait to your agents. The trait provides the `instructions()` method, so you don't need to define it.
 
 ```php
 use PromptPHP\Deck\Concerns\HasPromptTemplate;
@@ -105,7 +105,7 @@ class OrderAgent extends Agent
 }
 ```
 
-Running `make:agent` will also auto-scaffold a matching prompt directory.
+Running `make:agent` also auto-scaffolds a matching prompt directory.
 
 ## Key features
 
@@ -139,8 +139,8 @@ Running `make:agent` will also auto-scaffold a matching prompt directory.
         other chat-completion APIs.
     </Card>
     <Card title="Laravel AI SDK" icon="robot" href="/integrations/ai-sdk">
-        First-class integration with Laravel AI SDK — auto-scaffolding, traits,
-        and middleware.
+        First-class integration with Laravel AI SDK, including auto-scaffolding,
+        traits, and middleware.
     </Card>
     <Card
         title="Performance tracking"
