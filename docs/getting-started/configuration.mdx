@@ -5,7 +5,7 @@ description: "Set the Deck prompts path, file extension, versioning strategy, ca
 
 ## Introduction
 
-Deck by PromptPHP ships with sensible defaults that work out of the box. Like most Laravel packages, all configuration lives in `config/deck.php` and every option can be overridden via environment variables for deployment flexibility.
+Deck by PromptPHP ships with sensible defaults that work out of the box. Like most Laravel packages, Deck keeps all configuration in `config/deck.php`. You can override every option with environment variables for deployment flexibility.
 
 ## Publishing the configuration
 
@@ -51,8 +51,8 @@ Markdown (`.md`) is the default and recommended for readability. You can change 
 | `prompt`    | `system.prompt`, `user.prompt`       |
 
 <Note>
-    Changing the extension only affects newly generated files. Existing prompt
-    files are not renamed automatically.
+    Changing the extension only affects newly generated files. Deck doesn't
+    rename existing prompt files.
 </Note>
 
 ## Versioning strategy
@@ -177,11 +177,11 @@ Tracking is **off by default**, because it needs database tables that are publis
 
 When enabled:
 
-- **Version activation** is recorded in the `prompt_versions` table *as well as* `metadata.json`, and the table takes precedence. See [Tracking — Activation precedence](/advanced/tracking#activation-precedence).
+- **Version activation** is recorded in the `prompt_versions` table *as well as* `metadata.json`, and the table takes precedence. See [Activation precedence](/advanced/tracking#activation-precedence).
 - **Execution tracking** via `Deck::track()` inserts records into the `prompt_executions` table.
 
 <Note>
-  Prompt rendering never depends on tracking. If the tables are missing or the database is unreachable, Deck falls back to `metadata.json` and logs a warning once, rather than failing. `Deck::track()` never throws at all — it runs after a completed AI call, and no analytics failure is worth discarding that response.
+  Prompt rendering never depends on tracking. If the tables are missing or the database is unreachable, Deck falls back to `metadata.json` and logs a warning once, rather than failing. `Deck::track()` never throws at all. It runs after a completed AI call, and no analytics failure is worth discarding that response.
 </Note>
 
 ### Database connection
@@ -202,7 +202,7 @@ DECK_DB_CONNECTION=analytics
 'scaffold_on_make_agent' => env('DECK_SCAFFOLD_ON_MAKE_AGENT', true),
 ```
 
-When the [Laravel AI SDK](https://laravel.com/docs/ai-sdk) is installed and this option is `true`, Deck automatically creates a matching prompt directory whenever you run `php artisan make:agent`. See the [AI SDK Integration](/integrations/ai-sdk) documentation for details.
+When the [Laravel AI SDK](https://laravel.com/docs/ai-sdk) is installed and this option is `true`, Deck automatically creates a matching prompt directory whenever you run `php artisan make:agent`. See the [Laravel AI SDK integration](/integrations/ai-sdk) documentation for details.
 
 Set to `false` to disable automatic scaffolding:
 

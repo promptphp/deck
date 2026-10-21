@@ -5,7 +5,7 @@ description: "Load, render, version, cache, and track AI prompts in your Laravel
 
 ## Introduction
 
-Deck by PromptPHP provides a clean, expressive API for loading, rendering, and managing versioned AI prompts in your Laravel application. Prompts are stored as plain files on disk and organised by name, version, and role. They are accessed through the `Deck` facade.
+Deck by PromptPHP provides a clean, expressive API for loading, rendering, and managing versioned AI prompts in your Laravel application. Deck stores prompts as plain files on disk and organises them by name, version, and role. You access them through the `Deck` facade.
 
 A prompt can contain multiple **roles** (system, user, assistant, developer, tool, or any custom role you define). Each role's content supports `{{ $variable }}` interpolation, and the entire prompt can be converted into a messages array ready to send to OpenAI, Anthropic, or any chat-completion API.
 
@@ -37,11 +37,11 @@ $prompt = Deck::get('order-summary');
 $prompt = Deck::get('order-summary', 2);
 ```
 
-The `get` method returns a `PromptTemplate` instance. If no version is specified, the [active version](#version-resolution-order) is resolved automatically.
+The `get` method returns a `PromptTemplate` instance. If you don't specify a version, Deck resolves the [active version](#version-resolution-order) automatically.
 
 ### Prompt names
 
-A prompt name becomes a directory path, so names are validated before they are resolved. They may contain letters, numbers, dots, dashes, and underscores, and may not begin with a dot. Anything else — most importantly a name containing `/`, `\`, or `..` — throws `InvalidPromptNameException`.
+A prompt name becomes a directory path, so Deck validates names before resolving them. Names may contain letters, numbers, dots, dashes, and underscores, and may not begin with a dot. Anything else throws `InvalidPromptNameException`, most importantly a name containing `/`, `\`, or `..`.
 
 ```php
 Deck::get('order-summary');      // fine
@@ -94,7 +94,7 @@ $prompt = Deck::get('order-summary', 1);
 $prompt->version(); // 1
 ```
 
-If the version does not exist, an `InvalidVersionException` is thrown.
+If the version does not exist, Deck throws an `InvalidVersionException`.
 
 ## Rendering roles
 
@@ -102,7 +102,7 @@ Once you have a `PromptTemplate` instance, you can render any role's content wit
 
 ### Dynamic role methods
 
-The most expressive way to render a role is to call it as a method directly on the prompt instance. This uses PHP's `__call` magic method and works for **any** role — not just `system` and `user`:
+The most expressive way to render a role is to call it as a method directly on the prompt instance. This uses PHP's `__call` magic method and works for **any** role, not just `system` and `user`:
 
 ```php
 $prompt = Deck::get('code-reviewer');
@@ -119,7 +119,7 @@ $prompt->developer(['task' => 'review']);
 $prompt->tool(['name' => 'search']);
 ```
 
-When called without arguments, the content is returned with placeholders left intact:
+When you call it without arguments, it returns the content with placeholders left intact:
 
 ```php
 $prompt->system(); // "You are a {{ $tone }} AI assistant..."
@@ -135,7 +135,7 @@ $roleName = 'assistant';
 $content = $prompt->role($roleName, ['context' => $history]);
 ```
 
-This is functionally identical to the magic method approach. If the role does not exist, an empty string is returned.
+This is functionally identical to the magic method approach. If the role does not exist, it returns an empty string.
 
 ### Raw content
 
@@ -159,7 +159,7 @@ $prompt->roles();
 // ['system', 'user', 'assistant']
 ```
 
-Roles are discovered automatically from the files in the version directory. Any file matching the configured extension (e.g. `.md`) becomes a role — the filename (without extension) is the role name.
+Roles are discovered automatically from the files in the version directory. Any file matching the configured extension (e.g. `.md`) becomes a role. The filename (without extension) is the role name.
 
 ### Checking for a role
 
@@ -175,8 +175,8 @@ if ($prompt->has('assistant')) {
 
 Metadata comes from two files, and `metadata` returns them merged:
 
-1. The prompt's root `metadata.json` — shared by every version (name, description, and anything else you record there).
-2. The version's own `v{n}/metadata.json` — specific to that one version.
+1. The prompt's root `metadata.json`, shared by every version (name, description, and anything else you record there).
+2. The version's own `v{n}/metadata.json`, specific to that one version.
 
 Version-level keys win when both files define the same key, so a version can override the shared description without affecting its siblings.
 
@@ -185,7 +185,7 @@ $prompt->metadata();
 // ['description' => 'Summarises customer orders', 'variables' => ['tone', 'input'], ...]
 ```
 
-Metadata is an associative array. If neither file exists, an empty array is returned.
+Metadata is an associative array. If neither file exists, `metadata` returns an empty array.
 
 <Note>
   The `active_version` key is never included. It records which version your application serves, which is routing state rather than metadata about the template you loaded. Read it with `Deck::active()` instead.
@@ -217,7 +217,7 @@ $messages = Deck::get('chat-agent')->toMessages([
 // ]
 ```
 
-This array can be passed directly to any AI API client:
+You can pass this array directly to any AI API client:
 
 ```php
 // OpenAI
@@ -342,7 +342,7 @@ Or use the Artisan command:
 php artisan prompt:list --all
 ```
 
-See [Artisan Commands — prompt:list](/core/commands#promptlist) for details.
+See [`prompt:list`](/core/commands#promptlist) for details.
 
 ### Activating a version
 
@@ -353,9 +353,9 @@ Deck::activate('order-summary', 2);
 Deck::activate('order-summary', 'v2');
 ```
 
-The version accepts the same formats as `Deck::get()` — `2`, `'2'`, and `'v2'` are equivalent. Anything that cannot be parsed throws `InvalidVersionException`.
+The version accepts the same formats as `Deck::get()`, so `2`, `'2'`, and `'v2'` are equivalent. Anything that cannot be parsed throws `InvalidVersionException`.
 
-**When database tracking is enabled**, this updates the `prompt_versions` table — setting `is_active = false` on all versions of that prompt, then `is_active = true` on the specified version.
+**When database tracking is enabled**, this updates the `prompt_versions` table. It sets `is_active = false` on all versions of that prompt, then `is_active = true` on the specified version.
 
 **When tracking is disabled**, it writes the `active_version` key to the prompt's root `metadata.json` file.
 
@@ -369,17 +369,17 @@ php artisan prompt:activate order-summary 2
 php artisan prompt:activate order-summary v2
 ```
 
-See [Artisan Commands — prompt:activate](/core/commands#promptactivate) for details.
+See [`prompt:activate`](/core/commands#promptactivate) for details.
 
 ### Version resolution order
 
-When you call `Deck::get('name')` without a version, the active version is resolved in this priority order:
+When you call `Deck::get('name')` without a version, Deck resolves the active version in this priority order:
 
 1. **Database** — If tracking is enabled, looks for a version marked `is_active = true` in the `prompt_versions` table for that prompt name.
 2. **metadata.json** — Reads the `active_version` key from the prompt's root `metadata.json` file.
 3. **Highest version** — Falls back to the highest version number found on disk (e.g. if `v1/` and `v3/` exist, version 3 is used).
 
-If no versions exist at all, an `InvalidVersionException` is thrown.
+If no versions exist at all, Deck throws an `InvalidVersionException`.
 
 ## Caching
 
@@ -399,7 +399,7 @@ The cache key follows the pattern `{prefix}{name}.v{version}`. Prompts are cache
 
 Caching is automatically **disabled** when `APP_DEBUG=true` to ensure file changes are picked up immediately during development.
 
-See [Configuration — Cache](/getting-started/configuration#cache) for the full reference.
+See [Cache configuration](/getting-started/configuration#cache) for the full reference.
 
 ## Execution tracking
 
@@ -418,14 +418,14 @@ Deck::track('order-summary', 2, [
 ]);
 ```
 
-All fields in the data array are optional. Records are inserted into the `prompt_executions` table. If tracking is disabled, the `track` method is a safe no-op.
+All fields in the data array are optional. Deck inserts records into the `prompt_executions` table. If tracking is disabled, the `track` method is a safe no-op.
 
-See [Tracking & Performance](/advanced/tracking) for comprehensive documentation on the tracking system, database schema, and Eloquent models.
+See [Tracking & performance](/advanced/tracking) for comprehensive documentation on the tracking system, database schema, and Eloquent models.
 
 <Tip>
     When using the [Laravel AI SDK integration](/integrations/ai-sdk), the
-    `TrackPromptMiddleware` handles execution tracking automatically — no manual
-    `track()` calls needed.
+    `TrackPromptMiddleware` handles execution tracking automatically. You don't need
+    manual `track()` calls.
 </Tip>
 
 ## Serialisation

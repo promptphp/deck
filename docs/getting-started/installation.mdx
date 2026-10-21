@@ -13,9 +13,9 @@ Deck by PromptPHP has the following requirements:
 | Laravel    | `^11.0` ++ |
 
 <Note>
-    The `sebastian/diff` package is required and is used for the `prompt:diff`
-    command. It may conflict with your PHPUnit/Pest PHP installation so you may
-    need to upgrade these dependencies to the latest version.
+    Deck requires the `sebastian/diff` package for the `prompt:diff` command.
+    It may conflict with your PHPUnit/Pest PHP installation. If it does,
+    upgrade these dependencies to the latest version.
 </Note>
 
 ### Optional dependencies
@@ -65,9 +65,9 @@ This creates two tables:
 | `prompt_executions` | Logs individual prompt executions with tokens, latency, cost, and feedback data. |
 
 <Note>
-    Database tracking is optional. Deck works fully without it as version
+    Database tracking is optional. Deck works fully without it. Version
     activation falls back to `metadata.json` files, and execution tracking is
-    simply disabled.
+    disabled.
 </Note>
 
 If you prefer, you may publish both the configuration and migration files by running a single command:
@@ -95,7 +95,7 @@ DECK_DB_CONNECTION=              # Database connection name (null for default)
 DECK_SCAFFOLD_ON_MAKE_AGENT=true # Auto-create prompt when running `make:agent`
 ```
 
-All environment variables are optional as sensible defaults are provided.
+All environment variables are optional because Deck provides sensible defaults.
 
 ## Verifying the installation
 
@@ -116,7 +116,7 @@ You should see the scaffolded prompt structure in `resources/prompts/hello-world
 
 ## Manual discovery
 
-The package uses Laravel's auto-discovery, so the service provider and facade are registered automatically. No manual registration is needed.
+The package uses Laravel's auto-discovery, so Laravel registers the service provider and facade automatically. You don't need to register them manually.
 
 If you have disabled auto-discovery, add the provider and facade to your `bootstrap/providers.php` (Laravel 11+) or `config/app.php`:
 

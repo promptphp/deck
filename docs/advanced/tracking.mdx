@@ -17,7 +17,7 @@ Deck by PromptPHP includes an optional database tracking system that logs prompt
 Tracking is entirely optional and **off by default**. Deck works fully without it.
 
 <Note>
-  Prompt rendering never depends on tracking. If you enable it without running the migrations, or the database becomes unreachable, Deck falls back to `metadata.json` and logs a warning once rather than failing. `Deck::track()` never throws under any circumstances — it runs after a completed, paid-for AI call.
+  Prompt rendering never depends on tracking. If you enable it without running the migrations, or the database becomes unreachable, Deck falls back to `metadata.json` and logs a warning once rather than failing. `Deck::track()` never throws under any circumstances, because it runs after a completed, paid-for AI call.
 </Note>
 
 ## Setup
@@ -141,11 +141,11 @@ Deck::track('order-summary', 2, [
 ]);
 ```
 
-If tracking is disabled in configuration, the `track()` method is a safe no-op — you can call it without checking configuration first.
+If tracking is disabled in configuration, the `track()` method is a safe no-op. You can call it without checking configuration first.
 
 ### Automatic tracking via middleware
 
-When using the [Laravel AI SDK integration](/integrations/ai-sdk), the `TrackPromptMiddleware` handles tracking automatically. See [AI SDK — Performance Tracking Middleware](/integrations/ai-sdk#performance-tracking-middleware) for setup details.
+When using the [Laravel AI SDK integration](/integrations/ai-sdk), the `TrackPromptMiddleware` handles tracking automatically. See [Performance tracking middleware](/integrations/ai-sdk#performance-tracking-middleware) for setup details.
 
 ### Tracked fields
 
@@ -387,12 +387,12 @@ When tracking is enabled, `Deck::activate()` and `prompt:activate` record the ac
 
 Once a version has been activated with tracking enabled, **the database wins**. `metadata.json` is consulted only when the table holds no record for that prompt.
 
-The practical consequence: editing `active_version` in `metadata.json`, committing it, and deploying **will not change which version is served**. Activation is environment state — it is how you promote a version in staging without touching production, and how you roll back without a deploy. The file is the bootstrap default, used until the first activation in that environment.
+The practical consequence: editing `active_version` in `metadata.json`, committing it, and deploying **will not change which version is served**. Activation is environment state. It is how you promote a version in staging without touching production, and how you roll back without a deploy. The file is the bootstrap default, used until the first activation in that environment.
 
 To go back to file-based control for a prompt, delete its rows from `prompt_versions`.
 
 <Note>
-  The table only ever holds versions that have been **activated**. It is not a mirror of your prompt library — a version you have created but never activated has no row. The `system_prompt` and `user_prompt` columns are nullable and are written as `NULL`: Deck is file-based, and content lives on disk.
+  The table only ever holds versions that have been **activated**. It is not a mirror of your prompt library. A version you have created but never activated has no row. The `system_prompt` and `user_prompt` columns are nullable, and Deck writes them as `NULL` because content lives on disk.
 </Note>
 
 ```php
