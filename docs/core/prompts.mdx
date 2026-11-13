@@ -355,7 +355,7 @@ Deck::activate('order-summary', 'v2');
 
 The version accepts the same formats as `Deck::get()`, so `2`, `'2'`, and `'v2'` are equivalent. Anything that cannot be parsed throws `InvalidVersionException`.
 
-**When database tracking is enabled**, this updates the `prompt_versions` table. It sets `is_active = false` on all versions of that prompt, then `is_active = true` on the specified version.
+**When database tracking is enabled**, this records the version in the `prompt_versions` table. It sets `is_active = false` on all versions of that prompt, then marks the specified version active, inserting a row if that version has not been activated before. It also writes the `active_version` key to `metadata.json`.
 
 **When tracking is disabled**, it writes the `active_version` key to the prompt's root `metadata.json` file.
 

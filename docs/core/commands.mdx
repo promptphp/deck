@@ -177,7 +177,7 @@ Version 2 of prompt [order-summary] activated.
 
 ### How it works
 
-- **With database tracking enabled**: Updates the `prompt_versions` table. It sets `is_active = false` on all versions for that prompt, then `is_active = true` on the specified version.
+- **With database tracking enabled**: Records the version in the `prompt_versions` table. It sets `is_active = false` on all versions for that prompt, then marks the specified version active, inserting a row if that version has not been activated before. It also writes the `active_version` key to `metadata.json`.
 - **Without tracking**: Writes the `active_version` key to the prompt's root `metadata.json` file.
 
 ### Error handling
