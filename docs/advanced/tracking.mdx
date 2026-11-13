@@ -68,7 +68,7 @@ Stores prompt version records and tracks which version is active.
 | `name`          | `string`       | No       | The prompt name (e.g. `order-summary`).                       |
 | `version`       | `unsigned int` | No       | The version number (e.g. `1`, `2`, `3`).                      |
 | `system_prompt` | `text`         | Yes      | The system prompt content.                                    |
-| `user_prompt`   | `text`         | No       | The user prompt content.                                      |
+| `user_prompt`   | `text`         | Yes      | The user prompt content.                                      |
 | `metadata`      | `json`         | Yes      | Version metadata as JSON.                                     |
 | `is_active`     | `boolean`      | No       | Whether this version is the active version. Default: `false`. |
 | `created_at`    | `timestamp`    | Yes      | Creation timestamp.                                           |

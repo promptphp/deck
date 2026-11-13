@@ -35,7 +35,7 @@ Load a prompt by name and optional version. Accepts `2`, `'2'`, or `'v2'`. If ve
 
 Caches the loaded prompt if caching is enabled.
 
-**Throws:** `PromptNotFoundException` if the prompt does not exist. `InvalidVersionException` if the specified version does not exist.
+**Throws:** `InvalidPromptNameException` if the name is not a valid prompt name. `PromptNotFoundException` if the prompt does not exist. `InvalidVersionException` if the specified version does not exist.
 
 ```php
 $prompt = $manager->get('order-summary');       // active version
@@ -70,7 +70,7 @@ Activate a specific version of a prompt. Returns `true` on success.
 
 Accepts the same version formats as `get()`, so `2`, `'2'`, and `'v2'` are equivalent. A version that cannot be parsed throws `InvalidVersionException`.
 
-- **With tracking enabled:** Updates the `prompt_versions` database table.
+- **With tracking enabled:** Records the version as active in the `prompt_versions` table, inserting a row if the version has not been activated before, and also writes `metadata.json`.
 - **Without tracking:** Writes to `metadata.json` in the prompt directory.
 
 ```php
@@ -316,7 +316,7 @@ Handle the `CommandFinished` event. Only acts on successful `make:agent` command
 | `name`          | `string`       | —         | Prompt name.                        |
 | `version`       | `int`          | `integer` | Version number.                     |
 | `system_prompt` | `string\|null` | —         | System prompt content.              |
-| `user_prompt`   | `string`       | —         | User prompt content.                |
+| `user_prompt`   | `string\|null` | —         | User prompt content.                |
 | `metadata`      | `array\|null`  | `array`   | Version metadata.                   |
 | `is_active`     | `bool`         | `boolean` | Whether this is the active version. |
 
@@ -365,10 +365,21 @@ Thrown when a prompt directory does not exist.
 
 Thrown when a requested version does not exist or no versions are found.
 
-| Factory Method                                | Description                                                                               |
-| --------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `forPrompt(string $name, int $version): self` | Creates exception with message: `"Version {version} for prompt [{name}] does not exist."` |
-| `noVersions(string $name): self`              | Creates exception with message: `"No versions found for prompt [{name}]."`                |
+| Factory Method                                              | Description                                                                                                         |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `forPrompt(string $name, ?int $version): self`              | Creates exception with message: `"Version {version} for prompt [{name}] does not exist."`                           |
+| `noVersions(string $name): self`                            | Creates exception with message: `"No versions found for prompt [{name}]."`                                          |
+| `unparseable(string $name, string\|int $version): self`     | Creates exception with message: `"Invalid version [{version}] for prompt [{name}]. Use a positive number like [1] or [v1]."` |
+
+### InvalidPromptNameException
+
+`PromptPHP\Deck\Exceptions\InvalidPromptNameException`
+
+Thrown when a prompt name contains characters other than letters, numbers, dots, dashes, and underscores, or begins with a dot.
+
+| Factory Method              | Description                                                                                                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `named(string $name): self` | Creates exception with message: `"Prompt name [{name}] is not valid. Names may contain letters, numbers, dots, dashes, and underscores, and may not begin with a dot."` |
 
 ### ConfigurationException
 

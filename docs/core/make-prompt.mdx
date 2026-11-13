@@ -315,6 +315,8 @@ All prompt names are automatically converted to **kebab-case** for consistent di
 
 This normalisation applies to both the prompt name and any extra role names provided via `--role`.
 
+After normalisation, the prompt name must contain only letters, numbers, dots, dashes, and underscores, and may not begin with a dot. Directory separators are not converted, so a name such as `Support/Reply` fails with an error instead of creating a nested prompt.
+
 ## Configuration
 
 The command respects the following values from `config/deck.php`:
